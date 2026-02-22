@@ -24,197 +24,7 @@ import "antd/dist/reset.css";
 
 const { Sider, Content } = Layout;
 const { Title, Text } = Typography;
-import quotedPrintable from "quoted-printable";
-import utf8 from "utf8";
-
-// Extraire et normaliser la photo en data URL utilisable dans <img src="...">
-function getPhoto(card) {
-  try {
-    console.log("PHOTO raw:", JSON.stringify(card.photo, null, 2));
-    const prop = card.photo?.[0];
-    if (!prop) return null;
-
-    const value = prop.value || "";
-    const meta = prop.meta || {};
-
-    const encoding = (
-      meta.encoding?.[0] ||
-      meta.ENCODING?.[0] ||
-      ""
-    ).toLowerCase();
-    const type = (meta.type?.[0] || meta.TYPE?.[0] || "jpeg").toLowerCase();
-    const valueParam = (meta.value?.[0] || meta.VALUE?.[0] || "").toLowerCase();
-
-    // --- CAS 1 : data URI déjà formé (vCard 4.0) ---
-    if (typeof value === "string" && value.startsWith("data:")) {
-      return value;
-    }
-
-    // --- CAS 2 : ENCODING=BASE64 ou b (vCard 2.1 / 3.0) ---
-    if (encoding === "base64" || encoding === "b") {
-      const cleaned = value.replace(/\s+/g, "");
-      if (!cleaned) return null;
-      const mimeType = type === "jpg" ? "jpeg" : type;
-      return `data:image/${mimeType};base64,${cleaned}`;
-    }
-
-    // --- CAS 3 : URL externe accessible publiquement ---
-    if (
-      typeof value === "string" &&
-      (value.startsWith("http://") || value.startsWith("https://"))
-    ) {
-      // Rejeter les URLs privées connues (iCloud, etc.)
-      const privateHosts = [
-        "icloud.com",
-        "p18-contacts.icloud.com",
-        "contacts.icloud.com",
-        "me.com",
-      ];
-      const isPrivate = privateHosts.some((host) => value.includes(host));
-      if (isPrivate) return null; // ← on ignore silencieusement
-
-      return value;
-    }
-
-    // --- CAS 4 : VALUE=URI avec URL ---
-    if (
-      valueParam === "uri" &&
-      typeof value === "string" &&
-      value.startsWith("http")
-    ) {
-      const privateHosts = ["icloud.com", "me.com"];
-      const isPrivate = privateHosts.some((host) => value.includes(host));
-      if (isPrivate) return null;
-      return value;
-    }
-
-    // --- CAS 5 : fallback base64 brut ---
-    if (
-      typeof value === "string" &&
-      value.length > 100 &&
-      /^[A-Za-z0-9+/=\s]+$/.test(value)
-    ) {
-      const cleaned = value.replace(/\s+/g, "");
-      const mimeType = type === "jpg" ? "jpeg" : type || "jpeg";
-      return `data:image/${mimeType};base64,${cleaned}`;
-    }
-
-    return null;
-  } catch (e) {
-    console.warn("Erreur getPhoto:", e);
-    return null; // jamais de crash — on retourne null silencieusement
-  }
-}
-
-function decodeQP(value, meta) {
-  try {
-    const encoding = meta?.encoding?.[0] || meta?.ENCODING?.[0] || "";
-    const charset = meta?.charset?.[0] || meta?.CHARSET?.[0] || "UTF-8";
-
-    if (encoding.toUpperCase() !== "QUOTED-PRINTABLE") return value;
-
-    // Rejoindre les soft line breaks (= en fin de ligne)
-    const joined = value.replace(/=\r\n/g, "").replace(/=\n/g, "");
-
-    const decoded = quotedPrintable.decode(joined);
-
-    // Décoder selon le charset
-    if (charset.toUpperCase() === "UTF-8") {
-      return utf8.decode(decoded);
-    }
-    return decoded;
-  } catch (e) {
-    console.warn("Erreur QP decode:", e);
-    return value;
-  }
-}
-
-// Helper pour extraire une valeur string d'un champ, avec décodage QP
-function getStr(card, field) {
-  const prop = card[field]?.[0];
-  if (!prop) return "";
-  const val = Array.isArray(prop.value)
-    ? prop.value.filter(Boolean).join(" ")
-    : prop.value || "";
-  return decodeQP(val, prop.meta);
-}
-
-// Helper pour extraire tous les champs d'un type (TEL, EMAIL, ADR...)
-function getAll(card, field) {
-  const props = card[field] || [];
-  return props.map((p) => {
-    const type = p.meta?.type?.[0] || p.meta?.TYPE?.[0] || field;
-
-    if (Array.isArray(p.value)) {
-      return {
-        type,
-        value: p.value.map((part) => decodeQP(part || "", p.meta)),
-        raw: p.value,
-      };
-    }
-
-    // ← si value est une string, on la met dans un tableau
-    return {
-      type,
-      value: decodeQP(p.value || "", p.meta),
-      raw: typeof p.value === "string" ? p.value.split(";") : [],
-    };
-  });
-}
-// vcard-parser retourne un objet pour UNE seule vCard
-// Pour plusieurs vCards dans un fichier, on doit splitter manuellement
-function splitAndParse(raw) {
-  // Unfold les lignes repliées (ligne suivante commence par espace)
-  const unfolded = raw.replace(/\r\n[ \t]/g, "").replace(/\n[ \t]/g, "");
-
-  // Extraire chaque bloc BEGIN:VCARD...END:VCARD
-  const blocks = [];
-  const regex = /BEGIN:VCARD[\s\S]*?END:VCARD/gi;
-  let match;
-  while ((match = regex.exec(unfolded)) !== null) {
-    blocks.push(match[0]);
-  }
-
-  return blocks.map((block, i) => {
-    try {
-      const card = vCard.parse(block);
-
-      const nParts = (card.n?.[0]?.value || []).map((part, i) =>
-        decodeQP(part, card.n[0].meta),
-      );
-
-      return {
-        id: i,
-        fn: getStr(card, "fn") || `Contact ${i + 1}`,
-        firstName: nParts[1] || "",
-        lastName: nParts[0] || "",
-        middleName: nParts[2] || "",
-        prefix: nParts[3] || "",
-        suffix: nParts[4] || "",
-        org: getStr(card, "org"),
-        title: getStr(card, "title"),
-        tel: getAll(card, "tel"),
-        email: getAll(card, "email"),
-        adr: getAll(card, "adr"),
-        note: getStr(card, "note"),
-        url: getStr(card, "url"),
-        bday: getStr(card, "bday"),
-        photo: getPhoto(card),
-        gender: getStr(card, "gender"),
-        tz: getStr(card, "tz"),
-      };
-    } catch (e) {
-      console.error(`Erreur parsing contact ${i}:`, e);
-      return {
-        id: i,
-        fn: `Contact ${i + 1} (erreur)`,
-        tel: [],
-        email: [],
-        adr: [],
-      };
-    }
-  });
-}
+import { splitAndParse, formatAdr } from "./utils/vcard";
 
 const TYPE_COLORS = {
   home: "blue",
@@ -351,17 +161,6 @@ export default function App() {
 }
 
 function ContactDetail({ contact }) {
-  // Formater l'adresse depuis les parties ADR
-  function formatAdr(parts) {
-    // Sécurité — si parts n'est pas un tableau, on retourne la valeur brute
-    if (!parts) return "";
-    if (!Array.isArray(parts)) return String(parts);
-
-    // [pobox, ext, street, city, state, zip, country]
-    const [, , street, city, state, zip, country] = parts;
-    return [street, city, state, zip, country].filter(Boolean).join(", ");
-  }
-
   return (
     <div style={{ maxWidth: 650 }}>
       {/* En-tête */}
@@ -443,7 +242,7 @@ function ContactDetail({ contact }) {
           {contact.adr.map((a, i) => (
             <div key={i} style={{ marginBottom: 6 }}>
               <Tag color={typeColor(a.type)}>{a.type}</Tag>
-              <Text>{Array.isArray(a.raw) ? formatAdr(a.raw) : a.value}</Text>
+              <Text>{formatAdr(a.raw)}</Text>
             </div>
           ))}
         </Section>
