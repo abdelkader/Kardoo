@@ -7,7 +7,64 @@ import 'antd/dist/reset.css'
 
 const { Sider, Content } = Layout
 const { Title, Text } = Typography
+import quotedPrintable from 'quoted-printable'
+import utf8 from 'utf8'
 
+function decodeQP(value, meta) {
+  try {
+    const encoding = meta?.encoding?.[0] || meta?.ENCODING?.[0] || ''
+    const charset = meta?.charset?.[0] || meta?.CHARSET?.[0] || 'UTF-8'
+
+    if (encoding.toUpperCase() !== 'QUOTED-PRINTABLE') return value
+
+    // Rejoindre les soft line breaks (= en fin de ligne)
+    const joined = value.replace(/=\r\n/g, '').replace(/=\n/g, '')
+
+    const decoded = quotedPrintable.decode(joined)
+
+    // Décoder selon le charset
+    if (charset.toUpperCase() === 'UTF-8') {
+      return utf8.decode(decoded)
+    }
+    return decoded
+  } catch (e) {
+    console.warn('Erreur QP decode:', e)
+    return value
+  }
+}
+
+// Helper pour extraire une valeur string d'un champ, avec décodage QP
+function getStr(card, field) {
+  const prop = card[field]?.[0]
+  if (!prop) return ''
+  const val = Array.isArray(prop.value)
+    ? prop.value.filter(Boolean).join(' ')
+    : prop.value || ''
+  return decodeQP(val, prop.meta)
+}
+
+// Helper pour extraire tous les champs d'un type (TEL, EMAIL, ADR...)
+function getAll(card, field) {
+  const props = card[field] || []
+  return props.map(p => {
+    const type = p.meta?.type?.[0] || p.meta?.TYPE?.[0] || field
+
+    // Pour ADR, value est un tableau de parties
+    if (Array.isArray(p.value)) {
+      return {
+        type,
+        value: p.value.map(part => decodeQP(part, p.meta)),
+        raw: p.value,
+      }
+    }
+
+    return {
+      type,
+      value: decodeQP(p.value || '', p.meta),
+      raw: p.value,
+    }
+  })
+}
 // vcard-parser retourne un objet pour UNE seule vCard
 // Pour plusieurs vCards dans un fichier, on doit splitter manuellement
 function splitAndParse(raw) {
@@ -26,48 +83,29 @@ function splitAndParse(raw) {
     try {
       const card = vCard.parse(block)
 
-      // Helpers pour extraire proprement les valeurs
-      const getStr = (field) => card[field]?.[0]?.value || ''
-      const getArr = (field) => card[field] || []
+const nParts = (card.n?.[0]?.value || []).map(
+  (part, i) => decodeQP(part, card.n[0].meta)
+)
 
-      // N : [famille, prénom, additional, prefix, suffix]
-      const nParts = card.n?.[0]?.value || []
-
-      // ADR : [pobox, ext, street, city, state, zip, country]
-      const addresses = getArr('adr').map(a => ({
-        type: a.meta?.type?.[0] || 'Adresse',
-        parts: Array.isArray(a.value) ? a.value : [a.value],
-      }))
-
-      const tels = getArr('tel').map(t => ({
-        type: t.meta?.type?.[0] || 'Tel',
-        value: t.value,
-      }))
-
-      const emails = getArr('email').map(e => ({
-        type: e.meta?.type?.[0] || 'Email',
-        value: e.value,
-      }))
-
-      return {
-        id: i,
-        fn: getStr('fn') || `Contact ${i + 1}`,
-        firstName: nParts[1] || '',
-        lastName: nParts[0] || '',
-        middleName: nParts[2] || '',
-        prefix: nParts[3] || '',
-        suffix: nParts[4] || '',
-        org: getStr('org'),
-        title: getStr('title'),
-        tel: tels,
-        email: emails,
-        adr: addresses,
-        note: getStr('note'),
-        url: getStr('url'),
-        bday: getStr('bday'),
-        gender: getStr('gender'),
-        tz: getStr('tz'),
-      }
+return {
+  id: i,
+  fn: getStr(card, 'fn') || `Contact ${i + 1}`,
+  firstName: nParts[1] || '',
+  lastName: nParts[0] || '',
+  middleName: nParts[2] || '',
+  prefix: nParts[3] || '',
+  suffix: nParts[4] || '',
+  org: getStr(card, 'org'),
+  title: getStr(card, 'title'),
+  tel: getAll(card, 'tel'),
+  email: getAll(card, 'email'),
+  adr: getAll(card, 'adr'),
+  note: getStr(card, 'note'),
+  url: getStr(card, 'url'),
+  bday: getStr(card, 'bday'),
+  gender: getStr(card, 'gender'),
+  tz: getStr(card, 'tz'),
+}
     } catch (e) {
       console.error(`Erreur parsing contact ${i}:`, e)
       return { id: i, fn: `Contact ${i + 1} (erreur)`, tel: [], email: [], adr: [] }
@@ -139,29 +177,38 @@ export default function App() {
           ? <Empty description="Aucun contact" style={{ marginTop: 40 }} />
           : (
             <List
-              dataSource={filtered}
-              renderItem={(c) => (
-                <List.Item
-                  onClick={() => setSelected(c)}
-                  style={{
-                    padding: '10px 16px',
-                    cursor: 'pointer',
-                    background: selected?.id === c.id ? '#e6f4ff' : 'transparent',
-                    borderLeft: selected?.id === c.id ? '3px solid #1677ff' : '3px solid transparent',
-                  }}
-                >
-                  <List.Item.Meta
-                    avatar={<Avatar icon={<UserOutlined />} style={{ backgroundColor: '#1677ff' }} />}
-                    title={<Text strong>{c.fn}</Text>}
-                    description={
-                      <Text type="secondary" style={{ fontSize: 12 }}>
-                        {c.org || c.email[0]?.value || ''}
-                      </Text>
-                    }
-                  />
-                </List.Item>
-              )}
-            />
+  dataSource={filtered}
+  renderItem={(c) => (
+    <List.Item
+      onClick={() => setSelected(c)}
+      style={{
+        padding: '6px 12px',
+        cursor: 'pointer',
+        background: selected?.id === c.id ? '#e6f4ff' : 'transparent',
+        borderLeft: selected?.id === c.id ? '3px solid #1677ff' : '3px solid transparent',
+        borderBottom: 'none',
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <Avatar size={28} icon={<UserOutlined />} style={{ backgroundColor: '#1677ff', flexShrink: 0 }} />
+        <div style={{ textAlign: 'left', overflow: 'hidden' }}>
+          <div>
+            <Text strong={selected?.id === c.id} style={{ fontSize: 13, lineHeight: '1.2' }}>
+              {c.fn}
+            </Text>
+          </div>
+          {(c.org || c.email[0]?.value) && (
+            <div>
+              <Text type="secondary" style={{ fontSize: 11, lineHeight: '1.2' }}>
+                {c.org || c.email[0]?.value}
+              </Text>
+            </div>
+          )}
+        </div>
+      </div>
+    </List.Item>
+  )}
+/>
           )
         }
       </Sider>
