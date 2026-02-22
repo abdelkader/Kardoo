@@ -6,44 +6,30 @@ import {
   Button,
   Avatar,
   Typography,
-  Tag,
   Empty,
-  Divider,
+  Modal,
 } from "antd";
 import {
   UserOutlined,
   FolderOpenOutlined,
-  PhoneOutlined,
-  MailOutlined,
-  HomeOutlined,
-  GlobalOutlined,
+  SaveOutlined,
 } from "@ant-design/icons";
-import { OpenVCardFile } from "../wailsjs/go/main/App";
+import { OpenVCardFile, SaveVCardFile } from "../wailsjs/go/main/App";
+import { splitAndParse, generateAllVCards } from "./utils/vcard";
+import ContactDetail from "./components/ContactDetail";
 import "antd/dist/reset.css";
+
 const { Sider, Content } = Layout;
 const { Text } = Typography;
-import { splitAndParse } from "./utils/vcard";
-import ContactDetail from "./components/ContactDetail";
-
-const TYPE_COLORS = {
-  home: "blue",
-  work: "green",
-  cell: "purple",
-  postal: "orange",
-  parcel: "cyan",
-  voice: "geekblue",
-};
-
-function typeColor(type) {
-  return TYPE_COLORS[type?.toLowerCase()] || "default";
-}
 
 export default function App() {
   const [contacts, setContacts] = useState([]);
   const [selected, setSelected] = useState(null);
+  const [displayedContact, setDisplayedContact] = useState(null);
   const [search, setSearch] = useState("");
   const [error, setError] = useState("");
   const [isDirty, setIsDirty] = useState(false);
+  const [currentFilePath, setCurrentFilePath] = useState("");
 
   const handleSelectContact = (c) => {
     if (isDirty) {
@@ -56,24 +42,46 @@ export default function App() {
         onOk: () => {
           setIsDirty(false);
           setSelected(c);
+          setDisplayedContact(c);
         },
       });
     } else {
       setSelected(c);
+      setDisplayedContact(c);
     }
   };
 
   const handleOpen = async () => {
     setError("");
     try {
-      const raw = await OpenVCardFile();
-      if (!raw) return;
-      const parsed = splitAndParse(raw);
+      const result = await OpenVCardFile();
+      if (!result) return;
+      setCurrentFilePath(result.path);
+      const parsed = splitAndParse(result.content);
       setContacts(parsed);
       setSelected(parsed[0] || null);
+      setDisplayedContact(parsed[0] || null);
     } catch (e) {
       setError("Erreur : " + e.message);
       console.error(e);
+    }
+  };
+
+  const handleSaveContact = async (updated) => {
+    const newContacts = contacts.map((c) =>
+      c.id === updated.id ? updated : c,
+    );
+    setContacts(newContacts);
+    setSelected(updated);
+    setDisplayedContact(updated);
+
+    // Sauvegarder sur disque
+    try {
+      const content = generateAllVCards(newContacts);
+      await SaveVCardFile(currentFilePath, content);
+    } catch (e) {
+      console.error("Erreur sauvegarde:", e);
+      setError("Erreur de sauvegarde : " + e.message);
     }
   };
 
@@ -85,7 +93,6 @@ export default function App() {
 
   return (
     <Layout style={{ height: "100vh" }}>
-      {/* Sidebar */}
       <Sider
         width={260}
         theme="light"
@@ -146,7 +153,7 @@ export default function App() {
                       backgroundColor: c.photo ? "transparent" : "#1677ff",
                       flexShrink: 0,
                     }}
-                    onError={() => true} // ← empêche Ant Design de logger une erreur
+                    onError={() => true}
                   />
                   <div style={{ textAlign: "left", overflow: "hidden" }}>
                     <Text
@@ -164,15 +171,10 @@ export default function App() {
       </Sider>
 
       <Content style={{ padding: 24, overflow: "auto", background: "#fff" }}>
-        {selected ? (
+        {displayedContact ? (
           <ContactDetail
-            contact={selected}
-            onSave={(updated) => {
-              setContacts((prev) =>
-                prev.map((c) => (c.id === updated.id ? updated : c)),
-              );
-              setSelected(updated);
-            }}
+            contact={displayedContact}
+            onSave={handleSaveContact}
             onDirtyChange={setIsDirty}
           />
         ) : (

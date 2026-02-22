@@ -1,3 +1,7 @@
+import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat";
+dayjs.extend(customParseFormat);
+import { OpenImageFile } from "../../wailsjs/go/main/App";
 import { useState, useEffect } from "react";
 import {
   Tabs,
@@ -5,11 +9,8 @@ import {
   Button,
   Avatar,
   DatePicker,
-  Tag,
   Typography,
   Divider,
-  Modal,
-  Space,
   Card,
 } from "antd";
 import {
@@ -19,10 +20,7 @@ import {
   SaveOutlined,
   CameraOutlined,
 } from "@ant-design/icons";
-import dayjs from "dayjs";
 import AddressDialog from "./AddressDialog";
-import { formatAdr } from "../utils/vcard";
-
 const { Text } = Typography;
 
 // Types de téléphone et URL disponibles
@@ -35,6 +33,8 @@ const URL_TYPES = [
   "LinkedIn",
   "Twitter",
 ];
+
+dayjs.extend(customParseFormat);
 
 function FieldRow({ label, children, style }) {
   return (
@@ -139,7 +139,7 @@ function MultiLinePanel({
   );
 }
 
-export default function ContactDetail({ contact, onSave }) {
+export default function ContactDetail({ contact, onSave, onDirtyChange }) {
   const [form, setForm] = useState(null);
   const [dirty, setDirty] = useState(false);
   const [adrDialogOpen, setAdrDialogOpen] = useState(false);
@@ -245,134 +245,213 @@ export default function ContactDetail({ contact, onSave }) {
   // Onglet Main
   const mainTab = (
     <div>
-      {/* Section Name */}
-      <div style={{ display: "flex", gap: 16, marginBottom: 16 }}>
-        <div style={{ flex: 1 }}>
-          <Text
-            strong
-            style={{
-              fontSize: 12,
-              color: "#888",
-              display: "block",
-              marginBottom: 6,
-            }}
-          >
-            NAME
+      {/* Groupbox Name */}
+      <Card
+        size="small"
+        title={
+          <Text strong style={{ fontSize: 12 }}>
+            Name
           </Text>
-          <FieldRow label="Title">
-            <Input
-              size="small"
-              value={form.prefix}
-              onChange={(e) => update("prefix", e.target.value)}
-              style={{ width: 80 }}
-            />
-          </FieldRow>
-          <FieldRow label="Full">
-            <Input
-              size="small"
-              value={form.fn}
-              onChange={(e) => update("fn", e.target.value)}
-              style={{ flex: 1 }}
-            />
-          </FieldRow>
-          <div style={{ display: "flex", gap: 6, marginBottom: 8 }}>
-            <div style={{ flex: 1 }}>
-              <Text type="secondary" style={{ fontSize: 11 }}>
-                First
-              </Text>
-              <Input
-                size="small"
-                value={form.firstName}
-                onChange={(e) => update("firstName", e.target.value)}
-              />
+        }
+        style={{ marginBottom: 10, borderColor: "#bbb" }}
+        headStyle={{
+          backgroundColor: "#f0f0f0",
+          borderBottom: "1px solid #bbb",
+        }}
+      >
+        <div style={{ display: "flex", gap: 16 }}>
+          <div style={{ flex: 1 }}>
+            {/* Ligne 1 : Title + Full */}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 12,
+                marginBottom: 6,
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                <Text type="secondary" style={{ fontSize: 11, flexShrink: 0 }}>
+                  Title
+                </Text>
+                <Input
+                  size="small"
+                  value={form.prefix}
+                  onChange={(e) => update("prefix", e.target.value)}
+                  style={{ width: 70 }}
+                />
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 4,
+                  flex: 1,
+                }}
+              >
+                <Text type="secondary" style={{ fontSize: 11, flexShrink: 0 }}>
+                  Full
+                </Text>
+                <Input
+                  size="small"
+                  value={form.fn}
+                  onChange={(e) => update("fn", e.target.value)}
+                  style={{ flex: 1 }}
+                />
+              </div>
             </div>
-            <div style={{ flex: 1 }}>
-              <Text type="secondary" style={{ fontSize: 11 }}>
-                Middle
-              </Text>
-              <Input
-                size="small"
-                value={form.middleName}
-                onChange={(e) => update("middleName", e.target.value)}
-              />
+
+            {/* Ligne 2 : First + Middle + Last */}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 12,
+                marginBottom: 6,
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 4,
+                  flex: 1,
+                }}
+              >
+                <Text type="secondary" style={{ fontSize: 11, flexShrink: 0 }}>
+                  First
+                </Text>
+                <Input
+                  size="small"
+                  value={form.firstName}
+                  onChange={(e) => update("firstName", e.target.value)}
+                  style={{ flex: 1 }}
+                />
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 4,
+                  flex: 1,
+                }}
+              >
+                <Text type="secondary" style={{ fontSize: 11, flexShrink: 0 }}>
+                  Middle
+                </Text>
+                <Input
+                  size="small"
+                  value={form.middleName}
+                  onChange={(e) => update("middleName", e.target.value)}
+                  style={{ flex: 1 }}
+                />
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 4,
+                  flex: 1,
+                }}
+              >
+                <Text type="secondary" style={{ fontSize: 11, flexShrink: 0 }}>
+                  Last
+                </Text>
+                <Input
+                  size="small"
+                  value={form.lastName}
+                  onChange={(e) => update("lastName", e.target.value)}
+                  style={{ flex: 1 }}
+                />
+              </div>
             </div>
-            <div style={{ flex: 1 }}>
-              <Text type="secondary" style={{ fontSize: 11 }}>
-                Last
+
+            {/* Ligne 3 : Birthday */}
+            <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+              <Text type="secondary" style={{ fontSize: 11, flexShrink: 0 }}>
+                Birthdate
               </Text>
-              <Input
+              <DatePicker
                 size="small"
-                value={form.lastName}
-                onChange={(e) => update("lastName", e.target.value)}
+                format={["YYYY-MM-DD", "DD/MM/YYYY", "MM/DD/YYYY"]}
+                value={
+                  form.bday
+                    ? dayjs(form.bday, ["YYYY-MM-DD", "YYYYMMDD", "--MM-DD"])
+                    : null
+                }
+                onChange={(date, dateString) =>
+                  update("bday", dateString || "")
+                }
+                inputReadOnly={false}
+                placeholder="YYYY-MM-DD"
               />
             </div>
           </div>
-          <FieldRow label="Birthday">
-            <Input
-              size="small"
-              value={form.bday}
-              onChange={(e) => update("bday", e.target.value)}
-              placeholder="YYYY-MM-DD"
-              style={{ width: 140 }}
-            />
-          </FieldRow>
-        </div>
 
-        {/* Photo */}
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: 6,
-          }}
-        >
-          <Avatar
-            size={90}
-            src={form.photo || undefined}
-            icon={!form.photo && <UserOutlined />}
-            style={{ backgroundColor: form.photo ? "transparent" : "#1677ff" }}
-          />
-          <Button
-            size="small"
-            icon={<CameraOutlined />}
-            type="text"
-            style={{ fontSize: 11 }}
+          {/* Photo */}
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 6,
+            }}
           >
-            Changer
-          </Button>
+            <Avatar
+              size={100}
+              src={form.photo || undefined}
+              icon={!form.photo && <UserOutlined />}
+              style={{
+                backgroundColor: form.photo ? "transparent" : "#1677ff",
+              }}
+            />
+            <Button
+              size="small"
+              icon={<CameraOutlined />}
+              type="text"
+              style={{ fontSize: 11 }}
+              onClick={async () => {
+                try {
+                  const dataUrl = await OpenImageFile();
+                  if (dataUrl) update("photo", dataUrl);
+                } catch (e) {
+                  console.error("Erreur photo:", e);
+                }
+              }}
+            >
+              Changer
+            </Button>
+          </div>
         </div>
-      </div>
+      </Card>
 
-      <Divider style={{ margin: "8px 0" }} />
-
-      {/* Section Adresses */}
-      <div style={{ marginBottom: 12 }}>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: 6,
-          }}
-        >
-          <Text strong style={{ fontSize: 12, color: "#888" }}>
-            ADRESSES
+      {/* Groupbox Address */}
+      <Card
+        size="small"
+        title={
+          <Text strong style={{ fontSize: 12 }}>
+            Address
           </Text>
+        }
+        extra={
           <Button
             size="small"
             icon={<PlusOutlined />}
             type="text"
             onClick={() => setAdrDialogOpen(true)}
           />
-        </div>
-
+        }
+        style={{ marginBottom: 10, borderColor: "#bbb" }}
+        headStyle={{
+          backgroundColor: "#f0f0f0",
+          borderBottom: "1px solid #bbb",
+        }}
+      >
         {form.adr.length === 0 && (
           <Text type="secondary" style={{ fontSize: 12 }}>
             Aucune adresse
           </Text>
         )}
-
         {form.adr.length > 0 && (
           <Tabs
             size="small"
@@ -386,79 +465,155 @@ export default function ContactDetail({ contact, onSave }) {
               label: a.type || "Adresse",
               closable: true,
               children: (
-                <div style={{ padding: "8px 0" }}>
-                  {/* Street */}
-                  <FieldRow label="Street">
+                <div style={{ padding: "4px 0" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 8,
+                      marginBottom: 6,
+                    }}
+                  >
+                    <Text
+                      type="secondary"
+                      style={{ fontSize: 11, width: 50, flexShrink: 0 }}
+                    >
+                      Addres
+                    </Text>
                     <Input
                       size="small"
                       value={a.raw?.[2] || ""}
                       onChange={(e) => updateAdrPart(i, 2, e.target.value)}
                       style={{ flex: 1 }}
                     />
-                  </FieldRow>
-                  <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
-                    <div style={{ flex: 1 }}>
-                      <Text type="secondary" style={{ fontSize: 11 }}>
-                        City
-                      </Text>
-                      <Input
-                        size="small"
-                        value={a.raw?.[3] || ""}
-                        onChange={(e) => updateAdrPart(i, 3, e.target.value)}
-                      />
-                    </div>
-                    <div style={{ flex: 1 }}>
-                      <Text type="secondary" style={{ fontSize: 11 }}>
-                        Region
-                      </Text>
-                      <Input
-                        size="small"
-                        value={a.raw?.[4] || ""}
-                        onChange={(e) => updateAdrPart(i, 4, e.target.value)}
-                      />
-                    </div>
                   </div>
-                  <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
-                    <div style={{ flex: 1 }}>
-                      <Text type="secondary" style={{ fontSize: 11 }}>
-                        Zip
-                      </Text>
-                      <Input
-                        size="small"
-                        value={a.raw?.[5] || ""}
-                        onChange={(e) => updateAdrPart(i, 5, e.target.value)}
-                      />
-                    </div>
-                    <div style={{ flex: 1 }}>
-                      <Text type="secondary" style={{ fontSize: 11 }}>
-                        Country
-                      </Text>
-                      <Input
-                        size="small"
-                        value={a.raw?.[6] || ""}
-                        onChange={(e) => updateAdrPart(i, 6, e.target.value)}
-                      />
-                    </div>
-                  </div>
-                  <div style={{ display: "flex", gap: 8 }}>
-                    <div style={{ flex: 1 }}>
-                      <Text type="secondary" style={{ fontSize: 11 }}>
+                  <div style={{ display: "flex", gap: 8, marginBottom: 6 }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 4,
+                        flex: 1,
+                      }}
+                    >
+                      <Text
+                        type="secondary"
+                        style={{ fontSize: 11, flexShrink: 0 }}
+                      >
                         Ext
                       </Text>
                       <Input
                         size="small"
                         value={a.raw?.[1] || ""}
                         onChange={(e) => updateAdrPart(i, 1, e.target.value)}
+                        style={{ flex: 1 }}
                       />
                     </div>
-                    <div style={{ flex: 1 }}>
-                      <Text type="secondary" style={{ fontSize: 11 }}>
-                        PO Box
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 4,
+                        flex: 1,
+                      }}
+                    >
+                      <Text
+                        type="secondary"
+                        style={{ fontSize: 11, flexShrink: 0 }}
+                      >
+                        City
+                      </Text>
+                      <Input
+                        size="small"
+                        value={a.raw?.[3] || ""}
+                        onChange={(e) => updateAdrPart(i, 3, e.target.value)}
+                        style={{ flex: 1 }}
+                      />
+                    </div>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 4,
+                        flex: 1,
+                      }}
+                    >
+                      <Text
+                        type="secondary"
+                        style={{ fontSize: 11, flexShrink: 0 }}
+                      >
+                        Region
+                      </Text>
+                      <Input
+                        size="small"
+                        value={a.raw?.[4] || ""}
+                        onChange={(e) => updateAdrPart(i, 4, e.target.value)}
+                        style={{ flex: 1 }}
+                      />
+                    </div>
+                  </div>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 4,
+                        flex: 1,
+                      }}
+                    >
+                      <Text
+                        type="secondary"
+                        style={{ fontSize: 11, flexShrink: 0 }}
+                      >
+                        Zip
+                      </Text>
+                      <Input
+                        size="small"
+                        value={a.raw?.[5] || ""}
+                        onChange={(e) => updateAdrPart(i, 5, e.target.value)}
+                        style={{ flex: 1 }}
+                      />
+                    </div>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 4,
+                        flex: 1,
+                      }}
+                    >
+                      <Text
+                        type="secondary"
+                        style={{ fontSize: 11, flexShrink: 0 }}
+                      >
+                        PO
                       </Text>
                       <Input
                         size="small"
                         value={a.raw?.[0] || ""}
                         onChange={(e) => updateAdrPart(i, 0, e.target.value)}
+                        style={{ flex: 1 }}
+                      />
+                    </div>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 4,
+                        flex: 1,
+                      }}
+                    >
+                      <Text
+                        type="secondary"
+                        style={{ fontSize: 11, flexShrink: 0 }}
+                      >
+                        Country
+                      </Text>
+                      <Input
+                        size="small"
+                        value={a.raw?.[6] || ""}
+                        onChange={(e) => updateAdrPart(i, 6, e.target.value)}
+                        style={{ flex: 1 }}
                       />
                     </div>
                   </div>
@@ -467,32 +622,151 @@ export default function ContactDetail({ contact, onSave }) {
             }))}
           />
         )}
-      </div>
+      </Card>
 
-      <Divider style={{ margin: "8px 0" }} />
+      {/* Téléphones & Web côte à côte */}
+      <div style={{ display: "flex", gap: 10 }}>
+        <Card
+          size="small"
+          title={
+            <Text strong style={{ fontSize: 12 }}>
+              Phones
+            </Text>
+          }
+          extra={
+            <Button
+              size="small"
+              icon={<PlusOutlined />}
+              type="text"
+              onClick={addTel}
+            />
+          }
+          style={{ flex: 1, borderColor: "#bbb" }}
+          headStyle={{
+            backgroundColor: "#f0f0f0",
+            borderBottom: "1px solid #bbb",
+          }}
+        >
+          {form.tel.length === 0 && (
+            <Text type="secondary" style={{ fontSize: 12 }}>
+              Aucun téléphone
+            </Text>
+          )}
+          {form.tel.map((item, i) => (
+            <div
+              key={i}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
+                marginBottom: 6,
+              }}
+            >
+              <select
+                value={item.type}
+                onChange={(e) => updateTel(i, "type", e.target.value)}
+                style={{
+                  border: "1px solid #d9d9d9",
+                  borderRadius: 6,
+                  padding: "3px 6px",
+                  fontSize: 12,
+                  color: "#555",
+                  background: "#fafafa",
+                }}
+              >
+                {TEL_TYPES.map((t) => (
+                  <option key={t} value={t.toLowerCase()}>
+                    {t}
+                  </option>
+                ))}
+              </select>
+              <Input
+                size="small"
+                value={item.value}
+                onChange={(e) => updateTel(i, "value", e.target.value)}
+                style={{ flex: 1 }}
+              />
+              <Button
+                size="small"
+                type="text"
+                danger
+                icon={<DeleteOutlined />}
+                onClick={() => removeTel(i)}
+              />
+            </div>
+          ))}
+        </Card>
 
-      {/* Téléphones & Web */}
-      <div style={{ display: "flex", gap: 12 }}>
-        <div style={{ flex: 1 }}>
-          <MultiLinePanel
-            title="Téléphones"
-            items={form.tel}
-            typeOptions={TEL_TYPES}
-            onAdd={addTel}
-            onRemove={removeTel}
-            onChange={updateTel}
-          />
-        </div>
-        <div style={{ flex: 1 }}>
-          <MultiLinePanel
-            title="Web"
-            items={form.url}
-            typeOptions={URL_TYPES}
-            onAdd={addUrl}
-            onRemove={removeUrl}
-            onChange={updateUrl}
-          />
-        </div>
+        <Card
+          size="small"
+          title={
+            <Text strong style={{ fontSize: 12 }}>
+              Web
+            </Text>
+          }
+          extra={
+            <Button
+              size="small"
+              icon={<PlusOutlined />}
+              type="text"
+              onClick={addUrl}
+            />
+          }
+          style={{ flex: 1, borderColor: "#bbb" }}
+          headStyle={{
+            backgroundColor: "#f0f0f0",
+            borderBottom: "1px solid #bbb",
+          }}
+        >
+          {form.url.length === 0 && (
+            <Text type="secondary" style={{ fontSize: 12 }}>
+              Aucune URL
+            </Text>
+          )}
+          {form.url.map((item, i) => (
+            <div
+              key={i}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
+                marginBottom: 6,
+              }}
+            >
+              <select
+                value={item.type}
+                onChange={(e) => updateUrl(i, "type", e.target.value)}
+                style={{
+                  border: "1px solid #d9d9d9",
+                  borderRadius: 6,
+                  padding: "3px 6px",
+                  fontSize: 12,
+                  color: "#555",
+                  background: "#fafafa",
+                }}
+              >
+                {URL_TYPES.map((t) => (
+                  <option key={t} value={t.toLowerCase()}>
+                    {t}
+                  </option>
+                ))}
+              </select>
+              <Input
+                size="small"
+                value={item.value}
+                onChange={(e) => updateUrl(i, "value", e.target.value)}
+                style={{ flex: 1 }}
+              />
+              <Button
+                size="small"
+                type="text"
+                danger
+                icon={<DeleteOutlined />}
+                onClick={() => removeUrl(i)}
+              />
+            </div>
+          ))}
+        </Card>
       </div>
     </div>
   );

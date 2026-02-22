@@ -171,3 +171,75 @@ export function splitAndParse(raw) {
     }
   })
 }
+
+export function generateVCard(contact) {
+  const lines = []
+  lines.push('BEGIN:VCARD')
+  lines.push('VERSION:3.0')
+
+  // N et FN
+  const n = [
+    contact.lastName || '',
+    contact.firstName || '',
+    contact.middleName || '',
+    contact.prefix || '',
+    contact.suffix || '',
+  ].join(';')
+  lines.push(`N:${n}`)
+  lines.push(`FN:${contact.fn || ''}`)
+
+  // ORG
+  if (contact.org) lines.push(`ORG:${contact.org}`)
+
+  // TITLE
+  if (contact.title) lines.push(`TITLE:${contact.title}`)
+
+  // BDAY
+  if (contact.bday) lines.push(`BDAY:${contact.bday}`)
+
+  // GENDER
+  if (contact.gender) lines.push(`GENDER:${contact.gender}`)
+
+  // TZ
+  if (contact.tz) lines.push(`TZ:${contact.tz}`)
+
+  // TEL
+  contact.tel?.forEach(t => {
+    if (t.value) lines.push(`TEL;TYPE=${t.type?.toUpperCase() || 'VOICE'}:${t.value}`)
+  })
+
+  // EMAIL
+  contact.email?.forEach(e => {
+    if (e.value) lines.push(`EMAIL;TYPE=${e.type?.toUpperCase() || 'INTERNET'}:${e.value}`)
+  })
+
+  // ADR
+  contact.adr?.forEach(a => {
+    const raw = a.raw || ['', '', '', '', '', '', '']
+    const adrStr = raw.join(';')
+    lines.push(`ADR;TYPE=${a.type?.toUpperCase() || 'HOME'}:${adrStr}`)
+  })
+
+  // URL
+  contact.url?.forEach(u => {
+    if (u.value) lines.push(`URL;TYPE=${u.type?.toUpperCase() || 'HOME'}:${u.value}`)
+  })
+
+  // NOTE
+  if (contact.note) lines.push(`NOTE:${contact.note}`)
+
+  // PHOTO en base64
+  if (contact.photo && contact.photo.startsWith('data:')) {
+    const [header, data] = contact.photo.split(',')
+    const mime = header.match(/data:(image\/\w+)/)?.[1] || 'image/jpeg'
+    const type = mime.split('/')[1].toUpperCase()
+    lines.push(`PHOTO;ENCODING=b;TYPE=${type}:${data}`)
+  }
+
+  lines.push('END:VCARD')
+  return lines.join('\r\n')
+}
+
+export function generateAllVCards(contacts) {
+  return contacts.map(generateVCard).join('\r\n')
+}
