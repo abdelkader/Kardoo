@@ -18,13 +18,12 @@ import {
   HomeOutlined,
   GlobalOutlined,
 } from "@ant-design/icons";
-import vCard from "vcard-parser";
 import { OpenVCardFile } from "../wailsjs/go/main/App";
 import "antd/dist/reset.css";
-
 const { Sider, Content } = Layout;
-const { Title, Text } = Typography;
-import { splitAndParse, formatAdr } from "./utils/vcard";
+const { Text } = Typography;
+import { splitAndParse } from "./utils/vcard";
+import ContactDetail from "./components/ContactDetail";
 
 const TYPE_COLORS = {
   home: "blue",
@@ -44,6 +43,25 @@ export default function App() {
   const [selected, setSelected] = useState(null);
   const [search, setSearch] = useState("");
   const [error, setError] = useState("");
+  const [isDirty, setIsDirty] = useState(false);
+
+  const handleSelectContact = (c) => {
+    if (isDirty) {
+      Modal.confirm({
+        title: "Modifications non sauvegardées",
+        content: "Voulez-vous abandonner les modifications en cours ?",
+        okText: "Abandonner",
+        cancelText: "Annuler",
+        okButtonProps: { danger: true },
+        onOk: () => {
+          setIsDirty(false);
+          setSelected(c);
+        },
+      });
+    } else {
+      setSelected(c);
+    }
+  };
 
   const handleOpen = async () => {
     setError("");
@@ -107,7 +125,7 @@ export default function App() {
             dataSource={filtered}
             renderItem={(c) => (
               <List.Item
-                onClick={() => setSelected(c)}
+                onClick={() => handleSelectContact(c)}
                 style={{
                   padding: "6px 12px",
                   cursor: "pointer",
@@ -145,10 +163,18 @@ export default function App() {
         )}
       </Sider>
 
-      {/* Panneau de détail */}
-      <Content style={{ padding: 32, overflow: "auto", background: "#fff" }}>
+      <Content style={{ padding: 24, overflow: "auto", background: "#fff" }}>
         {selected ? (
-          <ContactDetail contact={selected} />
+          <ContactDetail
+            contact={selected}
+            onSave={(updated) => {
+              setContacts((prev) =>
+                prev.map((c) => (c.id === updated.id ? updated : c)),
+              );
+              setSelected(updated);
+            }}
+            onDirtyChange={setIsDirty}
+          />
         ) : (
           <Empty
             description="Ouvre un fichier .vcf et sélectionne un contact"
@@ -157,147 +183,5 @@ export default function App() {
         )}
       </Content>
     </Layout>
-  );
-}
-
-function ContactDetail({ contact }) {
-  return (
-    <div style={{ maxWidth: 650 }}>
-      {/* En-tête */}
-      <div
-        style={{
-          display: "flex",
-          gap: 20,
-          alignItems: "center",
-          marginBottom: 24,
-        }}
-      >
-        <Avatar
-          size={80}
-          src={contact.photo || undefined}
-          icon={!contact.photo && <UserOutlined />}
-          style={{
-            backgroundColor: contact.photo ? "transparent" : "#1677ff",
-            flexShrink: 0,
-          }}
-          onError={() => true}
-        />
-        <div>
-          <Title level={3} style={{ margin: 0 }}>
-            {contact.fn}
-          </Title>
-          {contact.prefix && <Tag>{contact.prefix}</Tag>}
-          {contact.suffix && <Tag>{contact.suffix}</Tag>}
-          {contact.org && (
-            <div>
-              <Text type="secondary">{contact.org}</Text>
-            </div>
-          )}
-          {contact.title && (
-            <div>
-              <Text type="secondary">{contact.title}</Text>
-            </div>
-          )}
-          {contact.gender && (
-            <Tag style={{ marginTop: 4 }}>
-              {contact.gender === "M"
-                ? "♂ Homme"
-                : contact.gender === "F"
-                  ? "♀ Femme"
-                  : contact.gender}
-            </Tag>
-          )}
-        </div>
-      </div>
-
-      <Divider />
-
-      {/* Téléphones */}
-      {contact.tel.length > 0 && (
-        <Section icon={<PhoneOutlined />} title="Téléphone">
-          {contact.tel.map((t, i) => (
-            <div key={i} style={{ marginBottom: 6 }}>
-              <Tag color={typeColor(t.type)}>{t.type}</Tag>
-              <Text>{t.value}</Text>
-            </div>
-          ))}
-        </Section>
-      )}
-
-      {/* Emails */}
-      {contact.email.length > 0 && (
-        <Section icon={<MailOutlined />} title="Email">
-          {contact.email.map((e, i) => (
-            <div key={i} style={{ marginBottom: 6 }}>
-              <Tag color={typeColor(e.type)}>{e.type}</Tag>
-              <Text>{e.value}</Text>
-            </div>
-          ))}
-        </Section>
-      )}
-
-      {/* Adresses */}
-      {contact.adr.length > 0 && (
-        <Section icon={<HomeOutlined />} title="Adresse">
-          {contact.adr.map((a, i) => (
-            <div key={i} style={{ marginBottom: 6 }}>
-              <Tag color={typeColor(a.type)}>{a.type}</Tag>
-              <Text>{formatAdr(a.raw)}</Text>
-            </div>
-          ))}
-        </Section>
-      )}
-
-      {/* Infos supplémentaires */}
-      {(contact.bday || contact.tz || contact.url || contact.note) && (
-        <>
-          <Divider />
-          {contact.bday && (
-            <InfoRow label="Date de naissance" value={contact.bday} />
-          )}
-          {contact.tz && <InfoRow label="Fuseau horaire" value={contact.tz} />}
-          {contact.url && (
-            <InfoRow
-              label="Site web"
-              value={
-                <a href={contact.url} target="_blank" rel="noreferrer">
-                  <GlobalOutlined /> {contact.url}
-                </a>
-              }
-            />
-          )}
-          {contact.note && <InfoRow label="Note" value={contact.note} />}
-        </>
-      )}
-    </div>
-  );
-}
-
-function Section({ icon, title, children }) {
-  return (
-    <div style={{ marginBottom: 20 }}>
-      <Text
-        strong
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 6,
-          marginBottom: 8,
-          color: "#555",
-        }}
-      >
-        {icon} {title}
-      </Text>
-      <div style={{ paddingLeft: 20 }}>{children}</div>
-    </div>
-  );
-}
-
-function InfoRow({ label, value }) {
-  return (
-    <div style={{ marginBottom: 8 }}>
-      <Text type="secondary">{label} : </Text>
-      <Text>{value}</Text>
-    </div>
   );
 }
