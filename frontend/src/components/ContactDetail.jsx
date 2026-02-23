@@ -144,12 +144,23 @@ export default function ContactDetail({ contact, onSave, onDirtyChange }) {
       adr: contact.adr.map((a) => ({ ...a })),
       tel: contact.tel.map((t) => ({ ...t })),
       email: contact.email.map((e) => ({ ...e })),
-      url: contact.url ? [{ type: "home", value: contact.url }] : [],
+      url: contact.url || [],
       org: contact.org || "",
       title: contact.title || "",
       note: contact.note || "",
       gender: contact.gender || "",
       tz: contact.tz || "",
+      nickname: contact.nickname || "",
+      anniversary: contact.anniversary || "",
+      role: contact.role || "",
+      categories: contact.categories || "",
+      geo: contact.geo || "",
+      rev: contact.rev || "",
+      uid: contact.uid || "",
+      kind: contact.kind || "",
+      lang: contact.lang || [],
+      impp: contact.impp || [],
+      related: contact.related || [],
     });
     setDirty(false);
   }, [contact]);
@@ -469,35 +480,342 @@ export default function ContactDetail({ contact, onSave, onDirtyChange }) {
 
   const extraTab = (
     <div>
-      {[
-        { label: "Org", field: "org", style: { flex: 1 } },
-        { label: "Title", field: "title", style: { flex: 1 } },
-        { label: "Gender", field: "gender", style: { width: 60 } },
-        { label: "TZ", field: "tz", style: { flex: 1 } },
-      ].map(({ label, field, style }) => (
-        <InlineField key={field} label={label} style={{ marginBottom: 8 }}>
-          <Input
-            size="small"
-            value={form[field]}
-            onChange={(e) => update(field, e.target.value)}
-            style={style}
-          />
-        </InlineField>
-      ))}
-      <div>
-        <Text
-          type="secondary"
-          style={{ fontSize: 12, display: "block", marginBottom: 4 }}
-        >
-          Note
-        </Text>
+      {/* Groupbox Identité */}
+      <Card
+        size="small"
+        title={
+          <Text strong style={{ fontSize: 12 }}>
+            Identité
+          </Text>
+        }
+        style={cardStyle}
+        headStyle={headStyle}
+      >
+        <div style={{ display: "flex", gap: 12, marginBottom: 6 }}>
+          <InlineField label="Org" style={{ flex: 2 }}>
+            <Input
+              size="small"
+              value={form.org}
+              onChange={(e) => update("org", e.target.value)}
+              style={{ flex: 1 }}
+            />
+          </InlineField>
+          <InlineField label="Role" style={{ flex: 1 }}>
+            <Input
+              size="small"
+              value={form.role}
+              onChange={(e) => update("role", e.target.value)}
+              style={{ flex: 1 }}
+            />
+          </InlineField>
+        </div>
+        <div style={{ display: "flex", gap: 12, marginBottom: 6 }}>
+          <InlineField label="Title" style={{ flex: 1 }}>
+            <Input
+              size="small"
+              value={form.title}
+              onChange={(e) => update("title", e.target.value)}
+              style={{ flex: 1 }}
+            />
+          </InlineField>
+          <InlineField label="Nickname" style={{ flex: 1 }}>
+            <Input
+              size="small"
+              value={form.nickname}
+              onChange={(e) => update("nickname", e.target.value)}
+              style={{ flex: 1 }}
+            />
+          </InlineField>
+        </div>
+        <div style={{ display: "flex", gap: 12 }}>
+          <InlineField label="Kind" style={{ flex: 1 }}>
+            <Input
+              size="small"
+              value={form.kind}
+              onChange={(e) => update("kind", e.target.value)}
+              style={{ flex: 1 }}
+            />
+          </InlineField>
+          <InlineField label="Gender" style={{ flex: 1 }}>
+            <Input
+              size="small"
+              value={form.gender}
+              onChange={(e) => update("gender", e.target.value)}
+              style={{ flex: 1 }}
+            />
+          </InlineField>
+          <InlineField label="Categories" style={{ flex: 2 }}>
+            <Input
+              size="small"
+              value={form.categories}
+              onChange={(e) => update("categories", e.target.value)}
+              style={{ flex: 1 }}
+            />
+          </InlineField>
+        </div>
+      </Card>
+
+      {/* Groupbox Dates */}
+      <Card
+        size="small"
+        title={
+          <Text strong style={{ fontSize: 12 }}>
+            Dates
+          </Text>
+        }
+        style={cardStyle}
+        headStyle={headStyle}
+      >
+        <div style={{ display: "flex", gap: 12 }}>
+          <InlineField label="Anniv.">
+            <DatePicker
+              size="small"
+              format={["YYYY-MM-DD", "DD/MM/YYYY", "MM/DD/YYYY"]}
+              value={
+                form.anniversary
+                  ? dayjs(form.anniversary, ["YYYY-MM-DD", "YYYYMMDD"])
+                  : null
+              }
+              onChange={(_, dateString) =>
+                update("anniversary", dateString || "")
+              }
+              inputReadOnly={false}
+              placeholder="YYYY-MM-DD"
+            />
+          </InlineField>
+        </div>
+      </Card>
+
+      {/* Groupbox Localisation */}
+      <Card
+        size="small"
+        title={
+          <Text strong style={{ fontSize: 12 }}>
+            Localisation
+          </Text>
+        }
+        style={cardStyle}
+        headStyle={headStyle}
+      >
+        <div style={{ display: "flex", gap: 12, marginBottom: 6 }}>
+          <InlineField label="GEO" style={{ flex: 1 }}>
+            <Input
+              size="small"
+              value={form.geo}
+              onChange={(e) => update("geo", e.target.value)}
+              style={{ flex: 1 }}
+            />
+          </InlineField>
+          <InlineField label="TZ" style={{ flex: 1 }}>
+            <Input
+              size="small"
+              value={form.tz}
+              onChange={(e) => update("tz", e.target.value)}
+              style={{ flex: 1 }}
+            />
+          </InlineField>
+        </div>
+      </Card>
+
+      {/* Note */}
+      <Card
+        size="small"
+        title={
+          <Text strong style={{ fontSize: 12 }}>
+            Note
+          </Text>
+        }
+        style={cardStyle}
+        headStyle={headStyle}
+      >
         <Input.TextArea
           value={form.note}
           onChange={(e) => update("note", e.target.value)}
-          rows={4}
+          rows={3}
           style={{ fontSize: 13 }}
         />
+      </Card>
+
+      {/* Langues + IMPP côte à côte */}
+      <div style={{ display: "flex", gap: 10, marginBottom: 10 }}>
+        {/* Langues */}
+        <Card
+          size="small"
+          title={
+            <Text strong style={{ fontSize: 12 }}>
+              Langues
+            </Text>
+          }
+          extra={
+            <Button
+              size="small"
+              icon={<PlusOutlined />}
+              type="text"
+              onClick={() =>
+                update("lang", [...form.lang, { pref: "", value: "" }])
+              }
+            />
+          }
+          style={{ ...cardStyle, flex: 1, marginBottom: 0 }}
+          headStyle={headStyle}
+        >
+          {form.lang.length === 0 && (
+            <Text type="secondary" style={{ fontSize: 12 }}>
+              Aucune langue
+            </Text>
+          )}
+          {form.lang.map((l, i) => (
+            <div
+              key={i}
+              style={{
+                display: "flex",
+                gap: 6,
+                marginBottom: 6,
+                alignItems: "center",
+              }}
+            >
+              <Input
+                size="small"
+                placeholder="fr"
+                value={l.value}
+                onChange={(e) =>
+                  update(
+                    "lang",
+                    form.lang.map((x, idx) =>
+                      idx === i ? { ...x, value: e.target.value } : x,
+                    ),
+                  )
+                }
+                style={{ flex: 1 }}
+              />
+              <Input
+                size="small"
+                placeholder="pref"
+                value={l.pref}
+                onChange={(e) =>
+                  update(
+                    "lang",
+                    form.lang.map((x, idx) =>
+                      idx === i ? { ...x, pref: e.target.value } : x,
+                    ),
+                  )
+                }
+                style={{ width: 50 }}
+              />
+              <Button
+                size="small"
+                type="text"
+                danger
+                icon={<DeleteOutlined />}
+                onClick={() =>
+                  update(
+                    "lang",
+                    form.lang.filter((_, idx) => idx !== i),
+                  )
+                }
+              />
+            </div>
+          ))}
+        </Card>
+
+        {/* IMPP */}
+        <ItemList
+          title="Messagerie (IMPP)"
+          items={form.impp}
+          typeOptions={[
+            "Skype",
+            "WhatsApp",
+            "Telegram",
+            "Signal",
+            "AIM",
+            "Jabber",
+          ]}
+          onAdd={() =>
+            update("impp", [...form.impp, { type: "skype", value: "" }])
+          }
+          onRemove={(i) =>
+            update(
+              "impp",
+              form.impp.filter((_, idx) => idx !== i),
+            )
+          }
+          onChange={(i, field, value) =>
+            update(
+              "impp",
+              form.impp.map((x, idx) =>
+                idx === i ? { ...x, [field]: value } : x,
+              ),
+            )
+          }
+          style={{ flex: 1, marginBottom: 0 }}
+        />
       </div>
+
+      {/* Personnes liées */}
+      <ItemList
+        title="Personnes liées"
+        items={form.related}
+        typeOptions={[
+          "Friend",
+          "Spouse",
+          "Child",
+          "Parent",
+          "Sibling",
+          "Assistant",
+          "Manager",
+          "Colleague",
+        ]}
+        onAdd={() =>
+          update("related", [...form.related, { type: "friend", value: "" }])
+        }
+        onRemove={(i) =>
+          update(
+            "related",
+            form.related.filter((_, idx) => idx !== i),
+          )
+        }
+        onChange={(i, field, value) =>
+          update(
+            "related",
+            form.related.map((x, idx) =>
+              idx === i ? { ...x, [field]: value } : x,
+            ),
+          )
+        }
+        style={{ marginBottom: 10 }}
+      />
+
+      {/* UID + REV — lecture seule */}
+      {(form.uid || form.rev) && (
+        <Card
+          size="small"
+          title={
+            <Text strong style={{ fontSize: 12 }}>
+              Métadonnées
+            </Text>
+          }
+          style={cardStyle}
+          headStyle={headStyle}
+        >
+          {form.uid && (
+            <InlineField label="UID" style={{ marginBottom: form.rev ? 6 : 0 }}>
+              <Input
+                size="small"
+                value={form.uid}
+                onChange={(e) => update("uid", e.target.value)}
+                style={{ flex: 1 }}
+              />
+            </InlineField>
+          )}
+          {form.rev && (
+            <InlineField label="Révision">
+              <Text type="secondary" style={{ fontSize: 12 }}>
+                {form.rev}
+              </Text>
+            </InlineField>
+          )}
+        </Card>
+      )}
     </div>
   );
 

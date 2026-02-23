@@ -16,19 +16,18 @@ export function decodeQP(value, meta) {
       try {
         return utf8.decode(decoded)
       } catch {
-        // Fallback si utf8.decode échoue — utilise TextDecoder natif du navigateur
         try {
           const bytes = new Uint8Array([...decoded].map(c => c.charCodeAt(0)))
           return new TextDecoder('utf-8').decode(bytes)
         } catch {
-          return decoded // retourne le QP décodé sans UTF-8
+          return decoded
         }
       }
     }
     return decoded
   } catch (e) {
     console.warn('Erreur QP decode:', e)
-    return value // retourne la valeur brute originale en dernier recours
+    return value
   }
 }
 
@@ -38,13 +37,12 @@ export function getStr(card, field) {
   const val = Array.isArray(prop.value)
     ? prop.value.filter(Boolean).join(' ')
     : prop.value || ''
-  return decodeQP(val, prop.meta)
+         return decodeQP(val, prop.meta)
 }
 
 export function getAll(card, field) {
   const props = card[field] || []
   return props.map(p => {
-    // vCard 2.1 met le type directement comme clé sans valeur ex: {HOME: ''} 
     const type =
       p.meta?.type?.[0] ||
       p.meta?.TYPE?.[0] ||
@@ -54,11 +52,10 @@ export function getAll(card, field) {
       field
 
     if (Array.isArray(p.value)) {
-      // Décoder chaque partie individuellement
       return {
         type,
         value: p.value.map(part => decodeQP(part || '', p.meta)),
-        raw: p.value.map(part => decodeQP(part || '', p.meta)), // ← décodé aussi
+        raw: p.value.map(part => decodeQP(part || '', p.meta)),
       }
     }
 
@@ -119,7 +116,6 @@ export function getPhoto(card) {
 export function formatAdr(parts) {
   if (!parts) return ''
   if (!Array.isArray(parts)) return String(parts)
-  // [pobox, ext, street, city, state, zip, country]
   const [, , street, city, state, zip, country] = parts
   return [street, city, state, zip, country]
     .map(p => (typeof p === 'string' ? p.trim() : ''))
@@ -142,8 +138,18 @@ export function splitAndParse(raw) {
       const card = vCard.parse(block)
 
       const nParts = (card.n?.[0]?.value || []).map(
-        part => decodeQP(part || '', card.n[0].meta)
+        part => decodeQP(part || '', card.n?.[0]?.meta)
       )
+
+      const langs = (card.lang || []).map(l => ({
+        pref: l.meta?.pref?.[0] || l.meta?.PREF?.[0] || '',
+        value: decodeQP(l.value || '', l.meta),
+      }))
+
+      const impp = (card.impp || []).map(l => ({
+        type: l.meta?.type?.[0] || l.meta?.TYPE?.[0] || '',
+        value: decodeQP(l.value || '', l.meta),
+      }))
 
       return {
         id: i,
@@ -159,15 +165,31 @@ export function splitAndParse(raw) {
         email: getAll(card, 'email'),
         adr: getAll(card, 'adr'),
         note: getStr(card, 'note'),
-        url: getStr(card, 'url'),
+        url: getAll(card, 'url'),
         bday: getStr(card, 'bday'),
         gender: getStr(card, 'gender'),
         tz: getStr(card, 'tz'),
         photo: getPhoto(card),
+        nickname: getStr(card, 'nickname'),
+        anniversary: getStr(card, 'anniversary'),
+        role: getStr(card, 'role'),
+        categories: getStr(card, 'categories'),
+        geo: getStr(card, 'geo'),
+        rev: getStr(card, 'rev'),
+        uid: getStr(card, 'uid'),
+        kind: getStr(card, 'kind'),
+        related: getAll(card, 'related').map(r => ({ type: r.type, value: r.value })),
+        lang: langs,
+        impp,
       }
     } catch (e) {
       console.error(`Erreur parsing contact ${i}:`, e)
-      return { id: i, fn: `Contact ${i + 1} (erreur)`, tel: [], email: [], adr: [], photo: null }
+      return {
+        id: i,
+        fn: `Contact ${i + 1} (erreur)`,
+        tel: [], email: [], adr: [], photo: null,
+        lang: [], impp: [], related: [], url: [],
+      }
     }
   })
 }
@@ -177,7 +199,6 @@ export function generateVCard(contact) {
   lines.push('BEGIN:VCARD')
   lines.push('VERSION:3.0')
 
-  // N et FN
   const n = [
     contact.lastName || '',
     contact.firstName || '',
@@ -188,48 +209,50 @@ export function generateVCard(contact) {
   lines.push(`N:${n}`)
   lines.push(`FN:${contact.fn || ''}`)
 
-  // ORG
-  if (contact.org) lines.push(`ORG:${contact.org}`)
+  if (contact.nickname)    lines.push(`NICKNAME:${contact.nickname}`)
+  if (contact.org)         lines.push(`ORG:${contact.org}`)
+  if (contact.title)       lines.push(`TITLE:${contact.title}`)
+  if (contact.role)        lines.push(`ROLE:${contact.role}`)
+  if (contact.kind)        lines.push(`KIND:${contact.kind}`)
+  if (contact.bday)        lines.push(`BDAY:${contact.bday}`)
+  if (contact.anniversary) lines.push(`ANNIVERSARY:${contact.anniversary}`)
+  if (contact.gender)      lines.push(`GENDER:${contact.gender}`)
+  if (contact.tz)          lines.push(`TZ:${contact.tz}`)
+  if (contact.geo)         lines.push(`GEO:${contact.geo}`)
+  if (contact.categories)  lines.push(`CATEGORIES:${contact.categories}`)
+  if (contact.uid)         lines.push(`UID:${contact.uid}`)
+  if (contact.note)        lines.push(`NOTE:${contact.note}`)
 
-  // TITLE
-  if (contact.title) lines.push(`TITLE:${contact.title}`)
-
-  // BDAY
-  if (contact.bday) lines.push(`BDAY:${contact.bday}`)
-
-  // GENDER
-  if (contact.gender) lines.push(`GENDER:${contact.gender}`)
-
-  // TZ
-  if (contact.tz) lines.push(`TZ:${contact.tz}`)
-
-  // TEL
   contact.tel?.forEach(t => {
     if (t.value) lines.push(`TEL;TYPE=${t.type?.toUpperCase() || 'VOICE'}:${t.value}`)
   })
 
-  // EMAIL
   contact.email?.forEach(e => {
     if (e.value) lines.push(`EMAIL;TYPE=${e.type?.toUpperCase() || 'INTERNET'}:${e.value}`)
   })
 
-  // ADR
   contact.adr?.forEach(a => {
     const raw = a.raw || ['', '', '', '', '', '', '']
-    const adrStr = raw.join(';')
-    lines.push(`ADR;TYPE=${a.type?.toUpperCase() || 'HOME'}:${adrStr}`)
+    lines.push(`ADR;TYPE=${a.type?.toUpperCase() || 'HOME'}:${raw.join(';')}`)
   })
 
-  // URL
   contact.url?.forEach(u => {
     if (u.value) lines.push(`URL;TYPE=${u.type?.toUpperCase() || 'HOME'}:${u.value}`)
   })
 
-  // NOTE
-  if (contact.note) lines.push(`NOTE:${contact.note}`)
+  contact.lang?.forEach(l => {
+    if (l.value) lines.push(`LANG;PREF=${l.pref || '1'}:${l.value}`)
+  })
 
-  // PHOTO en base64
-  if (contact.photo && contact.photo.startsWith('data:')) {
+  contact.impp?.forEach(im => {
+    if (im.value) lines.push(`IMPP${im.type ? `;TYPE=${im.type.toUpperCase()}` : ''}:${im.value}`)
+  })
+
+  contact.related?.forEach(r => {
+    if (r.value) lines.push(`RELATED${r.type ? `;TYPE=${r.type.toUpperCase()}` : ''}:${r.value}`)
+  })
+
+  if (contact.photo?.startsWith('data:')) {
     const [header, data] = contact.photo.split(',')
     const mime = header.match(/data:(image\/\w+)/)?.[1] || 'image/jpeg'
     const type = mime.split('/')[1].toUpperCase()
