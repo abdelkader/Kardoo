@@ -1,7 +1,7 @@
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 dayjs.extend(customParseFormat);
-import { OpenImageFile } from "../../wailsjs/go/main/App";
+
 import { useState, useEffect } from "react";
 import {
   Tabs,
@@ -10,7 +10,6 @@ import {
   Avatar,
   DatePicker,
   Typography,
-  Divider,
   Card,
 } from "antd";
 import {
@@ -20,10 +19,11 @@ import {
   SaveOutlined,
   CameraOutlined,
 } from "@ant-design/icons";
+import { OpenImageFile } from "../../wailsjs/go/main/App";
 import AddressDialog from "./AddressDialog";
+
 const { Text } = Typography;
 
-// Types de téléphone et URL disponibles
 const TEL_TYPES = ["Cell", "Home", "Work", "Fax", "Voice", "Pager"];
 const URL_TYPES = [
   "Home",
@@ -34,45 +34,31 @@ const URL_TYPES = [
   "Twitter",
 ];
 
-dayjs.extend(customParseFormat);
+const cardStyle = { marginBottom: 10, borderColor: "#bbb" };
+const headStyle = {
+  backgroundColor: "#f0f0f0",
+  borderBottom: "1px solid #bbb",
+};
 
-function FieldRow({ label, children, style }) {
+// Composant réutilisable pour une ligne label + input inline
+function InlineField({ label, children, style }) {
   return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: 8,
-        marginBottom: 8,
-        ...style,
-      }}
-    >
-      {label && (
-        <Text
-          type="secondary"
-          style={{ width: 60, flexShrink: 0, fontSize: 12 }}
-        >
-          {label}
-        </Text>
-      )}
+    <div style={{ display: "flex", alignItems: "center", gap: 4, ...style }}>
+      <Text type="secondary" style={{ fontSize: 11, flexShrink: 0 }}>
+        {label}
+      </Text>
       {children}
     </div>
   );
 }
 
-function MultiLinePanel({
-  title,
-  items,
-  typeOptions,
-  onAdd,
-  onRemove,
-  onChange,
-}) {
+// Composant réutilisable pour les listes téléphone/URL
+function ItemList({ items, typeOptions, onAdd, onRemove, onChange, title }) {
   return (
     <Card
       size="small"
       title={
-        <Text strong style={{ fontSize: 13 }}>
+        <Text strong style={{ fontSize: 12 }}>
           {title}
         </Text>
       }
@@ -84,7 +70,8 @@ function MultiLinePanel({
           onClick={onAdd}
         />
       }
-      style={{ marginBottom: 12 }}
+      style={cardStyle}
+      headStyle={headStyle}
     >
       {items.length === 0 && (
         <Text type="secondary" style={{ fontSize: 12 }}>
@@ -111,7 +98,6 @@ function MultiLinePanel({
               fontSize: 12,
               color: "#555",
               background: "#fafafa",
-              cursor: "pointer",
             }}
           >
             {typeOptions.map((t) => (
@@ -144,7 +130,6 @@ export default function ContactDetail({ contact, onSave, onDirtyChange }) {
   const [dirty, setDirty] = useState(false);
   const [adrDialogOpen, setAdrDialogOpen] = useState(false);
 
-  // Initialiser le formulaire quand le contact change
   useEffect(() => {
     if (!contact) return;
     setForm({
@@ -174,42 +159,42 @@ export default function ContactDetail({ contact, onSave, onDirtyChange }) {
   const update = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }));
     setDirty(true);
-    onDirtyChange?.(true); // ← remonte l'état
+    onDirtyChange?.(true);
   };
 
   const handleSave = () => {
     onSave({ ...contact, ...form });
     setDirty(false);
-    onDirtyChange?.(false); // ← remonte l'état
+    onDirtyChange?.(false);
   };
 
   // Adresses
-  const addAddress = ({ types, preferred }) => {
-    const type = types[0];
-    const newAdr = {
-      type,
-      value: ["", "", "", "", "", "", ""],
-      raw: ["", "", "", "", "", "", ""],
-    };
-    update("adr", [...form.adr, newAdr]);
+  const addAddress = ({ types }) => {
+    update("adr", [
+      ...form.adr,
+      {
+        type: types[0],
+        value: ["", "", "", "", "", "", ""],
+        raw: ["", "", "", "", "", "", ""],
+      },
+    ]);
     setAdrDialogOpen(false);
   };
-
-  const removeAddress = (i) => {
+  const removeAddress = (i) =>
     update(
       "adr",
       form.adr.filter((_, idx) => idx !== i),
     );
-  };
-
   const updateAdrPart = (adrIdx, partIdx, value) => {
-    const newAdr = form.adr.map((a, i) => {
-      if (i !== adrIdx) return a;
-      const newRaw = [...(a.raw || ["", "", "", "", "", "", ""])];
-      newRaw[partIdx] = value;
-      return { ...a, raw: newRaw, value: newRaw };
-    });
-    update("adr", newAdr);
+    update(
+      "adr",
+      form.adr.map((a, i) => {
+        if (i !== adrIdx) return a;
+        const newRaw = [...(a.raw || ["", "", "", "", "", "", ""])];
+        newRaw[partIdx] = value;
+        return { ...a, raw: newRaw, value: newRaw };
+      }),
+    );
   };
 
   // Téléphones
@@ -220,12 +205,11 @@ export default function ContactDetail({ contact, onSave, onDirtyChange }) {
       "tel",
       form.tel.filter((_, idx) => idx !== i),
     );
-  const updateTel = (i, field, value) => {
+  const updateTel = (i, field, value) =>
     update(
       "tel",
       form.tel.map((t, idx) => (idx === i ? { ...t, [field]: value } : t)),
     );
-  };
 
   // URLs
   const addUrl = () =>
@@ -235,17 +219,15 @@ export default function ContactDetail({ contact, onSave, onDirtyChange }) {
       "url",
       form.url.filter((_, idx) => idx !== i),
     );
-  const updateUrl = (i, field, value) => {
+  const updateUrl = (i, field, value) =>
     update(
       "url",
       form.url.map((u, idx) => (idx === i ? { ...u, [field]: value } : u)),
     );
-  };
 
-  // Onglet Main
   const mainTab = (
     <div>
-      {/* Groupbox Name */}
+      {/* Name */}
       <Card
         size="small"
         title={
@@ -253,124 +235,56 @@ export default function ContactDetail({ contact, onSave, onDirtyChange }) {
             Name
           </Text>
         }
-        style={{ marginBottom: 10, borderColor: "#bbb" }}
-        headStyle={{
-          backgroundColor: "#f0f0f0",
-          borderBottom: "1px solid #bbb",
-        }}
+        style={cardStyle}
+        headStyle={headStyle}
       >
         <div style={{ display: "flex", gap: 16 }}>
           <div style={{ flex: 1 }}>
-            {/* Ligne 1 : Title + Full */}
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 12,
-                marginBottom: 6,
-              }}
-            >
-              <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                <Text type="secondary" style={{ fontSize: 11, flexShrink: 0 }}>
-                  Title
-                </Text>
+            <div style={{ display: "flex", gap: 12, marginBottom: 6 }}>
+              <InlineField label="Title">
                 <Input
                   size="small"
                   value={form.prefix}
                   onChange={(e) => update("prefix", e.target.value)}
                   style={{ width: 70 }}
                 />
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 4,
-                  flex: 1,
-                }}
-              >
-                <Text type="secondary" style={{ fontSize: 11, flexShrink: 0 }}>
-                  Full
-                </Text>
+              </InlineField>
+              <InlineField label="Full" style={{ flex: 1 }}>
                 <Input
                   size="small"
                   value={form.fn}
                   onChange={(e) => update("fn", e.target.value)}
                   style={{ flex: 1 }}
                 />
-              </div>
+              </InlineField>
             </div>
-
-            {/* Ligne 2 : First + Middle + Last */}
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 12,
-                marginBottom: 6,
-              }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 4,
-                  flex: 1,
-                }}
-              >
-                <Text type="secondary" style={{ fontSize: 11, flexShrink: 0 }}>
-                  First
-                </Text>
+            <div style={{ display: "flex", gap: 12, marginBottom: 6 }}>
+              <InlineField label="First" style={{ flex: 1 }}>
                 <Input
                   size="small"
                   value={form.firstName}
                   onChange={(e) => update("firstName", e.target.value)}
                   style={{ flex: 1 }}
                 />
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 4,
-                  flex: 1,
-                }}
-              >
-                <Text type="secondary" style={{ fontSize: 11, flexShrink: 0 }}>
-                  Middle
-                </Text>
+              </InlineField>
+              <InlineField label="Middle" style={{ flex: 1 }}>
                 <Input
                   size="small"
                   value={form.middleName}
                   onChange={(e) => update("middleName", e.target.value)}
                   style={{ flex: 1 }}
                 />
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 4,
-                  flex: 1,
-                }}
-              >
-                <Text type="secondary" style={{ fontSize: 11, flexShrink: 0 }}>
-                  Last
-                </Text>
+              </InlineField>
+              <InlineField label="Last" style={{ flex: 1 }}>
                 <Input
                   size="small"
                   value={form.lastName}
                   onChange={(e) => update("lastName", e.target.value)}
                   style={{ flex: 1 }}
                 />
-              </div>
+              </InlineField>
             </div>
-
-            {/* Ligne 3 : Birthday */}
-            <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-              <Text type="secondary" style={{ fontSize: 11, flexShrink: 0 }}>
-                Birthdate
-              </Text>
+            <InlineField label="Birthdate">
               <DatePicker
                 size="small"
                 format={["YYYY-MM-DD", "DD/MM/YYYY", "MM/DD/YYYY"]}
@@ -379,13 +293,11 @@ export default function ContactDetail({ contact, onSave, onDirtyChange }) {
                     ? dayjs(form.bday, ["YYYY-MM-DD", "YYYYMMDD", "--MM-DD"])
                     : null
                 }
-                onChange={(date, dateString) =>
-                  update("bday", dateString || "")
-                }
+                onChange={(_, dateString) => update("bday", dateString || "")}
                 inputReadOnly={false}
                 placeholder="YYYY-MM-DD"
               />
-            </div>
+            </InlineField>
           </div>
 
           {/* Photo */}
@@ -425,7 +337,7 @@ export default function ContactDetail({ contact, onSave, onDirtyChange }) {
         </div>
       </Card>
 
-      {/* Groupbox Address */}
+      {/* Address */}
       <Card
         size="small"
         title={
@@ -441,18 +353,14 @@ export default function ContactDetail({ contact, onSave, onDirtyChange }) {
             onClick={() => setAdrDialogOpen(true)}
           />
         }
-        style={{ marginBottom: 10, borderColor: "#bbb" }}
-        headStyle={{
-          backgroundColor: "#f0f0f0",
-          borderBottom: "1px solid #bbb",
-        }}
+        style={cardStyle}
+        headStyle={headStyle}
       >
-        {form.adr.length === 0 && (
+        {form.adr.length === 0 ? (
           <Text type="secondary" style={{ fontSize: 12 }}>
             Aucune adresse
           </Text>
-        )}
-        {form.adr.length > 0 && (
+        ) : (
           <Tabs
             size="small"
             type="editable-card"
@@ -466,156 +374,65 @@ export default function ContactDetail({ contact, onSave, onDirtyChange }) {
               closable: true,
               children: (
                 <div style={{ padding: "4px 0" }}>
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 8,
-                      marginBottom: 6,
-                    }}
-                  >
-                    <Text
-                      type="secondary"
-                      style={{ fontSize: 11, width: 50, flexShrink: 0 }}
-                    >
-                      Addres
-                    </Text>
+                  <InlineField label="Addres" style={{ marginBottom: 6 }}>
                     <Input
                       size="small"
                       value={a.raw?.[2] || ""}
                       onChange={(e) => updateAdrPart(i, 2, e.target.value)}
                       style={{ flex: 1 }}
                     />
-                  </div>
+                  </InlineField>
                   <div style={{ display: "flex", gap: 8, marginBottom: 6 }}>
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 4,
-                        flex: 1,
-                      }}
-                    >
-                      <Text
-                        type="secondary"
-                        style={{ fontSize: 11, flexShrink: 0 }}
-                      >
-                        Ext
-                      </Text>
+                    <InlineField label="Ext" style={{ flex: 1 }}>
                       <Input
                         size="small"
                         value={a.raw?.[1] || ""}
                         onChange={(e) => updateAdrPart(i, 1, e.target.value)}
                         style={{ flex: 1 }}
                       />
-                    </div>
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 4,
-                        flex: 1,
-                      }}
-                    >
-                      <Text
-                        type="secondary"
-                        style={{ fontSize: 11, flexShrink: 0 }}
-                      >
-                        City
-                      </Text>
+                    </InlineField>
+                    <InlineField label="City" style={{ flex: 1 }}>
                       <Input
                         size="small"
                         value={a.raw?.[3] || ""}
                         onChange={(e) => updateAdrPart(i, 3, e.target.value)}
                         style={{ flex: 1 }}
                       />
-                    </div>
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 4,
-                        flex: 1,
-                      }}
-                    >
-                      <Text
-                        type="secondary"
-                        style={{ fontSize: 11, flexShrink: 0 }}
-                      >
-                        Region
-                      </Text>
+                    </InlineField>
+                    <InlineField label="Region" style={{ flex: 1 }}>
                       <Input
                         size="small"
                         value={a.raw?.[4] || ""}
                         onChange={(e) => updateAdrPart(i, 4, e.target.value)}
                         style={{ flex: 1 }}
                       />
-                    </div>
+                    </InlineField>
                   </div>
                   <div style={{ display: "flex", gap: 8 }}>
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 4,
-                        flex: 1,
-                      }}
-                    >
-                      <Text
-                        type="secondary"
-                        style={{ fontSize: 11, flexShrink: 0 }}
-                      >
-                        Zip
-                      </Text>
+                    <InlineField label="Zip" style={{ flex: 1 }}>
                       <Input
                         size="small"
                         value={a.raw?.[5] || ""}
                         onChange={(e) => updateAdrPart(i, 5, e.target.value)}
                         style={{ flex: 1 }}
                       />
-                    </div>
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 4,
-                        flex: 1,
-                      }}
-                    >
-                      <Text
-                        type="secondary"
-                        style={{ fontSize: 11, flexShrink: 0 }}
-                      >
-                        PO
-                      </Text>
+                    </InlineField>
+                    <InlineField label="PO" style={{ flex: 1 }}>
                       <Input
                         size="small"
                         value={a.raw?.[0] || ""}
                         onChange={(e) => updateAdrPart(i, 0, e.target.value)}
                         style={{ flex: 1 }}
                       />
-                    </div>
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 4,
-                        flex: 1,
-                      }}
-                    >
-                      <Text
-                        type="secondary"
-                        style={{ fontSize: 11, flexShrink: 0 }}
-                      >
-                        Country
-                      </Text>
+                    </InlineField>
+                    <InlineField label="Country" style={{ flex: 1 }}>
                       <Input
                         size="small"
                         value={a.raw?.[6] || ""}
                         onChange={(e) => updateAdrPart(i, 6, e.target.value)}
                         style={{ flex: 1 }}
                       />
-                    </div>
+                    </InlineField>
                   </div>
                 </div>
               ),
@@ -624,189 +441,50 @@ export default function ContactDetail({ contact, onSave, onDirtyChange }) {
         )}
       </Card>
 
-      {/* Téléphones & Web côte à côte */}
+      {/* Phones & Web */}
       <div style={{ display: "flex", gap: 10 }}>
-        <Card
-          size="small"
-          title={
-            <Text strong style={{ fontSize: 12 }}>
-              Phones
-            </Text>
-          }
-          extra={
-            <Button
-              size="small"
-              icon={<PlusOutlined />}
-              type="text"
-              onClick={addTel}
-            />
-          }
-          style={{ flex: 1, borderColor: "#bbb" }}
-          headStyle={{
-            backgroundColor: "#f0f0f0",
-            borderBottom: "1px solid #bbb",
-          }}
-        >
-          {form.tel.length === 0 && (
-            <Text type="secondary" style={{ fontSize: 12 }}>
-              Aucun téléphone
-            </Text>
-          )}
-          {form.tel.map((item, i) => (
-            <div
-              key={i}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 6,
-                marginBottom: 6,
-              }}
-            >
-              <select
-                value={item.type}
-                onChange={(e) => updateTel(i, "type", e.target.value)}
-                style={{
-                  border: "1px solid #d9d9d9",
-                  borderRadius: 6,
-                  padding: "3px 6px",
-                  fontSize: 12,
-                  color: "#555",
-                  background: "#fafafa",
-                }}
-              >
-                {TEL_TYPES.map((t) => (
-                  <option key={t} value={t.toLowerCase()}>
-                    {t}
-                  </option>
-                ))}
-              </select>
-              <Input
-                size="small"
-                value={item.value}
-                onChange={(e) => updateTel(i, "value", e.target.value)}
-                style={{ flex: 1 }}
-              />
-              <Button
-                size="small"
-                type="text"
-                danger
-                icon={<DeleteOutlined />}
-                onClick={() => removeTel(i)}
-              />
-            </div>
-          ))}
-        </Card>
-
-        <Card
-          size="small"
-          title={
-            <Text strong style={{ fontSize: 12 }}>
-              Web
-            </Text>
-          }
-          extra={
-            <Button
-              size="small"
-              icon={<PlusOutlined />}
-              type="text"
-              onClick={addUrl}
-            />
-          }
-          style={{ flex: 1, borderColor: "#bbb" }}
-          headStyle={{
-            backgroundColor: "#f0f0f0",
-            borderBottom: "1px solid #bbb",
-          }}
-        >
-          {form.url.length === 0 && (
-            <Text type="secondary" style={{ fontSize: 12 }}>
-              Aucune URL
-            </Text>
-          )}
-          {form.url.map((item, i) => (
-            <div
-              key={i}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 6,
-                marginBottom: 6,
-              }}
-            >
-              <select
-                value={item.type}
-                onChange={(e) => updateUrl(i, "type", e.target.value)}
-                style={{
-                  border: "1px solid #d9d9d9",
-                  borderRadius: 6,
-                  padding: "3px 6px",
-                  fontSize: 12,
-                  color: "#555",
-                  background: "#fafafa",
-                }}
-              >
-                {URL_TYPES.map((t) => (
-                  <option key={t} value={t.toLowerCase()}>
-                    {t}
-                  </option>
-                ))}
-              </select>
-              <Input
-                size="small"
-                value={item.value}
-                onChange={(e) => updateUrl(i, "value", e.target.value)}
-                style={{ flex: 1 }}
-              />
-              <Button
-                size="small"
-                type="text"
-                danger
-                icon={<DeleteOutlined />}
-                onClick={() => removeUrl(i)}
-              />
-            </div>
-          ))}
-        </Card>
+        <div style={{ flex: 1 }}>
+          <ItemList
+            title="Phones"
+            items={form.tel}
+            typeOptions={TEL_TYPES}
+            onAdd={addTel}
+            onRemove={removeTel}
+            onChange={updateTel}
+          />
+        </div>
+        <div style={{ flex: 1 }}>
+          <ItemList
+            title="Web"
+            items={form.url}
+            typeOptions={URL_TYPES}
+            onAdd={addUrl}
+            onRemove={removeUrl}
+            onChange={updateUrl}
+          />
+        </div>
       </div>
     </div>
   );
 
-  // Onglet Extra
   const extraTab = (
     <div>
-      <FieldRow label="Org">
-        <Input
-          size="small"
-          value={form.org}
-          onChange={(e) => update("org", e.target.value)}
-          style={{ flex: 1 }}
-        />
-      </FieldRow>
-      <FieldRow label="Title">
-        <Input
-          size="small"
-          value={form.title}
-          onChange={(e) => update("title", e.target.value)}
-          style={{ flex: 1 }}
-        />
-      </FieldRow>
-      <FieldRow label="Gender">
-        <Input
-          size="small"
-          value={form.gender}
-          onChange={(e) => update("gender", e.target.value)}
-          style={{ width: 60 }}
-        />
-      </FieldRow>
-      <FieldRow label="TZ">
-        <Input
-          size="small"
-          value={form.tz}
-          onChange={(e) => update("tz", e.target.value)}
-          style={{ flex: 1 }}
-        />
-      </FieldRow>
-      <div style={{ marginBottom: 8 }}>
+      {[
+        { label: "Org", field: "org", style: { flex: 1 } },
+        { label: "Title", field: "title", style: { flex: 1 } },
+        { label: "Gender", field: "gender", style: { width: 60 } },
+        { label: "TZ", field: "tz", style: { flex: 1 } },
+      ].map(({ label, field, style }) => (
+        <InlineField key={field} label={label} style={{ marginBottom: 8 }}>
+          <Input
+            size="small"
+            value={form[field]}
+            onChange={(e) => update(field, e.target.value)}
+            style={style}
+          />
+        </InlineField>
+      ))}
+      <div>
         <Text
           type="secondary"
           style={{ fontSize: 12, display: "block", marginBottom: 4 }}
@@ -825,7 +503,6 @@ export default function ContactDetail({ contact, onSave, onDirtyChange }) {
 
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column" }}>
-      {/* Barre de titre + Save */}
       <div
         style={{
           display: "flex",

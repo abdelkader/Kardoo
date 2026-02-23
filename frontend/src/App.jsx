@@ -59,7 +59,6 @@ export default function App() {
       setDisplayedContact(parsed[0] || null);
     } catch (e) {
       setError("Erreur : " + e.message);
-      console.error(e);
     }
   };
 
@@ -70,13 +69,9 @@ export default function App() {
     setContacts(newContacts);
     setSelected(updated);
     setDisplayedContact(updated);
-
-    // Sauvegarder sur disque
     try {
-      const content = generateAllVCards(newContacts);
-      await SaveVCardFile(currentFilePath, content);
+      await SaveVCardFile(currentFilePath, generateAllVCards(newContacts));
     } catch (e) {
-      console.error("Erreur sauvegarde:", e);
       setError("Erreur de sauvegarde : " + e.message);
     }
   };
@@ -149,14 +144,12 @@ export default function App() {
                     }}
                     onError={() => true}
                   />
-                  <div style={{ textAlign: "left", overflow: "hidden" }}>
-                    <Text
-                      strong={selected?.id === c.id}
-                      style={{ fontSize: 13, lineHeight: "1.2" }}
-                    >
-                      {c.fn}
-                    </Text>
-                  </div>
+                  <Text
+                    strong={selected?.id === c.id}
+                    style={{ fontSize: 13, lineHeight: "1.2" }}
+                  >
+                    {c.fn}
+                  </Text>
                 </div>
               </List.Item>
             )}

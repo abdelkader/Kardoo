@@ -10,10 +10,6 @@ export function OpenVCardFile() {
   return window['go']['main']['App']['OpenVCardFile']();
 }
 
-export function SaveToFile(arg1, arg2) {
-  return window['go']['main']['App']['SaveToFile'](arg1, arg2);
-}
-
 export function SaveVCardFile(arg1, arg2) {
   return window['go']['main']['App']['SaveVCardFile'](arg1, arg2);
 }

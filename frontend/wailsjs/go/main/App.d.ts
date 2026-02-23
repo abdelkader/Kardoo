@@ -5,6 +5,4 @@ export function OpenImageFile():Promise<string>;
 
 export function OpenVCardFile():Promise<Record<string, string>>;
 
-export function SaveToFile(arg1:string,arg2:string):Promise<void>;
-
 export function SaveVCardFile(arg1:string,arg2:string):Promise<void>;
