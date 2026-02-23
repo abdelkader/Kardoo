@@ -9,11 +9,7 @@ import {
   Empty,
   Modal,
 } from "antd";
-import {
-  UserOutlined,
-  FolderOpenOutlined,
-  SaveOutlined,
-} from "@ant-design/icons";
+import { UserOutlined, FolderOpenOutlined } from "@ant-design/icons";
 import { OpenVCardFile, SaveVCardFile } from "../wailsjs/go/main/App";
 import { splitAndParse, generateAllVCards } from "./utils/vcard";
 import ContactDetail from "./components/ContactDetail";
@@ -85,10 +81,8 @@ export default function App() {
     }
   };
 
-  const filtered = contacts.filter(
-    (c) =>
-      c.fn.toLowerCase().includes(search.toLowerCase()) ||
-      c.org?.toLowerCase().includes(search.toLowerCase()),
+  const filtered = contacts.filter((c) =>
+    c.fn.toLowerCase().includes(search.toLowerCase()),
   );
 
   return (
