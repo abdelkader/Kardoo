@@ -30,7 +30,43 @@ export function decodeQP(value, meta) {
     return value
   }
 }
+export function getSound(card) {
+  try {
+    const prop = card.sound?.[0]
+    if (!prop) return null
 
+    const value = prop.value || ''
+    const meta = prop.meta || {}
+
+    const encoding = (meta.encoding?.[0] || meta.ENCODING?.[0] || '').toLowerCase()
+    const type = (meta.type?.[0] || meta.TYPE?.[0] || 'ogg').toLowerCase()
+
+    if (typeof value === 'string' && value.startsWith('data:')) return { url: value, type }
+
+    if (typeof value === 'string' && (value.startsWith('http://') || value.startsWith('https://'))) {
+      return { url: value, type }
+    }
+
+    if (encoding === 'base64' || encoding === 'b') {
+      const cleaned = value.replace(/\s+/g, '')
+      if (!cleaned) return null
+      const mimeMap = {
+        ogg: 'audio/ogg',
+        mp3: 'audio/mpeg',
+        wav: 'audio/wav',
+        aac: 'audio/aac',
+        amr: 'audio/amr',   // ← ajouté
+      }
+      const mimeType = mimeMap[type] || 'audio/ogg'
+      return { url: `data:${mimeType};base64,${cleaned}`, type }
+    }
+
+    return null
+  } catch (e) {
+    console.warn('Erreur getSound:', e)
+    return null
+  }
+}
 export function getStr(card, field) {
   const prop = card[field]?.[0]
   if (!prop) return ''
@@ -178,6 +214,7 @@ export function splitAndParse(raw) {
         rev: getStr(card, 'rev'),
         uid: getStr(card, 'uid'),
         kind: getStr(card, 'kind'),
+        sound: getSound(card),
         related: getAll(card, 'related').map(r => ({ type: r.type, value: r.value })),
         lang: langs,
         impp,
@@ -189,6 +226,7 @@ export function splitAndParse(raw) {
         fn: `Contact ${i + 1} (erreur)`,
         tel: [], email: [], adr: [], photo: null,
         lang: [], impp: [], related: [], url: [],
+        sound: null,
       }
     }
   })
@@ -258,6 +296,15 @@ export function generateVCard(contact) {
     const type = mime.split('/')[1].toUpperCase()
     lines.push(`PHOTO;ENCODING=b;TYPE=${type}:${data}`)
   }
+
+  if (contact.sound?.url?.startsWith('data:')) {
+  const [header, data] = contact.sound.url.split(',')
+  const mime = header.match(/data:(audio\/\w+)/)?.[1] || 'audio/ogg'
+  const type = mime.split('/')[1].toUpperCase()
+  lines.push(`SOUND;ENCODING=b;TYPE=${type}:${data}`)
+} else if (contact.sound?.url?.startsWith('http')) {
+  lines.push(`SOUND:${contact.sound.url}`)
+}
 
   lines.push('END:VCARD')
   return lines.join('\r\n')

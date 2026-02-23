@@ -18,8 +18,9 @@ import {
   DeleteOutlined,
   SaveOutlined,
   CameraOutlined,
+  DownloadOutlined, // ← ajoute ici
 } from "@ant-design/icons";
-import { OpenImageFile } from "../../wailsjs/go/main/App";
+import { OpenImageFile, OpenSoundFile } from "../../wailsjs/go/main/App";
 import AddressDialog from "./AddressDialog";
 
 const { Text } = Typography;
@@ -158,6 +159,7 @@ export default function ContactDetail({ contact, onSave, onDirtyChange }) {
       note: contact.note || "",
       gender: contact.gender || "",
       tz: contact.tz || "",
+      sound: contact.sound || null,
       nickname: contact.nickname || "",
       anniversary: contact.anniversary || "",
       role: contact.role || "",
@@ -641,6 +643,69 @@ export default function ContactDetail({ contact, onSave, onDirtyChange }) {
         />
       </Card>
 
+      {/* Sound */}
+      <Card
+        size="small"
+        title={
+          <Text strong style={{ fontSize: 12 }}>
+            Son (prononciation)
+          </Text>
+        }
+        extra={
+          <Button
+            size="small"
+            icon={<PlusOutlined />}
+            type="text"
+            onClick={async () => {
+              try {
+                const dataUrl = await OpenSoundFile();
+                if (dataUrl) update("sound", dataUrl);
+              } catch (e) {
+                console.error("Erreur son:", e);
+              }
+            }}
+          />
+        }
+        style={cardStyle}
+        headStyle={headStyle}
+      >
+        {!form.sound ? (
+          <Text type="secondary" style={{ fontSize: 12 }}>
+            Aucun son
+          </Text>
+        ) : (
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            {/* Formats supportés par le navigateur */}
+            {["ogg", "mp3", "wav", "aac"].includes(form.sound.type) ? (
+              <audio
+                controls
+                src={form.sound.url}
+                style={{ flex: 1, height: 32 }}
+              />
+            ) : (
+              <div style={{ flex: 1 }}>
+                <Text type="warning" style={{ fontSize: 12 }}>
+                  ⚠️ Format {form.sound.type?.toUpperCase()} non supporté par le
+                  navigateur
+                </Text>
+                <br />
+                <a href={form.sound.url} download={`sound.${form.sound.type}`}>
+                  <Button size="small" icon={<DownloadOutlined />}>
+                    Télécharger
+                  </Button>
+                </a>
+              </div>
+            )}
+            <Button
+              size="small"
+              type="text"
+              danger
+              icon={<DeleteOutlined />}
+              onClick={() => update("sound", null)}
+            />
+          </div>
+        )}
+      </Card>
       {/* Langues + IMPP côte à côte */}
       <div style={{ display: "flex", gap: 10, marginBottom: 10 }}>
         <Card

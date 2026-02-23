@@ -71,3 +71,30 @@ func (a *App) SaveVCardFile(path string, content string) error {
 	}
 	return os.WriteFile(path, []byte(content), 0644)
 }
+
+func (a *App) OpenSoundFile() (string, error) {
+	file, err := runtime.OpenFileDialog(a.ctx, runtime.OpenDialogOptions{
+		Title: "Choisir un fichier audio",
+		Filters: []runtime.FileFilter{
+			{DisplayName: "Audio (*.ogg, *.mp3, *.wav)", Pattern: "*.ogg;*.mp3;*.wav"},
+		},
+	})
+	if err != nil || file == "" {
+		return "", err
+	}
+	content, err := os.ReadFile(file)
+	if err != nil {
+		return "", err
+	}
+	ext := strings.ToLower(filepath.Ext(file))
+	mimeMap := map[string]string{
+		".ogg": "audio/ogg",
+		".mp3": "audio/mpeg",
+		".wav": "audio/wav",
+	}
+	mimeType := mimeMap[ext]
+	if mimeType == "" {
+		mimeType = "audio/ogg"
+	}
+	return "data:" + mimeType + ";base64," + base64.StdEncoding.EncodeToString(content), nil
+}

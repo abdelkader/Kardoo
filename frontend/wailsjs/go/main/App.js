@@ -6,6 +6,10 @@ export function OpenImageFile() {
   return window['go']['main']['App']['OpenImageFile']();
 }
 
+export function OpenSoundFile() {
+  return window['go']['main']['App']['OpenSoundFile']();
+}
+
 export function OpenVCardFile() {
   return window['go']['main']['App']['OpenVCardFile']();
 }

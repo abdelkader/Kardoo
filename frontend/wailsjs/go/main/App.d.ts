@@ -3,6 +3,8 @@
 
 export function OpenImageFile():Promise<string>;
 
+export function OpenSoundFile():Promise<string>;
+
 export function OpenVCardFile():Promise<Record<string, string>>;
 
 export function SaveVCardFile(arg1:string,arg2:string):Promise<void>;
