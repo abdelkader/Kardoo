@@ -53,7 +53,15 @@ function InlineField({ label, children, style }) {
 }
 
 // Composant réutilisable pour les listes téléphone/URL
-function ItemList({ items, typeOptions, onAdd, onRemove, onChange, title }) {
+function ItemList({
+  items,
+  typeOptions,
+  onAdd,
+  onRemove,
+  onChange,
+  title,
+  style,
+}) {
   return (
     <Card
       size="small"
@@ -70,7 +78,7 @@ function ItemList({ items, typeOptions, onAdd, onRemove, onChange, title }) {
           onClick={onAdd}
         />
       }
-      style={cardStyle}
+      style={{ ...cardStyle, ...style }}
       headStyle={headStyle}
     >
       {items.length === 0 && (
@@ -555,18 +563,18 @@ export default function ContactDetail({ contact, onSave, onDirtyChange }) {
         </div>
       </Card>
 
-      {/* Groupbox Dates */}
-      <Card
-        size="small"
-        title={
-          <Text strong style={{ fontSize: 12 }}>
-            Dates
-          </Text>
-        }
-        style={cardStyle}
-        headStyle={headStyle}
-      >
-        <div style={{ display: "flex", gap: 12 }}>
+      {/* Dates + Localisation côte à côte */}
+      <div style={{ display: "flex", gap: 10, marginBottom: 10 }}>
+        <Card
+          size="small"
+          title={
+            <Text strong style={{ fontSize: 12 }}>
+              Dates
+            </Text>
+          }
+          style={{ ...cardStyle, flex: 1, marginBottom: 0 }}
+          headStyle={headStyle}
+        >
           <InlineField label="Anniv.">
             <DatePicker
               size="small"
@@ -583,22 +591,19 @@ export default function ContactDetail({ contact, onSave, onDirtyChange }) {
               placeholder="YYYY-MM-DD"
             />
           </InlineField>
-        </div>
-      </Card>
+        </Card>
 
-      {/* Groupbox Localisation */}
-      <Card
-        size="small"
-        title={
-          <Text strong style={{ fontSize: 12 }}>
-            Localisation
-          </Text>
-        }
-        style={cardStyle}
-        headStyle={headStyle}
-      >
-        <div style={{ display: "flex", gap: 12, marginBottom: 6 }}>
-          <InlineField label="GEO" style={{ flex: 1 }}>
+        <Card
+          size="small"
+          title={
+            <Text strong style={{ fontSize: 12 }}>
+              Localisation
+            </Text>
+          }
+          style={{ ...cardStyle, flex: 1, marginBottom: 0 }}
+          headStyle={headStyle}
+        >
+          <InlineField label="GEO" style={{ marginBottom: 6 }}>
             <Input
               size="small"
               value={form.geo}
@@ -606,7 +611,7 @@ export default function ContactDetail({ contact, onSave, onDirtyChange }) {
               style={{ flex: 1 }}
             />
           </InlineField>
-          <InlineField label="TZ" style={{ flex: 1 }}>
+          <InlineField label="TZ">
             <Input
               size="small"
               value={form.tz}
@@ -614,8 +619,8 @@ export default function ContactDetail({ contact, onSave, onDirtyChange }) {
               style={{ flex: 1 }}
             />
           </InlineField>
-        </div>
-      </Card>
+        </Card>
+      </div>
 
       {/* Note */}
       <Card
@@ -638,7 +643,6 @@ export default function ContactDetail({ contact, onSave, onDirtyChange }) {
 
       {/* Langues + IMPP côte à côte */}
       <div style={{ display: "flex", gap: 10, marginBottom: 10 }}>
-        {/* Langues */}
         <Card
           size="small"
           title={
@@ -718,7 +722,6 @@ export default function ContactDetail({ contact, onSave, onDirtyChange }) {
           ))}
         </Card>
 
-        {/* IMPP */}
         <ItemList
           title="Messagerie (IMPP)"
           items={form.impp}
