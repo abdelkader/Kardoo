@@ -3,15 +3,65 @@ package main
 import (
 	"context"
 	"encoding/base64"
+	"encoding/json"
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 type App struct {
 	ctx context.Context
+}
+
+type AppConfig struct {
+	WindowX      int    `json:"windowX"`
+	WindowY      int    `json:"windowY"`
+	WindowWidth  int    `json:"windowWidth"`
+	WindowHeight int    `json:"windowHeight"`
+	BackupOnSave bool   `json:"backupOnSave"`
+	BackupDir    string `json:"backupDir"`
+}
+
+func getConfigPath() (string, error) {
+	dir, err := os.UserConfigDir()
+	if err != nil {
+		return "", err
+	}
+	return filepath.Join(dir, "Kardoo", "Kardoo.appconfig"), nil
+}
+
+func (a *App) LoadConfig() (AppConfig, error) {
+	path, err := getConfigPath()
+	if err != nil {
+		return AppConfig{WindowWidth: 1200, WindowHeight: 800}, nil
+	}
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return AppConfig{WindowWidth: 1200, WindowHeight: 800}, nil
+	}
+	var cfg AppConfig
+	if err := json.Unmarshal(data, &cfg); err != nil {
+		return AppConfig{WindowWidth: 1200, WindowHeight: 800}, nil
+	}
+	return cfg, nil
+}
+
+func (a *App) SaveConfig(cfg AppConfig) error {
+	path, err := getConfigPath()
+	if err != nil {
+		return err
+	}
+	if err := os.MkdirAll(filepath.Dir(path), 0755); err != nil {
+		return err
+	}
+	data, err := json.MarshalIndent(cfg, "", "  ")
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(path, data, 0644)
 }
 
 func NewApp() *App {
@@ -57,7 +107,25 @@ func (a *App) OpenImageFile() (string, error) {
 	return "data:" + mimeType + ";base64," + base64.StdEncoding.EncodeToString(content), nil
 }
 
-func (a *App) SaveVCardFile(path string, content string) error {
+func (a *App) SaveVCardFile(path string, content string, backup bool, backupDir string) error {
+	// Backup avant sauvegarde
+	if backup && path != "" {
+		dir := backupDir
+		if dir == "" {
+			dir = filepath.Dir(path)
+		}
+		if err := os.MkdirAll(dir, 0755); err == nil {
+			base := filepath.Base(path)
+			ext := filepath.Ext(base)
+			name := base[:len(base)-len(ext)]
+			// Timestamp dans le nom du backup
+			backupPath := filepath.Join(dir, name+"_backup_"+time.Now().Format("20060102_150405")+ext)
+			if data, err := os.ReadFile(path); err == nil {
+				os.WriteFile(backupPath, data, 0644)
+			}
+		}
+	}
+
 	if path == "" {
 		var err error
 		path, err = runtime.SaveFileDialog(a.ctx, runtime.SaveDialogOptions{
@@ -70,6 +138,23 @@ func (a *App) SaveVCardFile(path string, content string) error {
 		}
 	}
 	return os.WriteFile(path, []byte(content), 0644)
+}
+
+func (a *App) ChooseDirectory() (string, error) {
+	return runtime.OpenDirectoryDialog(a.ctx, runtime.OpenDialogOptions{
+		Title: "Choisir le dossier de backup",
+	})
+}
+
+func (a *App) GetWindowPosition() (map[string]int, error) {
+	x, y := runtime.WindowGetPosition(a.ctx)
+	w, h := runtime.WindowGetSize(a.ctx)
+	return map[string]int{"x": x, "y": y, "width": w, "height": h}, nil
+}
+
+func (a *App) SetWindowPosition(x, y, w, h int) {
+	runtime.WindowSetPosition(a.ctx, x, y)
+	runtime.WindowSetSize(a.ctx, w, h)
 }
 
 func (a *App) OpenSoundFile() (string, error) {

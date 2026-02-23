@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Layout,
   List,
@@ -17,11 +17,20 @@ import {
   SettingOutlined,
   InfoCircleOutlined,
 } from "@ant-design/icons";
-import { OpenVCardFile, SaveVCardFile } from "../wailsjs/go/main/App";
+
 import { splitAndParse, generateAllVCards } from "./utils/vcard";
 import ContactDetail from "./components/ContactDetail";
+import SettingsDialog from "./components/SettingsDialog";
 import "antd/dist/reset.css";
 import logo from "./assets/logo.png";
+import {
+  LoadConfig,
+  SaveConfig,
+  SaveVCardFile,
+  GetWindowPosition,
+  SetWindowPosition,
+  OpenVCardFile,
+} from "../wailsjs/go/main/App";
 
 const { Sider, Content } = Layout;
 const { Text } = Typography;
@@ -69,6 +78,27 @@ export default function App() {
   const [currentFilePath, setCurrentFilePath] = useState("");
   const [pendingAction, setPendingAction] = useState(null);
   const [aboutOpen, setAboutOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [appConfig, setAppConfig] = useState({
+    backupOnSave: false,
+    backupDir: "",
+  });
+
+  useEffect(() => {
+    LoadConfig()
+      .then((cfg) => {
+        setAppConfig(cfg);
+        if (cfg.windowWidth && cfg.windowHeight) {
+          SetWindowPosition(
+            cfg.windowX,
+            cfg.windowY,
+            cfg.windowWidth,
+            cfg.windowHeight,
+          );
+        }
+      })
+      .catch(console.error);
+  }, []);
 
   const withDirtyCheck = (action) => {
     if (isDirty) {
@@ -109,7 +139,12 @@ export default function App() {
     setSelected(updated);
     setDisplayedContact(updated);
     try {
-      await SaveVCardFile(currentFilePath, generateAllVCards(newContacts));
+      await SaveVCardFile(
+        currentFilePath,
+        generateAllVCards(newContacts),
+        appConfig.backupOnSave,
+        appConfig.backupDir,
+      );
     } catch (e) {
       setError("Erreur de sauvegarde : " + e.message);
     }
@@ -149,9 +184,7 @@ export default function App() {
         <IconBarBtn
           icon={<SettingOutlined />}
           tooltip="Paramètres"
-          onClick={() => {
-            /* TODO */
-          }}
+          onClick={() => setSettingsOpen(true)}
         />
         <IconBarBtn
           icon={<InfoCircleOutlined />}
@@ -307,6 +340,14 @@ export default function App() {
           </Text>
         </div>
       </Modal>
+      <SettingsDialog
+        open={settingsOpen}
+        onClose={() => {
+          setSettingsOpen(false);
+          // Recharger la config après fermeture
+          LoadConfig().then(setAppConfig).catch(console.error);
+        }}
+      />
     </Layout>
   );
 }
