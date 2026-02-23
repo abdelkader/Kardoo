@@ -1,0 +1,69 @@
+{
+  "app": {
+    "open": "Open .vcf file",
+    "settings": "Settings",
+    "about": "About",
+    "search": "Search...",
+    "contacts": "contact",
+    "contacts_plural": "contacts",
+    "no_contacts": "Open a .vcf file",
+    "no_contact_selected": "Open a .vcf file and select a contact"
+  },
+  "contact": {
+    "save": "Save",
+    "saved": "Saved",
+    "no_name": "No name",
+    "name": "Name",
+    "address": "Address",
+    "phones": "Phones",
+    "web": "Web",
+    "identity": "Identity",
+    "dates": "Dates",
+    "localisation": "Location",
+    "note": "Note",
+    "languages": "Languages",
+    "messaging": "Messaging (IMPP)",
+    "related": "Related persons",
+    "sound": "Sound (pronunciation)",
+    "metadata": "Metadata",
+    "no_address": "No address",
+    "no_phone": "No phone",
+    "no_url": "No URL",
+    "no_sound": "No sound",
+    "no_element": "No element",
+    "no_language": "No language",
+    "change_photo": "Change",
+    "download_photo": "Download"
+  },
+  "dirty": {
+    "title": "Unsaved changes",
+    "content": "Do you want to discard the current changes?",
+    "abandon": "Discard",
+    "cancel": "Cancel"
+  },
+  "settings": {
+    "title": "Settings",
+    "window": "Window",
+    "position_x": "Position X",
+    "position_y": "Y",
+    "width": "Width",
+    "height": "H",
+    "capture": "Capture current position",
+    "capture_hint": "The window will open at this position on next launch",
+    "backup": "Backup",
+    "backup_on_save": "Create a backup on each save",
+    "backup_dir": "Backup folder:",
+    "backup_placeholder": "Same folder as the .vcf file",
+    "backup_hint": "Backups are named: contacts_backup_20250223_143022.vcf",
+    "save": "Save",
+    "saved": "✓ Saved",
+    "close": "Close",
+    "language": "Language"
+  },
+  "about": {
+    "close": "Close",
+    "description": "A tool to edit (Modify, delete) VCF files.",
+    "subtitle": "Manage your vCard contacts with ease.",
+    "copyright": "© 2025 abdelkader · All rights reserved"
+  }
+}

@@ -23,6 +23,7 @@ type AppConfig struct {
 	WindowHeight int    `json:"windowHeight"`
 	BackupOnSave bool   `json:"backupOnSave"`
 	BackupDir    string `json:"backupDir"`
+	Language     string `json:"language"`
 }
 
 func getConfigPath() (string, error) {

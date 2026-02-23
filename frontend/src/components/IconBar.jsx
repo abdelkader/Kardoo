@@ -4,8 +4,11 @@ import {
   InfoCircleOutlined,
 } from "@ant-design/icons";
 import IconBarBtn from "./IconBarBtn";
+import { useTranslation } from "react-i18next";
 
 export default function IconBar({ onOpen, onSettings, onAbout }) {
+  const { t } = useTranslation();
+
   return (
     <div
       style={{
@@ -21,18 +24,18 @@ export default function IconBar({ onOpen, onSettings, onAbout }) {
     >
       <IconBarBtn
         icon={<FolderOpenOutlined />}
-        tooltip="Ouvrir un fichier .vcf"
+        tooltip={t("app.open")}
         onClick={onOpen}
       />
       <div style={{ flex: 1 }} />
       <IconBarBtn
         icon={<SettingOutlined />}
-        tooltip="Paramètres"
+        tooltip={t("app.settings")}
         onClick={onSettings}
       />
       <IconBarBtn
         icon={<InfoCircleOutlined />}
-        tooltip="À propos"
+        tooltip={t("app.about")}
         onClick={onAbout}
       />
     </div>

@@ -9,6 +9,7 @@ import ContactDetail from "./components/ContactDetail";
 import AboutDialog from "./components/AboutDialog";
 import SettingsDialog from "./components/SettingsDialog";
 import "antd/dist/reset.css";
+import { useTranslation } from "react-i18next";
 
 const { Sider, Content } = Layout;
 
@@ -22,7 +23,7 @@ export default function App() {
     backupOnSave: false,
     backupDir: "",
   });
-
+  const { i18n, t } = useTranslation();
   const {
     contacts,
     selected,
@@ -37,6 +38,7 @@ export default function App() {
     LoadConfig()
       .then((cfg) => {
         setAppConfig(cfg);
+        if (cfg.language) i18n.changeLanguage(cfg.language);
         if (cfg.windowWidth && cfg.windowHeight) {
           SetWindowPosition(
             cfg.windowX,
@@ -91,7 +93,7 @@ export default function App() {
           />
         ) : (
           <Empty
-            description="Ouvre un fichier .vcf et sélectionne un contact"
+            description={t("app.no_contact_selected")}
             style={{ marginTop: 100 }}
           />
         )}
@@ -109,7 +111,7 @@ export default function App() {
         }}
         onCancel={() => setPendingAction(null)}
       >
-        Voulez-vous abandonner les modifications en cours ?
+        {t("dirty.content")}
       </Modal>
 
       <AboutDialog open={aboutOpen} onClose={() => setAboutOpen(false)} />

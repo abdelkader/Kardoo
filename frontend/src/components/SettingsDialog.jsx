@@ -1,5 +1,15 @@
+import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
-import { Modal, Switch, Button, Input, Divider, Typography, Card } from "antd";
+import {
+  Modal,
+  Switch,
+  Button,
+  Input,
+  Divider,
+  Typography,
+  Card,
+  Select,
+} from "antd";
 import { FolderOpenOutlined } from "@ant-design/icons";
 import {
   SaveConfig,
@@ -17,6 +27,8 @@ const headStyle = {
 };
 
 export default function SettingsDialog({ open, onClose }) {
+  const { t, i18n } = useTranslation();
+
   const [config, setConfig] = useState({
     windowX: 0,
     windowY: 0,
@@ -65,7 +77,7 @@ export default function SettingsDialog({ open, onClose }) {
 
   const handleSave = async () => {
     try {
-      await SaveConfig(config);
+      await SaveConfig({ ...config, language: i18n.language });
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
     } catch (e) {
@@ -76,15 +88,15 @@ export default function SettingsDialog({ open, onClose }) {
   return (
     <Modal
       open={open}
-      title="Paramètres"
+      title={t("settings.title")}
       onCancel={onClose}
       width={480}
       footer={[
         <Button key="cancel" onClick={onClose}>
-          Fermer
+          {t("settings.close")}
         </Button>,
         <Button key="save" type="primary" onClick={handleSave}>
-          {saved ? "✓ Sauvegardé" : "Sauvegarder"}
+          {saved ? t("settings.saved") : t("settings.save")}
         </Button>,
       ]}
     >
@@ -93,7 +105,7 @@ export default function SettingsDialog({ open, onClose }) {
         size="small"
         title={
           <Text strong style={{ fontSize: 12 }}>
-            Fenêtre
+            {t("settings.window")}
           </Text>
         }
         style={cardStyle}
@@ -107,7 +119,9 @@ export default function SettingsDialog({ open, onClose }) {
             alignItems: "center",
           }}
         >
-          <Text style={{ fontSize: 12, width: 60 }}>Position X</Text>
+          <Text style={{ fontSize: 12, width: 60 }}>
+            {t("settings.position_x")}
+          </Text>
           <Input
             size="small"
             type="number"
@@ -132,7 +146,7 @@ export default function SettingsDialog({ open, onClose }) {
             alignItems: "center",
           }}
         >
-          <Text style={{ fontSize: 12, width: 60 }}>Largeur</Text>
+          <Text style={{ fontSize: 12, width: 60 }}>{t("settings.width")}</Text>
           <Input
             size="small"
             type="number"
@@ -154,19 +168,39 @@ export default function SettingsDialog({ open, onClose }) {
           />
         </div>
         <Button size="small" onClick={handleSaveWindowPos}>
-          Capturer la position actuelle
+          {t("settings.capture")}
         </Button>
         <Text type="secondary" style={{ fontSize: 11, marginLeft: 8 }}>
-          La fenêtre s'ouvrira à cette position au prochain démarrage
+          {t("settings.window_position_saved")}
         </Text>
       </Card>
-
+      <Card
+        size="small"
+        title={
+          <Text strong style={{ fontSize: 12 }}>
+            {t("settings.language")}
+          </Text>
+        }
+        style={cardStyle}
+        headStyle={headStyle}
+      >
+        <Select
+          size="small"
+          value={i18n.language}
+          onChange={(lng) => i18n.changeLanguage(lng)}
+          options={[
+            { value: "fr", label: "🇫🇷 Français" },
+            { value: "en", label: "🇬🇧 English" },
+          ]}
+          style={{ width: 160 }}
+        />
+      </Card>
       {/* Backup */}
       <Card
         size="small"
         title={
           <Text strong style={{ fontSize: 12 }}>
-            Backup
+            {t("settings.backup")}
           </Text>
         }
         style={cardStyle}
@@ -186,19 +220,19 @@ export default function SettingsDialog({ open, onClose }) {
             onChange={(v) => update("backupOnSave", v)}
           />
           <Text style={{ fontSize: 12 }}>
-            Créer un backup à chaque sauvegarde
+            {t("settings.create_backup_on_save")}
           </Text>
         </div>
         {config.backupOnSave && (
           <div>
             <Text style={{ fontSize: 12, display: "block", marginBottom: 4 }}>
-              Dossier de backup :
+              {t("settings.backup_dir")}
             </Text>
             <div style={{ display: "flex", gap: 6 }}>
               <Input
                 size="small"
                 value={config.backupDir}
-                placeholder="Même dossier que le fichier .vcf"
+                placeholder={t("settings.backup_placeholder")}
                 onChange={(e) => update("backupDir", e.target.value)}
                 style={{ flex: 1 }}
               />
@@ -212,7 +246,7 @@ export default function SettingsDialog({ open, onClose }) {
               type="secondary"
               style={{ fontSize: 11, marginTop: 4, display: "block" }}
             >
-              Les backups sont nommés : contacts_backup_20250223_143022.vcf
+              {t("settings.backup_hint")}
             </Text>
           </div>
         )}

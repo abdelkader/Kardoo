@@ -11,9 +11,11 @@
   "dependencies": {
     "@ant-design/icons": "^6.1.0",
     "antd": "^6.3.0",
+    "i18next": "^25.8.13",
     "quoted-printable": "^1.0.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-i18next": "^16.5.4",
     "utf8": "^3.0.0",
     "vcard-parser": "^1.0.0",
     "vcf": "^2.1.2"

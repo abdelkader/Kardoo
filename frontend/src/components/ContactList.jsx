@@ -1,6 +1,6 @@
 import { List, Avatar, Typography, Input, Empty } from "antd";
 import { UserOutlined } from "@ant-design/icons";
-
+import { useTranslation } from "react-i18next";
 const { Text } = Typography;
 
 export default function ContactList({
@@ -12,18 +12,20 @@ export default function ContactList({
   onSelect,
   error,
 }) {
+  const { t } = useTranslation();
   return (
     <>
       <div style={{ padding: "10px 10px 6px" }}>
         <Input.Search
-          placeholder="Rechercher..."
+          placeholder={t("app.search")}
           value={search}
           onChange={(e) => onSearch(e.target.value)}
           style={{ marginBottom: 6 }}
           size="small"
         />
         <Text type="secondary" style={{ fontSize: 11 }}>
-          {filtered.length} contact{filtered.length !== 1 ? "s" : ""}
+          {filtered.length}{" "}
+          {filtered.length !== 1 ? t("app.contacts_plural") : t("app.contact")}
         </Text>
       </div>
 
@@ -37,7 +39,7 @@ export default function ContactList({
       )}
 
       {contacts.length === 0 ? (
-        <Empty description="Ouvre un fichier .vcf" style={{ marginTop: 40 }} />
+        <Empty description={t("app.no_contacts")} style={{ marginTop: 40 }} />
       ) : (
         <List
           dataSource={filtered}

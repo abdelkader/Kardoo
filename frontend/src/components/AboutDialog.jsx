@@ -1,16 +1,19 @@
 import { Modal, Button, Typography, Divider } from "antd";
 import logo from "../assets/logo.png";
+import { useTranslation } from "react-i18next";
 
 const { Text } = Typography;
 
 export default function AboutDialog({ open, onClose }) {
+  const { t } = useTranslation();
+
   return (
     <Modal
       open={open}
       onCancel={onClose}
       footer={
         <Button type="primary" onClick={onClose}>
-          Fermer
+          {t("about.close")}
         </Button>
       }
       width={360}
@@ -36,13 +39,13 @@ export default function AboutDialog({ open, onClose }) {
         </Text>
         <Divider />
         <Text style={{ fontSize: 13 }}>
-          A tool to edit (Modify, delete) VCF files.
+          {t("about.description")}
           <br />
-          Manage your vCard contacts with ease.
+          {t("about.subtitle")}
         </Text>
         <Divider />
         <Text type="secondary" style={{ fontSize: 12 }}>
-          © 2025 abdelkader · All rights reserved
+          {t("about.copyright")}
         </Text>
       </div>
     </Modal>

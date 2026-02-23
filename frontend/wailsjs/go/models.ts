@@ -7,6 +7,7 @@ export namespace main {
 	    windowHeight: number;
 	    backupOnSave: boolean;
 	    backupDir: string;
+	    language: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new AppConfig(source);
@@ -20,6 +21,7 @@ export namespace main {
 	        this.windowHeight = source["windowHeight"];
 	        this.backupOnSave = source["backupOnSave"];
 	        this.backupDir = source["backupDir"];
+	        this.language = source["language"];
 	    }
 	}
 

@@ -1,6 +1,7 @@
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 dayjs.extend(customParseFormat);
+import { useTranslation } from "react-i18next";
 
 import { useState, useEffect } from "react";
 import {
@@ -68,6 +69,7 @@ function ItemList({
   title,
   style,
 }) {
+  const { t } = useTranslation();
   return (
     <Card
       size="small"
@@ -89,7 +91,7 @@ function ItemList({
     >
       {items.length === 0 && (
         <Text type="secondary" style={{ fontSize: 12 }}>
-          Aucun élément
+          {t("contact.no_element")}
         </Text>
       )}
       {items.map((item, i) => (
@@ -143,7 +145,7 @@ export default function ContactDetail({ contact, onSave, onDirtyChange }) {
   const [form, setForm] = useState(null);
   const [dirty, setDirty] = useState(false);
   const [adrDialogOpen, setAdrDialogOpen] = useState(false);
-
+  const { t } = useTranslation();
   useEffect(() => {
     if (!contact) return;
     setForm({
@@ -258,7 +260,7 @@ export default function ContactDetail({ contact, onSave, onDirtyChange }) {
         size="small"
         title={
           <Text strong style={{ fontSize: 12 }}>
-            Name
+            {t("contact.name")}
           </Text>
         }
         style={cardStyle}
@@ -382,7 +384,7 @@ export default function ContactDetail({ contact, onSave, onDirtyChange }) {
         size="small"
         title={
           <Text strong style={{ fontSize: 12 }}>
-            Address
+            {t("contact.address")}
           </Text>
         }
         extra={
@@ -398,7 +400,7 @@ export default function ContactDetail({ contact, onSave, onDirtyChange }) {
       >
         {form.adr.length === 0 ? (
           <Text type="secondary" style={{ fontSize: 12 }}>
-            Aucune adresse
+            {t("contact.no_address")}
           </Text>
         ) : (
           <Tabs
@@ -514,7 +516,7 @@ export default function ContactDetail({ contact, onSave, onDirtyChange }) {
         size="small"
         title={
           <Text strong style={{ fontSize: 12 }}>
-            Identité
+            {t("contact.identity")}
           </Text>
         }
         style={cardStyle}
@@ -590,7 +592,7 @@ export default function ContactDetail({ contact, onSave, onDirtyChange }) {
           size="small"
           title={
             <Text strong style={{ fontSize: 12 }}>
-              Dates
+              {t("contact.dates")}
             </Text>
           }
           style={{ ...cardStyle, flex: 1, marginBottom: 0 }}
@@ -618,7 +620,7 @@ export default function ContactDetail({ contact, onSave, onDirtyChange }) {
           size="small"
           title={
             <Text strong style={{ fontSize: 12 }}>
-              Localisation
+              {t("contact.localisation")}
             </Text>
           }
           style={{ ...cardStyle, flex: 1, marginBottom: 0 }}
@@ -648,7 +650,7 @@ export default function ContactDetail({ contact, onSave, onDirtyChange }) {
         size="small"
         title={
           <Text strong style={{ fontSize: 12 }}>
-            Note
+            {t("contact.note")}
           </Text>
         }
         style={cardStyle}
@@ -667,7 +669,7 @@ export default function ContactDetail({ contact, onSave, onDirtyChange }) {
         size="small"
         title={
           <Text strong style={{ fontSize: 12 }}>
-            Son (prononciation)
+            {t("contact.sound")}
           </Text>
         }
         extra={
@@ -690,7 +692,7 @@ export default function ContactDetail({ contact, onSave, onDirtyChange }) {
       >
         {!form.sound ? (
           <Text type="secondary" style={{ fontSize: 12 }}>
-            Aucun son
+            {t("contact.no_sound")}
           </Text>
         ) : (
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -731,7 +733,7 @@ export default function ContactDetail({ contact, onSave, onDirtyChange }) {
           size="small"
           title={
             <Text strong style={{ fontSize: 12 }}>
-              Langues
+              {t("contact.languages")}
             </Text>
           }
           extra={
@@ -749,7 +751,7 @@ export default function ContactDetail({ contact, onSave, onDirtyChange }) {
         >
           {form.lang.length === 0 && (
             <Text type="secondary" style={{ fontSize: 12 }}>
-              Aucune langue
+              {t("contact.no_language")}
             </Text>
           )}
           {form.lang.map((l, i) => (
@@ -807,7 +809,7 @@ export default function ContactDetail({ contact, onSave, onDirtyChange }) {
         </Card>
 
         <ItemList
-          title="Messagerie (IMPP)"
+          title={t("contact.messaging")}
           items={form.impp}
           typeOptions={[
             "Skype",
@@ -840,7 +842,7 @@ export default function ContactDetail({ contact, onSave, onDirtyChange }) {
 
       {/* Personnes liées */}
       <ItemList
-        title="Personnes liées"
+        title={t("contact.related")}
         items={form.related}
         typeOptions={[
           "Friend",
@@ -926,7 +928,7 @@ export default function ContactDetail({ contact, onSave, onDirtyChange }) {
           disabled={!dirty}
           size="small"
         >
-          {dirty ? "Sauvegarder" : "Sauvegardé"}
+          {dirty ? t("contact.save") : t("contact.saved")}
         </Button>
       </div>
 

@@ -1,0 +1,69 @@
+{
+  "app": {
+    "open": "Ouvrir un fichier .vcf",
+    "settings": "Paramètres",
+    "about": "À propos",
+    "search": "Rechercher...",
+    "contacts": "contact",
+    "contacts_plural": "contacts",
+    "no_contacts": "Ouvre un fichier .vcf",
+    "no_contact_selected": "Ouvre un fichier .vcf et sélectionne un contact"
+  },
+  "contact": {
+    "save": "Sauvegarder",
+    "saved": "Sauvegardé",
+    "no_name": "Sans nom",
+    "name": "Name",
+    "address": "Address",
+    "phones": "Phones",
+    "web": "Web",
+    "identity": "Identité",
+    "dates": "Dates",
+    "localisation": "Localisation", 
+    "note": "Note",
+    "languages": "Langues",
+    "messaging": "Messagerie (IMPP)",
+    "related": "Personnes liées",
+    "sound": "Son (prononciation)",
+    "metadata": "Métadonnées",
+    "no_address": "Aucune adresse",
+    "no_phone": "Aucun téléphone",
+    "no_url": "Aucune URL",
+    "no_sound": "Aucun son",
+    "no_element": "Aucun élément",
+    "no_language": "Aucune langue",
+    "change_photo": "Changer",
+    "download_photo": "Télécharger"
+  },
+  "dirty": {
+    "title": "Modifications non sauvegardées",
+    "content": "Voulez-vous abandonner les modifications en cours ?",
+    "abandon": "Abandonner",
+    "cancel": "Annuler"
+  },
+  "settings": {
+    "title": "Paramètres",
+    "window": "Fenêtre",
+    "position_x": "Position X",
+    "position_y": "Y",
+    "width": "Largeur",
+    "height": "H",
+    "capture": "Capturer la position actuelle",
+    "capture_hint": "La fenêtre s'ouvrira à cette position au prochain démarrage",
+    "backup": "Backup",
+    "backup_on_save": "Créer un backup à chaque sauvegarde",
+    "backup_dir": "Dossier de backup :",
+    "backup_placeholder": "Même dossier que le fichier .vcf",
+    "backup_hint": "Les backups sont nommés : contacts_backup_20250223_143022.vcf",
+    "save": "Sauvegarder",
+    "saved": "✓ Sauvegardé",
+    "close": "Fermer",
+    "language": "Langue"
+  },
+  "about": {
+    "close": "Fermer",
+    "description": "A tool to edit (Modify, delete) VCF files.",
+    "subtitle": "Manage your vCard contacts with ease.",
+    "copyright": "© 2025 abdelkader · All rights reserved"
+  }
+}
