@@ -48,17 +48,34 @@ export default function App() {
   };
 
   const handleOpen = async () => {
-    setError("");
-    try {
-      const result = await OpenVCardFile();
-      if (!result) return;
-      setCurrentFilePath(result.path);
-      const parsed = splitAndParse(result.content);
-      setContacts(parsed);
-      setSelected(parsed[0] || null);
-      setDisplayedContact(parsed[0] || null);
-    } catch (e) {
-      setError("Erreur : " + e.message);
+    const doOpen = async () => {
+      setError("");
+      try {
+        const result = await OpenVCardFile();
+        if (!result) return;
+        setCurrentFilePath(result.path);
+        const parsed = splitAndParse(result.content);
+        setContacts(parsed);
+        setSelected(parsed[0] || null);
+        setDisplayedContact(parsed[0] || null);
+        setIsDirty(false);
+      } catch (e) {
+        setError("Erreur : " + e.message);
+      }
+    };
+
+    if (isDirty) {
+      Modal.confirm({
+        title: "Modifications non sauvegardées",
+        content:
+          "Voulez-vous abandonner les modifications en cours et ouvrir un autre fichier ?",
+        okText: "Abandonner",
+        cancelText: "Annuler",
+        okButtonProps: { danger: true },
+        onOk: doOpen,
+      });
+    } else {
+      doOpen();
     }
   };
 
