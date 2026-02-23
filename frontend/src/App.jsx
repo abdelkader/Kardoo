@@ -8,15 +8,56 @@ import {
   Typography,
   Empty,
   Modal,
+  Tooltip,
+  Divider,
 } from "antd";
-import { UserOutlined, FolderOpenOutlined } from "@ant-design/icons";
+import {
+  UserOutlined,
+  FolderOpenOutlined,
+  SettingOutlined,
+  InfoCircleOutlined,
+} from "@ant-design/icons";
 import { OpenVCardFile, SaveVCardFile } from "../wailsjs/go/main/App";
 import { splitAndParse, generateAllVCards } from "./utils/vcard";
 import ContactDetail from "./components/ContactDetail";
 import "antd/dist/reset.css";
+import logo from "./assets/logo.png";
 
 const { Sider, Content } = Layout;
 const { Text } = Typography;
+function IconBarBtn({ icon, tooltip, onClick, active }) {
+  return (
+    <Tooltip title={tooltip} placement="right">
+      <button
+        onClick={onClick}
+        style={{
+          width: 38,
+          height: 38,
+          border: "none",
+          borderRadius: 8,
+          background: active ? "#3b3b52" : "transparent",
+          color: active ? "#fff" : "#aaa",
+          cursor: "pointer",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontSize: 18,
+          transition: "background 0.15s, color 0.15s",
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.background = "#3b3b52";
+          e.currentTarget.style.color = "#fff";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.background = active ? "#3b3b52" : "transparent";
+          e.currentTarget.style.color = active ? "#fff" : "#aaa";
+        }}
+      >
+        {icon}
+      </button>
+    </Tooltip>
+  );
+}
 
 export default function App() {
   const [contacts, setContacts] = useState([]);
@@ -26,29 +67,25 @@ export default function App() {
   const [error, setError] = useState("");
   const [isDirty, setIsDirty] = useState(false);
   const [currentFilePath, setCurrentFilePath] = useState("");
+  const [pendingAction, setPendingAction] = useState(null);
+  const [aboutOpen, setAboutOpen] = useState(false);
 
-  const handleSelectContact = (c) => {
+  const withDirtyCheck = (action) => {
     if (isDirty) {
-      Modal.confirm({
-        title: "Modifications non sauvegardées",
-        content: "Voulez-vous abandonner les modifications en cours ?",
-        okText: "Abandonner",
-        cancelText: "Annuler",
-        okButtonProps: { danger: true },
-        onOk: () => {
-          setIsDirty(false);
-          setSelected(c);
-          setDisplayedContact(c);
-        },
-      });
+      setPendingAction(() => action);
     } else {
-      setSelected(c);
-      setDisplayedContact(c);
+      action();
     }
   };
 
-  const handleOpen = async () => {
-    const doOpen = async () => {
+  const handleSelectContact = (c) =>
+    withDirtyCheck(() => {
+      setSelected(c);
+      setDisplayedContact(c);
+    });
+
+  const handleOpen = () =>
+    withDirtyCheck(async () => {
       setError("");
       try {
         const result = await OpenVCardFile();
@@ -62,22 +99,7 @@ export default function App() {
       } catch (e) {
         setError("Erreur : " + e.message);
       }
-    };
-
-    if (isDirty) {
-      Modal.confirm({
-        title: "Modifications non sauvegardées",
-        content:
-          "Voulez-vous abandonner les modifications en cours et ouvrir un autre fichier ?",
-        okText: "Abandonner",
-        cancelText: "Annuler",
-        okButtonProps: { danger: true },
-        onOk: doOpen,
-      });
-    } else {
-      doOpen();
-    }
-  };
+    });
 
   const handleSaveContact = async (updated) => {
     const newContacts = contacts.map((c) =>
@@ -97,42 +119,80 @@ export default function App() {
     c.fn.toLowerCase().includes(search.toLowerCase()),
   );
 
+  // Remplace Layout, Sider, Content par :
   return (
     <Layout style={{ height: "100vh" }}>
+      {/* Barre d'icônes verticale */}
+      <div
+        style={{
+          width: 52,
+          background: "#1e1e2e",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          padding: "8px 0",
+          gap: 4,
+          borderRight: "1px solid #333",
+        }}
+      >
+        {/* Bouton ouvrir — en haut */}
+        <IconBarBtn
+          icon={<FolderOpenOutlined />}
+          tooltip="Ouvrir un fichier .vcf"
+          onClick={handleOpen}
+        />
+
+        {/* Spacer — pousse les boutons du bas vers le bas */}
+        <div style={{ flex: 1 }} />
+
+        {/* Paramètres — en bas */}
+        <IconBarBtn
+          icon={<SettingOutlined />}
+          tooltip="Paramètres"
+          onClick={() => {
+            /* TODO */
+          }}
+        />
+        <IconBarBtn
+          icon={<InfoCircleOutlined />}
+          tooltip="À propos"
+          onClick={() => setAboutOpen(true)}
+        />
+      </div>
+
+      {/* Sidebar contacts */}
       <Sider
-        width={260}
+        width={240}
         theme="light"
         style={{ borderRight: "1px solid #f0f0f0", overflow: "auto" }}
       >
-        <div style={{ padding: 12 }}>
-          <Button
-            icon={<FolderOpenOutlined />}
-            onClick={handleOpen}
-            block
-            type="primary"
-            style={{ marginBottom: 10 }}
-          >
-            Ouvrir .vcf
-          </Button>
+        <div style={{ padding: "10px 10px 6px" }}>
           <Input.Search
             placeholder="Rechercher..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             style={{ marginBottom: 6 }}
+            size="small"
           />
-          <Text type="secondary" style={{ fontSize: 12 }}>
+          <Text type="secondary" style={{ fontSize: 11 }}>
             {filtered.length} contact{filtered.length !== 1 ? "s" : ""}
           </Text>
         </div>
 
         {error && (
-          <Text type="danger" style={{ padding: "0 12px", display: "block" }}>
+          <Text
+            type="danger"
+            style={{ padding: "0 10px", display: "block", fontSize: 12 }}
+          >
             {error}
           </Text>
         )}
 
         {contacts.length === 0 ? (
-          <Empty description="Aucun contact" style={{ marginTop: 40 }} />
+          <Empty
+            description="Ouvre un fichier .vcf"
+            style={{ marginTop: 40 }}
+          />
         ) : (
           <List
             dataSource={filtered}
@@ -140,7 +200,7 @@ export default function App() {
               <List.Item
                 onClick={() => handleSelectContact(c)}
                 style={{
-                  padding: "6px 12px",
+                  padding: "6px 10px",
                   cursor: "pointer",
                   background: selected?.id === c.id ? "#e6f4ff" : "transparent",
                   borderLeft:
@@ -174,6 +234,7 @@ export default function App() {
         )}
       </Sider>
 
+      {/* Contenu principal */}
       <Content style={{ padding: 24, overflow: "auto", background: "#fff" }}>
         {displayedContact ? (
           <ContactDetail
@@ -188,6 +249,64 @@ export default function App() {
           />
         )}
       </Content>
+
+      {/* Modal confirmation abandon */}
+      <Modal
+        open={!!pendingAction}
+        title="Modifications non sauvegardées"
+        okText="Abandonner"
+        cancelText="Annuler"
+        okButtonProps={{ danger: true }}
+        onOk={() => {
+          pendingAction?.();
+          setPendingAction(null);
+        }}
+        onCancel={() => setPendingAction(null)}
+      >
+        Voulez-vous abandonner les modifications en cours ?
+      </Modal>
+
+      <Modal
+        open={aboutOpen}
+        onCancel={() => setAboutOpen(false)}
+        footer={
+          <Button type="primary" onClick={() => setAboutOpen(false)}>
+            Fermer
+          </Button>
+        }
+        width={360}
+        centered
+      >
+        <div style={{ textAlign: "center", padding: "16px 0" }}>
+          <img
+            src={logo}
+            alt="Kardoo"
+            style={{
+              width: 80,
+              height: 80,
+              borderRadius: 16,
+              marginBottom: 12,
+              objectFit: "contain",
+            }}
+          />
+          <Typography.Title level={4} style={{ margin: 0 }}>
+            Kardoo
+          </Typography.Title>
+          <Text type="secondary" style={{ fontSize: 12 }}>
+            Version 1.0.0
+          </Text>
+          <Divider />
+          <Text style={{ fontSize: 13 }}>
+            A tool to edit (Modify, delete) VCF files.
+            <br />
+            Manage your vCard contacts with ease.
+          </Text>
+          <Divider />
+          <Text type="secondary" style={{ fontSize: 12 }}>
+            © 2025 abdelkader · All rights reserved
+          </Text>
+        </div>
+      </Modal>
     </Layout>
   );
 }

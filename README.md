@@ -1,19 +1,76 @@
-# README
+# Kardoo
 
-## About
+> A simple and clean desktop tool to view, edit and manage your VCF (vCard) contact files.
 
-This is the official Wails React template.
+![Kardoo Screenshot](screenshot/screen1.png)
 
-You can configure the project by editing `wails.json`. More information about the project settings can be found
-here: https://wails.io/docs/reference/project-config
+---
 
-## Live Development
+## Features
 
-To run in live development mode, run `wails dev` in the project directory. This will run a Vite development
-server that will provide very fast hot reload of your frontend changes. If you want to develop in a browser
-and have access to your Go methods, there is also a dev server that runs on http://localhost:34115. Connect
-to this in your browser, and you can call your Go code from devtools.
+- 📂 Open single or multi-contact `.vcf` files
+- ✏️ Edit all standard vCard fields (v2.1, v3.0, v4.0)
+  - Name, photo, birthday, anniversary
+  - Phone numbers, emails, addresses, URLs
+  - Organization, title, role, nickname
+  - Languages, messaging (IMPP), related persons
+  - Notes, geo, timezone, gender, categories
+  - Sound (pronunciation) — playback or download
+- 💾 Save changes back to the original `.vcf` file
+- 🔍 Search contacts by name or organization
+- 🖼️ Change contact photo from a local image file
+- ⚠️ Unsaved changes protection on contact switch or file open
 
-## Building
+---
 
-To build a redistributable, production mode package, use `wails build`.
+## Screenshots
+
+![Main screen](screenshot/screen1.png)
+
+---
+
+## Tech Stack
+
+| Layer         | Technology                   |
+| ------------- | ---------------------------- |
+| Framework     | [Wails v2](https://wails.io) |
+| Frontend      | React + Vite                 |
+| UI Library    | Ant Design                   |
+| Backend       | Go                           |
+| vCard Parsing | vcard-parser                 |
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+- [Go 1.21+](https://go.dev/dl/)
+- [Node.js 18+](https://nodejs.org/)
+- [Wails CLI](https://wails.io/docs/gettingstarted/installation)
+
+```bash
+go install github.com/wailsapp/wails/v2/cmd/wails@latest
+```
+
+### Install & Run
+
+```bash
+git clone https://github.com/your-username/kardoo.git
+cd kardoo
+wails dev
+```
+
+### Build
+
+```bash
+wails build
+```
+
+The compiled binary will be in `build/bin/`.
+
+---
+
+## License
+
+MIT © 2025 abdelkader
