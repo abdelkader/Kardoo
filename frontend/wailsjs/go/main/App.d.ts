@@ -16,6 +16,8 @@ export function OpenVCardFile():Promise<Record<string, string>>;
 
 export function SaveConfig(arg1:main.AppConfig):Promise<void>;
 
+export function SaveContactPhoto(arg1:string,arg2:string):Promise<void>;
+
 export function SaveVCardFile(arg1:string,arg2:string,arg3:boolean,arg4:string):Promise<void>;
 
 export function SetWindowPosition(arg1:number,arg2:number,arg3:number,arg4:number):Promise<void>;

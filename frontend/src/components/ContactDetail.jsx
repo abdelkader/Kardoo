@@ -20,7 +20,12 @@ import {
   CameraOutlined,
   DownloadOutlined, // ← ajoute ici
 } from "@ant-design/icons";
-import { OpenImageFile, OpenSoundFile } from "../../wailsjs/go/main/App";
+import {
+  OpenImageFile,
+  OpenSoundFile,
+  SaveContactPhoto,
+} from "../../wailsjs/go/main/App";
+
 import AddressDialog from "./AddressDialog";
 
 const { Text } = Typography;
@@ -338,22 +343,36 @@ export default function ContactDetail({ contact, onSave, onDirtyChange }) {
                 backgroundColor: form.photo ? "transparent" : "#1677ff",
               }}
             />
-            <Button
-              size="small"
-              icon={<CameraOutlined />}
-              type="text"
-              style={{ fontSize: 11 }}
-              onClick={async () => {
-                try {
-                  const dataUrl = await OpenImageFile();
-                  if (dataUrl) update("photo", dataUrl);
-                } catch (e) {
-                  console.error("Erreur photo:", e);
-                }
-              }}
-            >
-              Changer
-            </Button>
+
+            <div style={{ display: "flex", gap: 4 }}>
+              <Button
+                size="small"
+                icon={<CameraOutlined />}
+                type="text"
+                onClick={async () => {
+                  try {
+                    const dataUrl = await OpenImageFile();
+                    if (dataUrl) update("photo", dataUrl);
+                  } catch (e) {
+                    console.error("Erreur photo:", e);
+                  }
+                }}
+              />
+              {form.photo && (
+                <Button
+                  size="small"
+                  icon={<DownloadOutlined />}
+                  type="text"
+                  onClick={async () => {
+                    try {
+                      await SaveContactPhoto(form.photo, form.fn || "contact");
+                    } catch (e) {
+                      console.error("Erreur photo:", e);
+                    }
+                  }}
+                />
+              )}
+            </div>
           </div>
         </div>
       </Card>

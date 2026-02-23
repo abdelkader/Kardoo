@@ -183,3 +183,38 @@ func (a *App) OpenSoundFile() (string, error) {
 	}
 	return "data:" + mimeType + ";base64," + base64.StdEncoding.EncodeToString(content), nil
 }
+
+func (a *App) SaveContactPhoto(base64Data string, defaultName string) error {
+	// Détecter le type d'image
+	mimeType := "image/jpeg"
+	ext := ".jpg"
+	if strings.Contains(base64Data, "image/png") {
+		mimeType = "image/png"
+		ext = ".png"
+	}
+	_ = mimeType
+
+	// Extraire la partie base64 pure
+	data := base64Data
+	if idx := strings.Index(base64Data, ","); idx != -1 {
+		data = base64Data[idx+1:]
+	}
+
+	decoded, err := base64.StdEncoding.DecodeString(data)
+	if err != nil {
+		return err
+	}
+
+	file, err := runtime.SaveFileDialog(a.ctx, runtime.SaveDialogOptions{
+		Title:           "Sauvegarder la photo",
+		DefaultFilename: defaultName + ext,
+		Filters: []runtime.FileFilter{
+			{DisplayName: "Images", Pattern: "*" + ext},
+		},
+	})
+	if err != nil || file == "" {
+		return err
+	}
+
+	return os.WriteFile(file, decoded, 0644)
+}
