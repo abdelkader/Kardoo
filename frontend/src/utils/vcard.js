@@ -188,6 +188,44 @@ export function getPhoto(card) {
   }
 }
 
+export function getLogo(card) {
+  try {
+    const prop = card.logo?.[0];
+    if (!prop) return null;
+    const value = prop.value || "";
+    const meta = prop.meta || {};
+    const encoding = (
+      meta.encoding?.[0] ||
+      meta.ENCODING?.[0] ||
+      ""
+    ).toLowerCase();
+    const type = (meta.type?.[0] || meta.TYPE?.[0] || "png").toLowerCase();
+
+    if (typeof value === "string" && value.startsWith("data:")) return value;
+    if (
+      typeof value === "string" &&
+      (value.startsWith("http://") || value.startsWith("https://"))
+    )
+      return value;
+    if (encoding === "base64" || encoding === "b") {
+      const cleaned = value.replace(/\s+/g, "");
+      if (!cleaned) return null;
+      const mimeMap = {
+        png: "image/png",
+        jpeg: "image/jpeg",
+        jpg: "image/jpeg",
+        gif: "image/gif",
+        webp: "image/webp",
+      };
+      const mimeType = mimeMap[type] || "image/png";
+      return `data:${mimeType};base64,${cleaned}`;
+    }
+    return null;
+  } catch (e) {
+    return null;
+  }
+}
+
 export function formatAdr(parts) {
   if (!parts) return "";
   if (!Array.isArray(parts)) return String(parts);
@@ -264,6 +302,7 @@ export function splitAndParse(raw) {
         kind: getStr(card, "kind"),
         sound: getSound(card),
         members: members,
+        logo: getLogo(card),
         related: getAll(card, "related").map((r) => ({
           type: r.type,
           value: r.value,
@@ -286,6 +325,7 @@ export function splitAndParse(raw) {
         url: [],
         sound: null,
         members: [],
+        logo: null,
       };
     }
   });
@@ -365,6 +405,17 @@ export function generateVCard(contact) {
     const mime = header.match(/data:(image\/\w+)/)?.[1] || "image/jpeg";
     const type = mime.split("/")[1].toUpperCase();
     lines.push(`PHOTO;ENCODING=b;TYPE=${type}:${data}`);
+  }
+
+  if (contact.logo) {
+    if (contact.logo.startsWith("data:")) {
+      const [header, data] = contact.logo.split(",");
+      const mime = header.match(/data:(image\/\w+)/)?.[1] || "image/png";
+      const type = mime.split("/")[1].toUpperCase();
+      lines.push(`LOGO;ENCODING=b;TYPE=${type}:${data}`);
+    } else {
+      lines.push(`LOGO:${contact.logo}`);
+    }
   }
 
   if (contact.sound?.url?.startsWith("data:")) {

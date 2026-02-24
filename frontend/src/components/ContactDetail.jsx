@@ -180,6 +180,7 @@ export default function ContactDetail({ contact, onSave, onDirtyChange }) {
       lang: contact.lang || [],
       impp: contact.impp || [],
       related: contact.related || [],
+      logo: contact.logo || null,
     });
     setDirty(false);
     onDirtyChange?.(false);
@@ -525,48 +526,145 @@ export default function ContactDetail({ contact, onSave, onDirtyChange }) {
         style={cardStyle}
         headStyle={headStyle}
       >
-        <div style={{ display: "flex", gap: 12, marginBottom: 6 }}>
-          <InlineField label="Org" style={{ flex: 2 }}>
-            <Input
-              size="small"
-              value={form.org}
-              onChange={(e) => update("org", e.target.value)}
-              style={{ flex: 1 }}
-            />
-          </InlineField>
-          <InlineField label="Role" style={{ flex: 1 }}>
-            <Input
-              size="small"
-              value={form.role}
-              onChange={(e) => update("role", e.target.value)}
-              style={{ flex: 1 }}
-            />
-          </InlineField>
+        <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+          {/* Champs gauche */}
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ display: "flex", gap: 12, marginBottom: 6 }}>
+              <InlineField label="Org" style={{ flex: 2 }}>
+                <Input
+                  size="small"
+                  value={form.org}
+                  onChange={(e) => update("org", e.target.value)}
+                  style={{ flex: 1 }}
+                />
+              </InlineField>
+              <InlineField label="Role" style={{ flex: 1 }}>
+                <Input
+                  size="small"
+                  value={form.role}
+                  onChange={(e) => update("role", e.target.value)}
+                  style={{ flex: 1 }}
+                />
+              </InlineField>
+            </div>
+            <div style={{ display: "flex", gap: 12, marginBottom: 6 }}>
+              <InlineField label="Title" style={{ flex: 1 }}>
+                <Input
+                  size="small"
+                  value={form.title}
+                  onChange={(e) => update("title", e.target.value)}
+                  style={{ flex: 1 }}
+                />
+              </InlineField>
+              <InlineField label="Nickname" style={{ flex: 1 }}>
+                <Input
+                  size="small"
+                  value={form.nickname}
+                  onChange={(e) => update("nickname", e.target.value)}
+                  style={{ flex: 1 }}
+                />
+              </InlineField>
+            </div>
+          </div>
+
+          {/* Logo organisation */}
+          <div
+            style={{
+              flexShrink: 0,
+              width: 64,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 4,
+            }}
+          >
+            {form.logo ? (
+              <img
+                src={form.logo}
+                alt="logo"
+                style={{
+                  width: 56,
+                  height: 56,
+                  objectFit: "contain",
+                  borderRadius: 6,
+                  border: "1px solid #ddd",
+                }}
+                onError={(e) => {
+                  e.target.style.display = "none";
+                }}
+              />
+            ) : (
+              <div
+                style={{
+                  width: 56,
+                  height: 56,
+                  borderRadius: 6,
+                  border: "1px dashed #ccc",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  background: "#fafafa",
+                }}
+              >
+                <Text
+                  type="secondary"
+                  style={{ fontSize: 10, textAlign: "center" }}
+                >
+                  Logo
+                </Text>
+              </div>
+            )}
+            <div style={{ display: "flex", gap: 2 }}>
+              <Button
+                size="small"
+                icon={<CameraOutlined />}
+                type="text"
+                onClick={async () => {
+                  try {
+                    const dataUrl = await OpenImageFile();
+                    if (dataUrl) update("logo", dataUrl);
+                  } catch (e) {
+                    console.error(e);
+                  }
+                }}
+              />
+              {form.logo && (
+                <>
+                  <Button
+                    size="small"
+                    icon={<DownloadOutlined />}
+                    type="text"
+                    onClick={async () => {
+                      try {
+                        await SaveContactPhoto(
+                          form.logo,
+                          (form.org || "logo") + "_logo",
+                        );
+                      } catch (e) {
+                        console.error(e);
+                      }
+                    }}
+                  />
+                  <Button
+                    size="small"
+                    icon={<DeleteOutlined />}
+                    type="text"
+                    danger
+                    onClick={() => update("logo", null)}
+                  />
+                </>
+              )}
+            </div>
+          </div>
         </div>
-        <div style={{ display: "flex", gap: 12, marginBottom: 6 }}>
-          <InlineField label="Title" style={{ flex: 1 }}>
-            <Input
-              size="small"
-              value={form.title}
-              onChange={(e) => update("title", e.target.value)}
-              style={{ flex: 1 }}
-            />
-          </InlineField>
-          <InlineField label="Nickname" style={{ flex: 1 }}>
-            <Input
-              size="small"
-              value={form.nickname}
-              onChange={(e) => update("nickname", e.target.value)}
-              style={{ flex: 1 }}
-            />
-          </InlineField>
-        </div>
-        {/* Kind + Member inline */}
+
+        {/* Kind */}
         <div
           style={{
             display: "flex",
             gap: 8,
             marginBottom: 8,
+            marginTop: 8,
             alignItems: "center",
           }}
         >
@@ -676,7 +774,8 @@ export default function ContactDetail({ contact, onSave, onDirtyChange }) {
             ))}
           </Card>
         )}
-        {/* Ligne : Gender + Categories */}
+
+        {/* Gender + Categories */}
         <div style={{ display: "flex", gap: 12, marginTop: 8 }}>
           <InlineField label="Gender" style={{ flex: 1 }}>
             <Input
@@ -745,7 +844,7 @@ export default function ContactDetail({ contact, onSave, onDirtyChange }) {
               style={{ flex: 1 }}
             />
           </InlineField>
-          <InlineField label="TZ&nbsp;&nbsp;&nbsp;">
+          <InlineField label="TZ">
             <Input
               size="small"
               value={form.tz}
@@ -807,7 +906,6 @@ export default function ContactDetail({ contact, onSave, onDirtyChange }) {
           </Text>
         ) : (
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            {/* Formats supportés par le navigateur */}
             {["ogg", "mp3", "wav", "aac"].includes(form.sound.type) ? (
               <audio
                 controls
@@ -838,6 +936,7 @@ export default function ContactDetail({ contact, onSave, onDirtyChange }) {
           </div>
         )}
       </Card>
+
       {/* Langues + IMPP côte à côte */}
       <div style={{ display: "flex", gap: 10, marginBottom: 10 }}>
         <Card
@@ -985,7 +1084,7 @@ export default function ContactDetail({ contact, onSave, onDirtyChange }) {
         style={{ marginBottom: 10 }}
       />
 
-      {/* UID + REV — lecture seule */}
+      {/* UID + REV */}
       {(form.uid || form.rev) && (
         <Card
           size="small"
