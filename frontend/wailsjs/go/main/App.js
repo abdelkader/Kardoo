@@ -14,6 +14,10 @@ export function LoadConfig() {
   return window['go']['main']['App']['LoadConfig']();
 }
 
+export function NewVCardFile() {
+  return window['go']['main']['App']['NewVCardFile']();
+}
+
 export function OpenImageFile() {
   return window['go']['main']['App']['OpenImageFile']();
 }

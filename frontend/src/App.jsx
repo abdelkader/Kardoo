@@ -1,7 +1,11 @@
 import { useState, useEffect } from "react";
 import { Layout, Modal, Empty } from "antd";
-
-import { LoadConfig, SetWindowPosition } from "../wailsjs/go/main/App";
+import { generateAllVCards, createEmptyContact } from "./utils/vcard";
+import {
+  LoadConfig,
+  SetWindowPosition,
+  SaveVCardFile,
+} from "../wailsjs/go/main/App";
 import { useContacts } from "./hooks/useContacts";
 import IconBar from "./components/IconBar";
 import ContactTree from "./components/ContactTree";
@@ -29,10 +33,12 @@ export default function App() {
     contacts,
     selected,
     displayedContact,
+    currentFilePath,
     error,
     openFile,
     saveContact,
     selectContact,
+    newContact,
   } = useContacts(appConfig);
 
   useEffect(() => {
@@ -57,6 +63,24 @@ export default function App() {
     else action();
   };
 
+  const handleNewContact = () =>
+    withDirtyCheck(async () => {
+      const result = await newContact(contacts, currentFilePath);
+      if (result) {
+        // Sauvegarde immédiate du fichier avec le nouveau contact vide
+        try {
+          await SaveVCardFile(
+            result.path,
+            generateAllVCards(result.contacts),
+            appConfig.backupOnSave,
+            appConfig.backupDir,
+          );
+        } catch (e) {
+          console.error("Erreur création fichier:", e);
+        }
+      }
+    });
+
   const filtered = contacts.filter((c) =>
     c.fn.toLowerCase().includes(search.toLowerCase()),
   );
@@ -67,6 +91,7 @@ export default function App() {
         onOpen={() => withDirtyCheck(openFile)}
         onSettings={() => setSettingsOpen(true)}
         onAbout={() => setAboutOpen(true)}
+        onNewContact={handleNewContact} // ← ajoute cette ligne
       />
 
       <Sider

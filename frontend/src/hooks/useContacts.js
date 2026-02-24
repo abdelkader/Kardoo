@@ -1,6 +1,14 @@
 import { useState } from "react";
-import { splitAndParse, generateAllVCards } from "../utils/vcard";
-import { OpenVCardFile, SaveVCardFile } from "../../wailsjs/go/main/App";
+import {
+  splitAndParse,
+  generateAllVCards,
+  createEmptyContact,
+} from "../utils/vcard";
+import {
+  OpenVCardFile,
+  SaveVCardFile,
+  NewVCardFile,
+} from "../../wailsjs/go/main/App";
 
 export function useContacts(appConfig) {
   const [contacts, setContacts] = useState([]);
@@ -48,6 +56,35 @@ export function useContacts(appConfig) {
     setDisplayedContact(c);
   };
 
+  const newContact = async (currentContacts, currentFilePath) => {
+    const newC = createEmptyContact(Date.now());
+
+    // Si un fichier est déjà ouvert — on ajoute simplement le contact
+    if (currentFilePath) {
+      const updated = [...currentContacts, newC];
+      setContacts(updated);
+      setSelected(newC);
+      setDisplayedContact(newC);
+      return { contacts: updated, path: currentFilePath };
+    }
+
+    // Sinon — on crée un nouveau fichier
+    try {
+      const result = await NewVCardFile();
+      if (!result?.path) return null;
+
+      const updated = [newC];
+      setContacts(updated);
+      setSelected(newC);
+      setDisplayedContact(newC);
+      setCurrentFilePath(result.path);
+      return { contacts: updated, path: result.path };
+    } catch (e) {
+      setError("Erreur : " + e.message);
+      return null;
+    }
+  };
+
   return {
     contacts,
     selected,
@@ -57,5 +94,6 @@ export function useContacts(appConfig) {
     openFile,
     saveContact,
     selectContact,
+    newContact,
   };
 }

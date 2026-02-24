@@ -219,3 +219,17 @@ func (a *App) SaveContactPhoto(base64Data string, defaultName string) error {
 
 	return os.WriteFile(file, decoded, 0644)
 }
+
+func (a *App) NewVCardFile() (map[string]string, error) {
+	file, err := runtime.SaveFileDialog(a.ctx, runtime.SaveDialogOptions{
+		Title:           "Créer un nouveau fichier vCard",
+		DefaultFilename: "contacts.vcf",
+		Filters: []runtime.FileFilter{
+			{DisplayName: "vCard (*.vcf)", Pattern: "*.vcf"},
+		},
+	})
+	if err != nil || file == "" {
+		return nil, err
+	}
+	return map[string]string{"path": file}, nil
+}

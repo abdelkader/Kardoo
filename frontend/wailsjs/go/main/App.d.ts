@@ -8,6 +8,8 @@ export function GetWindowPosition():Promise<Record<string, number>>;
 
 export function LoadConfig():Promise<main.AppConfig>;
 
+export function NewVCardFile():Promise<Record<string, string>>;
+
 export function OpenImageFile():Promise<string>;
 
 export function OpenSoundFile():Promise<string>;

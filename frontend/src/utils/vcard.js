@@ -434,3 +434,40 @@ export function generateVCard(contact) {
 export function generateAllVCards(contacts) {
   return contacts.map(generateVCard).join("\r\n");
 }
+
+export function createEmptyContact(id) {
+  return {
+    id,
+    fn: "Nouveau contact",
+    firstName: "",
+    lastName: "",
+    middleName: "",
+    prefix: "",
+    suffix: "",
+    bday: "",
+    photo: null,
+    logo: null,
+    adr: [],
+    tel: [],
+    email: [],
+    url: [],
+    org: "",
+    title: "",
+    note: "",
+    gender: "",
+    tz: "",
+    sound: null,
+    nickname: "",
+    anniversary: "",
+    role: "",
+    categories: "",
+    geo: "",
+    rev: "",
+    uid: "",
+    kind: "individual",
+    members: [],
+    lang: [],
+    impp: [],
+    related: [],
+  };
+}
