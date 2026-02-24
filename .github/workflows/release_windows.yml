@@ -1,0 +1,80 @@
+name: Release Kardoo Windows
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Version tag"
+        required: true
+        default: "1.0.0"
+
+jobs:
+  release-windows:
+    name: Release Windows
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Normalise version tag
+        id: normalise_version
+        shell: bash
+        run: |
+          if [ "${{ github.event.release.tag_name }}" == "" ]; then
+            version=$(echo ${{ github.event.inputs.tag }} | sed -e 's/v//g')
+            echo "version=$version" >> "$GITHUB_OUTPUT"
+          else
+            version=$(echo ${{ github.event.release.tag_name }} | sed -e 's/v//g')
+            echo "version=$version" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: stable
+          cache: true
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Wails
+        shell: bash
+        run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
+
+      - name: Build frontend assets
+        shell: bash
+        run: |
+          npm install -g npm@latest
+          cd frontend
+          jq '.version = "${{ steps.normalise_version.outputs.version }}"' package.json > tmp.json
+          mv tmp.json package.json
+          npm install
+
+      - name: Update Wails version
+        shell: bash
+        run: |
+          jq '.info.productVersion = "${{ steps.normalise_version.outputs.version }}"' wails.json > tmp.json
+          mv tmp.json wails.json
+
+      - name: Build Windows portable app
+        shell: bash
+        run: |
+          CGO_ENABLED=1 wails build -clean -platform windows/amd64 \
+          -webview2 embed \
+          -ldflags "-X main.version=v${{ steps.normalise_version.outputs.version }}"
+
+      - name: Compress portable binary
+        working-directory: ./build/bin
+        run: Compress-Archive "Kardoo.exe" "Kardoo_Portable_${{ steps.normalise_version.outputs.version }}_windows_x64.zip"
+
+      - name: Upload release asset (Portable)
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ steps.normalise_version.outputs.version }}
+          files: ./build/bin/Kardoo_Portable_${{ steps.normalise_version.outputs.version }}_windows_x64.zip
+          token: ${{ secrets.GITHUB_TOKEN }}
