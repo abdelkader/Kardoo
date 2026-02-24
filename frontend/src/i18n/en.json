@@ -10,6 +10,7 @@
     "no_contact_selected": "Open a .vcf file and select a contact"
   },
   "contact": {
+    "new_contact": "New contact",
     "save": "Save",
     "saved": "Saved",
     "no_name": "No name",

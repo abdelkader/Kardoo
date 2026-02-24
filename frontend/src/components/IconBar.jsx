@@ -1,3 +1,4 @@
+import { t } from "i18next";
 import IconBarBtn from "./IconBarBtn";
 
 import {
@@ -24,14 +25,14 @@ export default function IconBar({ onOpen, onSettings, onAbout, onNewContact }) {
       {/* Nouveau contact — en première position */}
       <IconBarBtn
         icon={<UserAddOutlined />}
-        tooltip="Nouveau contact"
+        tooltip={t("contact.new_contact")}
         onClick={onNewContact}
       />
 
       {/* Ouvrir fichier */}
       <IconBarBtn
         icon={<FolderOpenOutlined />}
-        tooltip="Ouvrir un fichier .vcf"
+        tooltip={t("app.open")}
         onClick={onOpen}
       />
 
@@ -39,12 +40,12 @@ export default function IconBar({ onOpen, onSettings, onAbout, onNewContact }) {
 
       <IconBarBtn
         icon={<SettingOutlined />}
-        tooltip="Paramètres"
+        tooltip={t("app.settings")}
         onClick={onSettings}
       />
       <IconBarBtn
         icon={<InfoCircleOutlined />}
-        tooltip="À propos"
+        tooltip={t("app.about")}
         onClick={onAbout}
       />
     </div>
