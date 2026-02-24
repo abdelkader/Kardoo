@@ -29,15 +29,17 @@
 
 ---
 
-## Tech Stack
+## 🏗️ Tech Stack
 
-| Layer         | Technology                   |
-| ------------- | ---------------------------- |
-| Framework     | [Wails v2](https://wails.io) |
-| Frontend      | React + Vite                 |
-| UI Library    | Ant Design                   |
-| Backend       | Go                           |
-| vCard Parsing | vcard-parser                 |
+| Layer | Technology |
+|-------|-----------|
+| Framework | Wails v2 |
+| Frontend | React + Vite |
+| UI | Ant Design |
+| Backend | Go |
+| i18n | react-i18next |
+| QR Code | qrcode |
+| Date parsing | dayjs |
 
 ---
 
