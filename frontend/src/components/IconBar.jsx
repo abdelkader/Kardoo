@@ -6,9 +6,16 @@ import {
   SettingOutlined,
   InfoCircleOutlined,
   UserAddOutlined,
+  QrcodeOutlined,
 } from "@ant-design/icons";
 
-export default function IconBar({ onOpen, onSettings, onAbout, onNewContact }) {
+export default function IconBar({
+  onOpen,
+  onSettings,
+  onAbout,
+  onNewContact,
+  onQrCode,
+}) {
   return (
     <div
       style={{
@@ -22,30 +29,32 @@ export default function IconBar({ onOpen, onSettings, onAbout, onNewContact }) {
         borderRight: "1px solid #333",
       }}
     >
-      {/* Nouveau contact — en première position */}
       <IconBarBtn
         icon={<UserAddOutlined />}
-        tooltip={t("contact.new_contact")}
+        tooltip="Nouveau contact"
         onClick={onNewContact}
       />
-
-      {/* Ouvrir fichier */}
       <IconBarBtn
         icon={<FolderOpenOutlined />}
-        tooltip={t("app.open")}
+        tooltip="Ouvrir un fichier .vcf"
         onClick={onOpen}
+      />
+      <IconBarBtn
+        icon={<QrcodeOutlined />}
+        tooltip="Exporter en QR Code"
+        onClick={onQrCode}
       />
 
       <div style={{ flex: 1 }} />
 
       <IconBarBtn
         icon={<SettingOutlined />}
-        tooltip={t("app.settings")}
+        tooltip="Paramètres"
         onClick={onSettings}
       />
       <IconBarBtn
         icon={<InfoCircleOutlined />}
-        tooltip={t("app.about")}
+        tooltip="À propos"
         onClick={onAbout}
       />
     </div>

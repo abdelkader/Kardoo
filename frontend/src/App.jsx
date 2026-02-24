@@ -13,6 +13,7 @@ import ContactDetail from "./components/ContactDetail";
 import GroupDetail from "./components/GroupDetail";
 import AboutDialog from "./components/AboutDialog";
 import SettingsDialog from "./components/SettingsDialog";
+import QrCodeDialog from "./components/QrCodeDialog";
 import "antd/dist/reset.css";
 import { useTranslation } from "react-i18next";
 
@@ -24,6 +25,7 @@ export default function App() {
   const [pendingAction, setPendingAction] = useState(null);
   const [aboutOpen, setAboutOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [qrOpen, setQrOpen] = useState(false);
   const [appConfig, setAppConfig] = useState({
     backupOnSave: false,
     backupDir: "",
@@ -91,7 +93,8 @@ export default function App() {
         onOpen={() => withDirtyCheck(openFile)}
         onSettings={() => setSettingsOpen(true)}
         onAbout={() => setAboutOpen(true)}
-        onNewContact={handleNewContact} // ← ajoute cette ligne
+        onNewContact={handleNewContact}
+        onQrCode={() => setQrOpen(true)}
       />
 
       <Sider
@@ -155,6 +158,11 @@ export default function App() {
           setSettingsOpen(false);
           LoadConfig().then(setAppConfig).catch(console.error);
         }}
+      />
+      <QrCodeDialog
+        open={qrOpen}
+        onClose={() => setQrOpen(false)}
+        contact={displayedContact}
       />
     </Layout>
   );
