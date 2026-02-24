@@ -225,7 +225,16 @@ export function splitAndParse(raw) {
         type: l.meta?.type?.[0] || l.meta?.TYPE?.[0] || "",
         value: decodeQP(l.value || "", l.meta),
       }));
-
+      const members = (card.member || []).map((m) => {
+        const value = decodeQP(m.value || "", m.meta);
+        if (value.startsWith("mailto:")) {
+          return { type: "email", value: value.replace("mailto:", "") };
+        }
+        if (value.startsWith("urn:uuid:")) {
+          return { type: "uid", value: value.replace("urn:uuid:", "") };
+        }
+        return { type: "unknown", value };
+      });
       return {
         id: i,
         fn: getStr(card, "fn") || `Contact ${i + 1}`,
@@ -254,12 +263,13 @@ export function splitAndParse(raw) {
         uid: getStr(card, "uid"),
         kind: getStr(card, "kind"),
         sound: getSound(card),
+        members: members,
         related: getAll(card, "related").map((r) => ({
           type: r.type,
           value: r.value,
         })),
         lang: langs,
-        impp,
+        impp: impp,
       };
     } catch (e) {
       console.error(`Erreur parsing contact ${i}:`, e);
@@ -275,6 +285,7 @@ export function splitAndParse(raw) {
         related: [],
         url: [],
         sound: null,
+        members: [],
       };
     }
   });

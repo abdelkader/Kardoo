@@ -4,8 +4,9 @@ import { Layout, Modal, Empty } from "antd";
 import { LoadConfig, SetWindowPosition } from "../wailsjs/go/main/App";
 import { useContacts } from "./hooks/useContacts";
 import IconBar from "./components/IconBar";
-import ContactList from "./components/ContactList";
+import ContactTree from "./components/ContactTree";
 import ContactDetail from "./components/ContactDetail";
+import GroupDetail from "./components/GroupDetail";
 import AboutDialog from "./components/AboutDialog";
 import SettingsDialog from "./components/SettingsDialog";
 import "antd/dist/reset.css";
@@ -73,9 +74,8 @@ export default function App() {
         theme="light"
         style={{ borderRight: "1px solid #f0f0f0", overflow: "auto" }}
       >
-        <ContactList
+        <ContactTree
           contacts={contacts}
-          filtered={filtered}
           selected={selected}
           search={search}
           onSearch={setSearch}
@@ -86,11 +86,20 @@ export default function App() {
 
       <Content style={{ padding: 24, overflow: "auto", background: "#fff" }}>
         {displayedContact ? (
-          <ContactDetail
-            contact={displayedContact}
-            onSave={saveContact}
-            onDirtyChange={setIsDirty}
-          />
+          displayedContact.kind === "group" ? (
+            <GroupDetail
+              group={displayedContact}
+              allContacts={contacts}
+              onSave={saveContact}
+              onDirtyChange={setIsDirty}
+            />
+          ) : (
+            <ContactDetail
+              contact={displayedContact}
+              onSave={saveContact}
+              onDirtyChange={setIsDirty}
+            />
+          )
         ) : (
           <Empty
             description={t("app.no_contact_selected")}

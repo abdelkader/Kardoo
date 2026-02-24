@@ -12,6 +12,7 @@ import {
   DatePicker,
   Typography,
   Card,
+  Select,
 } from "antd";
 import {
   UserOutlined,
@@ -175,11 +176,13 @@ export default function ContactDetail({ contact, onSave, onDirtyChange }) {
       rev: contact.rev || "",
       uid: contact.uid || "",
       kind: contact.kind || "",
+      members: contact.members || [],
       lang: contact.lang || [],
       impp: contact.impp || [],
       related: contact.related || [],
     });
     setDirty(false);
+    onDirtyChange?.(false);
   }, [contact]);
 
   if (!form) return null;
@@ -558,15 +561,123 @@ export default function ContactDetail({ contact, onSave, onDirtyChange }) {
             />
           </InlineField>
         </div>
-        <div style={{ display: "flex", gap: 12 }}>
-          <InlineField label="Kind" style={{ flex: 1 }}>
-            <Input
-              size="small"
-              value={form.kind}
-              onChange={(e) => update("kind", e.target.value)}
-              style={{ flex: 1 }}
-            />
-          </InlineField>
+        {/* Kind + Member inline */}
+        <div
+          style={{
+            display: "flex",
+            gap: 8,
+            marginBottom: 8,
+            alignItems: "center",
+          }}
+        >
+          <Text type="secondary" style={{ fontSize: 11, flexShrink: 0 }}>
+            Kind
+          </Text>
+          <Select
+            size="small"
+            value={form.kind || "individual"}
+            onChange={(v) => update("kind", v)}
+            options={[
+              { value: "individual", label: "Individual" },
+              { value: "group", label: "Group" },
+              { value: "organization", label: "Organization" },
+              { value: "location", label: "Location" },
+            ]}
+            style={{ width: 130 }}
+          />
+        </div>
+
+        {/* Members — visible seulement si kind=group */}
+        {form.kind === "group" && (
+          <Card
+            size="small"
+            title={
+              <Text strong style={{ fontSize: 12 }}>
+                Members
+              </Text>
+            }
+            extra={
+              <Button
+                size="small"
+                icon={<PlusOutlined />}
+                type="text"
+                onClick={() =>
+                  update("members", [
+                    ...(form.members || []),
+                    { type: "email", value: "" },
+                  ])
+                }
+              />
+            }
+            style={cardStyle}
+            headStyle={headStyle}
+          >
+            {(form.members || []).length === 0 && (
+              <Text type="secondary" style={{ fontSize: 12 }}>
+                Aucun membre
+              </Text>
+            )}
+            {(form.members || []).map((m, i) => (
+              <div
+                key={i}
+                style={{
+                  display: "flex",
+                  gap: 6,
+                  marginBottom: 6,
+                  alignItems: "center",
+                }}
+              >
+                <Select
+                  size="small"
+                  value={m.type}
+                  onChange={(v) =>
+                    update(
+                      "members",
+                      form.members.map((x, idx) =>
+                        idx === i ? { ...x, type: v } : x,
+                      ),
+                    )
+                  }
+                  options={[
+                    { value: "email", label: "📧 mailto" },
+                    { value: "uid", label: "🔑 urn:uuid" },
+                  ]}
+                  style={{ width: 110 }}
+                />
+                <Input
+                  size="small"
+                  value={m.value}
+                  placeholder={
+                    m.type === "email" ? "john@example.com" : "uuid..."
+                  }
+                  onChange={(e) =>
+                    update(
+                      "members",
+                      form.members.map((x, idx) =>
+                        idx === i ? { ...x, value: e.target.value } : x,
+                      ),
+                    )
+                  }
+                  style={{ flex: 1 }}
+                />
+                <Button
+                  size="small"
+                  type="text"
+                  danger
+                  icon={<DeleteOutlined />}
+                  onClick={() =>
+                    update(
+                      "members",
+                      form.members.filter((_, idx) => idx !== i),
+                    )
+                  }
+                />
+              </div>
+            ))}
+          </Card>
+        )}
+        {/* Ligne : Gender + Categories */}
+        <div style={{ display: "flex", gap: 12, marginTop: 8 }}>
           <InlineField label="Gender" style={{ flex: 1 }}>
             <Input
               size="small"
@@ -634,7 +745,7 @@ export default function ContactDetail({ contact, onSave, onDirtyChange }) {
               style={{ flex: 1 }}
             />
           </InlineField>
-          <InlineField label="TZ">
+          <InlineField label="TZ&nbsp;&nbsp;&nbsp;">
             <Input
               size="small"
               value={form.tz}
