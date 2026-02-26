@@ -40,8 +40,8 @@ export default function TitleBar() {
           paddingLeft: 12,
         }}
       >
-        <img src={logo} style={{ width: 18, height: 18 }} />
-        <span style={{ fontSize: 13, fontWeight: 500, color: "#333" }}>
+        <img src={logo} style={{ width: 24, height: 24 }} />
+        <span style={{ fontSize: 13, fontWeight: 700, color: "#333" }}>
           Kardoo
         </span>
       </div>

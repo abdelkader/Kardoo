@@ -82,6 +82,8 @@
     "vcf_desc": "vCard 4.0 — compatible with all devices",
     "json_desc": "jCard (RFC 7095)",
     "csv_desc": "Google Contacts format",
-    "xml_desc": "xCard (RFC 6351)"
+    "xml_desc": "xCard (RFC 6351)",
+    "export_selected": "Export ({{count}})",
+    "export_all": "Export ({{count}})"
   }
 }

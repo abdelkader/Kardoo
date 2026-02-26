@@ -161,8 +161,11 @@ export default function App() {
                 onExport={handleExport}
                 exportLabel={
                   checkedIds.length > 0
-                    ? `Exporter (${checkedIds.length})`
-                    : `Exporter (${contacts.filter((c) => c.kind !== "group").length})`
+                    ? t("export.export_selected", { count: checkedIds.length })
+                    : t("export.export_all", {
+                        count: contacts.filter((c) => c.kind !== "group")
+                          .length,
+                      })
                 }
               />
             )
