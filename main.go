@@ -34,9 +34,12 @@ func main() {
 	fmt.Println("Final w:", w, "h:", h)
 
 	err = wails.Run(&options.App{
-		Title:  "Kardoo",
-		Width:  w,
-		Height: h,
+		Title:     "Kardoo",
+		Width:     w,
+		Height:    h,
+		Frameless: true,
+		MinWidth:  600,
+		MinHeight: 400,
 		AssetServer: &assetserver.Options{
 			Assets: assets,
 		},

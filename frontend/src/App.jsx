@@ -1,12 +1,7 @@
 import { useState, useEffect } from "react";
-import { Layout, Modal, Empty, Button } from "antd";
-import { ExportOutlined } from "@ant-design/icons";
+import { Layout, Modal, Empty } from "antd";
 import { generateAllVCards } from "./utils/vcard";
-import {
-  LoadConfig,
-  SetWindowPosition,
-  SaveVCardFile,
-} from "../wailsjs/go/main/App";
+import { LoadConfig, SaveVCardFile } from "../wailsjs/go/main/App";
 import { useContacts } from "./hooks/useContacts";
 import IconBar from "./components/IconBar";
 import ContactTree from "./components/ContactTree";
@@ -16,6 +11,7 @@ import AboutDialog from "./components/AboutDialog";
 import SettingsDialog from "./components/SettingsDialog";
 import QrCodeDialog from "./components/QrCodeDialog";
 import ExportDialog from "./components/ExportDialog";
+import TitleBar from "./components/TitleBar";
 import "antd/dist/reset.css";
 import { useTranslation } from "react-i18next";
 
@@ -54,14 +50,6 @@ export default function App() {
       .then((cfg) => {
         setAppConfig(cfg);
         if (cfg.language) i18n.changeLanguage(cfg.language);
-        if (cfg.windowWidth && cfg.windowHeight) {
-          SetWindowPosition(
-            cfg.windowX,
-            cfg.windowY,
-            cfg.windowWidth,
-            cfg.windowHeight,
-          );
-        }
       })
       .catch(console.error);
   }, []);
@@ -124,63 +112,70 @@ export default function App() {
   );
 
   return (
-    <Layout style={{ height: "100vh" }}>
-      <IconBar
-        onOpen={() => withDirtyCheck(openFile)}
-        onSettings={() => setSettingsOpen(true)}
-        onAbout={() => setAboutOpen(true)}
-        onNewContact={handleNewContact}
-        onQrCode={() => setQrOpen(true)}
-      />
-
-      <Sider
-        width={240}
-        theme="light"
-        style={{ borderRight: "1px solid #f0f0f0", overflow: "auto" }}
-      >
-        <ContactTree
-          contacts={contacts}
-          selected={selected}
-          search={search}
-          onSearch={setSearch}
-          onSelect={(c) => withDirtyCheck(() => selectContact(c))}
-          onDelete={handleDeleteContacts}
-          checkedIds={checkedIds}
-          onCheckedChange={setCheckedIds}
-          error={error}
+    <div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
+      <TitleBar />
+      <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
+        <IconBar
+          onOpen={() => withDirtyCheck(openFile)}
+          onSettings={() => setSettingsOpen(true)}
+          onAbout={() => setAboutOpen(true)}
+          onNewContact={handleNewContact}
+          onQrCode={() => setQrOpen(true)}
         />
-      </Sider>
-
-      <Content style={{ padding: 24, overflow: "auto", background: "#fff" }}>
-        {displayedContact ? (
-          displayedContact.kind === "group" ? (
-            <GroupDetail
-              group={displayedContact}
-              allContacts={contacts}
-              onSave={saveContact}
-              onDirtyChange={setIsDirty}
-            />
-          ) : (
-            <ContactDetail
-              contact={displayedContact}
-              onSave={saveContact}
-              onDirtyChange={setIsDirty}
-              onExport={handleExport}
-              exportLabel={
-                checkedIds.length > 0
-                  ? `Exporter (${checkedIds.length})`
-                  : `Exporter (${contacts.filter((c) => c.kind !== "group").length})`
-              }
-            />
-          )
-        ) : (
-          <Empty
-            description={t("app.no_contact_selected")}
-            style={{ marginTop: 100 }}
+        <div
+          style={{
+            width: 240,
+            borderRight: "1px solid #f0f0f0",
+            overflow: "auto",
+            background: "#fff",
+          }}
+        >
+          <ContactTree
+            contacts={contacts}
+            selected={selected}
+            search={search}
+            onSearch={setSearch}
+            onSelect={(c) => withDirtyCheck(() => selectContact(c))}
+            onDelete={handleDeleteContacts}
+            checkedIds={checkedIds}
+            onCheckedChange={setCheckedIds}
+            error={error}
           />
-        )}
-      </Content>
+        </div>
+        <div
+          style={{ flex: 1, padding: 24, overflow: "auto", background: "#fff" }}
+        >
+          {displayedContact ? (
+            displayedContact.kind === "group" ? (
+              <GroupDetail
+                group={displayedContact}
+                allContacts={contacts}
+                onSave={saveContact}
+                onDirtyChange={setIsDirty}
+              />
+            ) : (
+              <ContactDetail
+                contact={displayedContact}
+                onSave={saveContact}
+                onDirtyChange={setIsDirty}
+                onExport={handleExport}
+                exportLabel={
+                  checkedIds.length > 0
+                    ? `Exporter (${checkedIds.length})`
+                    : `Exporter (${contacts.filter((c) => c.kind !== "group").length})`
+                }
+              />
+            )
+          ) : (
+            <Empty
+              description={t("app.no_contact_selected")}
+              style={{ marginTop: 100 }}
+            />
+          )}
+        </div>
+      </div>
 
+      {/* Modals */}
       <Modal
         open={!!pendingAction}
         title="Modifications non sauvegardées"
@@ -195,7 +190,6 @@ export default function App() {
       >
         {t("dirty.content")}
       </Modal>
-
       <AboutDialog open={aboutOpen} onClose={() => setAboutOpen(false)} />
       <SettingsDialog
         open={settingsOpen}
@@ -214,6 +208,6 @@ export default function App() {
         onClose={() => setExportOpen(false)}
         contacts={exportContacts}
       />
-    </Layout>
+    </div>
   );
 }

@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
-	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -298,12 +297,23 @@ func (a *App) saveWindowState(ctx context.Context) {
 	cfg, _ := a.LoadConfig()
 	x, y := runtime.WindowGetPosition(ctx)
 	w, h := runtime.WindowGetSize(ctx)
-	fmt.Println("saveWindowState:", x, y, w, h)
-	if w > 100 && h > 100 {
+	if w > 100 && h > 100 && w < 5000 && h < 3000 {
 		cfg.WindowX = x
 		cfg.WindowY = y
 		cfg.WindowWidth = w
 		cfg.WindowHeight = h
 		a.SaveConfig(cfg)
 	}
+}
+
+func (a *App) WindowMinimise() {
+	runtime.WindowMinimise(a.ctx)
+}
+
+func (a *App) WindowToggleMaximise() {
+	runtime.WindowToggleMaximise(a.ctx)
+}
+
+func (a *App) WindowClose() {
+	runtime.Quit(a.ctx)
 }
