@@ -77,7 +77,7 @@ export default function SettingsDialog({ open, onClose }) {
 
   const handleSave = async () => {
     try {
-      await SaveConfig({ ...config, language: i18n.language });
+      await SaveConfig(config); // ← plus besoin de spread language
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
     } catch (e) {
@@ -187,7 +187,10 @@ export default function SettingsDialog({ open, onClose }) {
         <Select
           size="small"
           value={i18n.language}
-          onChange={(lng) => i18n.changeLanguage(lng)}
+          onChange={(lng) => {
+            i18n.changeLanguage(lng);
+            update("language", lng); // ← ajoute cette ligne
+          }}
           options={[
             { value: "fr", label: "🇫🇷 Français" },
             { value: "en", label: "🇬🇧 English" },
