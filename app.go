@@ -233,3 +233,17 @@ func (a *App) NewVCardFile() (map[string]string, error) {
 	}
 	return map[string]string{"path": file}, nil
 }
+
+func (a *App) ExportContact(content string, defaultName string) error {
+	file, err := runtime.SaveFileDialog(a.ctx, runtime.SaveDialogOptions{
+		Title:           "Exporter le contact",
+		DefaultFilename: defaultName + ".vcf",
+		Filters: []runtime.FileFilter{
+			{DisplayName: "vCard (*.vcf)", Pattern: "*.vcf"},
+		},
+	})
+	if err != nil || file == "" {
+		return err
+	}
+	return os.WriteFile(file, []byte(content), 0644)
+}

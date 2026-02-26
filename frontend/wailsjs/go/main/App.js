@@ -6,6 +6,10 @@ export function ChooseDirectory() {
   return window['go']['main']['App']['ChooseDirectory']();
 }
 
+export function ExportContact(arg1, arg2) {
+  return window['go']['main']['App']['ExportContact'](arg1, arg2);
+}
+
 export function GetWindowPosition() {
   return window['go']['main']['App']['GetWindowPosition']();
 }

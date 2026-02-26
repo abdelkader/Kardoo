@@ -20,15 +20,18 @@ import {
   DeleteOutlined,
   SaveOutlined,
   CameraOutlined,
-  DownloadOutlined, // ← ajoute ici
+  DownloadOutlined,
+  ExportOutlined,
 } from "@ant-design/icons";
 import {
   OpenImageFile,
   OpenSoundFile,
   SaveContactPhoto,
+  ExportContact,
 } from "../../wailsjs/go/main/App";
 
 import AddressDialog from "./AddressDialog";
+import { generateVCard } from "../utils/vcard";
 
 const { Text } = Typography;
 
@@ -1137,6 +1140,20 @@ export default function ContactDetail({
           {form.fn || "Sans nom"}
         </Text>
         <div style={{ display: "flex", gap: 8 }}>
+          <Button
+            icon={<ExportOutlined />}
+            size="small"
+            onClick={async () => {
+              try {
+                const vcf = generateVCard(form);
+                await ExportContact(vcf, form.fn || "contact");
+              } catch (e) {
+                console.error("Erreur export:", e);
+              }
+            }}
+          >
+            Export
+          </Button>
           <Button
             type="primary"
             icon={<SaveOutlined />}

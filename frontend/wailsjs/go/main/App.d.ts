@@ -4,6 +4,8 @@ import {main} from '../models';
 
 export function ChooseDirectory():Promise<string>;
 
+export function ExportContact(arg1:string,arg2:string):Promise<void>;
+
 export function GetWindowPosition():Promise<Record<string, number>>;
 
 export function LoadConfig():Promise<main.AppConfig>;
