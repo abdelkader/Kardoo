@@ -1,3 +1,5 @@
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/B0B2KV8
+
 # Kardoo
 
 > A simple and clean desktop tool to view, edit and manage your VCF (vCard) contact files.
@@ -23,23 +25,17 @@
 
 ---
 
-## Screenshots
-
-![Main screen](screenshot/screen1.png)
-
----
-
 ## 🏗️ Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| Framework | Wails v2 |
-| Frontend | React + Vite |
-| UI | Ant Design |
-| Backend | Go |
-| i18n | react-i18next |
-| QR Code | qrcode |
-| Date parsing | dayjs |
+| Layer        | Technology    |
+| ------------ | ------------- |
+| Framework    | Wails v2      |
+| Frontend     | React + Vite  |
+| UI           | Ant Design    |
+| Backend      | Go            |
+| i18n         | react-i18next |
+| QR Code      | qrcode        |
+| Date parsing | dayjs         |
 
 ---
 
