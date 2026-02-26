@@ -6,6 +6,10 @@ export function ChooseDirectory():Promise<string>;
 
 export function ExportContact(arg1:string,arg2:string):Promise<void>;
 
+export function ExportToFile(arg1:string,arg2:string,arg3:string):Promise<void>;
+
+export function ExportToFolder(arg1:Record<string, string>):Promise<void>;
+
 export function GetWindowPosition():Promise<Record<string, number>>;
 
 export function LoadConfig():Promise<main.AppConfig>;

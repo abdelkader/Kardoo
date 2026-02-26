@@ -10,6 +10,14 @@ export function ExportContact(arg1, arg2) {
   return window['go']['main']['App']['ExportContact'](arg1, arg2);
 }
 
+export function ExportToFile(arg1, arg2, arg3) {
+  return window['go']['main']['App']['ExportToFile'](arg1, arg2, arg3);
+}
+
+export function ExportToFolder(arg1) {
+  return window['go']['main']['App']['ExportToFolder'](arg1);
+}
+
 export function GetWindowPosition() {
   return window['go']['main']['App']['GetWindowPosition']();
 }

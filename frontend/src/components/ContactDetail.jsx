@@ -27,11 +27,9 @@ import {
   OpenImageFile,
   OpenSoundFile,
   SaveContactPhoto,
-  ExportContact,
 } from "../../wailsjs/go/main/App";
 
 import AddressDialog from "./AddressDialog";
-import { generateVCard } from "../utils/vcard";
 
 const { Text } = Typography;
 
@@ -149,11 +147,14 @@ export default function ContactDetail({
   contact,
   onSave,
   onDirtyChange,
-  onDelete,
+  onExport,
+  exportLabel,
 }) {
   const [form, setForm] = useState(null);
   const [dirty, setDirty] = useState(false);
   const [adrDialogOpen, setAdrDialogOpen] = useState(false);
+  const [checkedIds, setCheckedIds] = useState([]);
+
   const { t } = useTranslation();
   useEffect(() => {
     if (!contact) return;
@@ -1143,16 +1144,9 @@ export default function ContactDetail({
           <Button
             icon={<ExportOutlined />}
             size="small"
-            onClick={async () => {
-              try {
-                const vcf = generateVCard(form);
-                await ExportContact(vcf, form.fn || "contact");
-              } catch (e) {
-                console.error("Erreur export:", e);
-              }
-            }}
+            onClick={() => onExport?.()}
           >
-            Export
+            {exportLabel || "Export"}
           </Button>
           <Button
             type="primary"

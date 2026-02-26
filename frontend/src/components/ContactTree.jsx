@@ -166,18 +166,20 @@ export default function ContactTree({
   onSearch,
   onSelect,
   onDelete,
+  checkedIds,
+  onCheckedChange,
   error,
 }) {
   const { t } = useTranslation();
-  const [checkedIds, setCheckedIds] = useState([]);
+
   const [hoveredId, setHoveredId] = useState(null);
 
   useEffect(() => {
-    setCheckedIds([]);
+    onCheckedChange([]);
   }, [contacts]);
 
   const handleCheck = (id, checked) => {
-    setCheckedIds((prev) =>
+    onCheckedChange((prev) =>
       checked ? [...prev, id] : prev.filter((i) => i !== id),
     );
   };

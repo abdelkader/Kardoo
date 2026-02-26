@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { Layout, Modal, Empty } from "antd";
-import { generateAllVCards, createEmptyContact } from "./utils/vcard";
+import { Layout, Modal, Empty, Button } from "antd";
+import { ExportOutlined } from "@ant-design/icons";
+import { generateAllVCards } from "./utils/vcard";
 import {
   LoadConfig,
   SetWindowPosition,
@@ -14,6 +15,7 @@ import GroupDetail from "./components/GroupDetail";
 import AboutDialog from "./components/AboutDialog";
 import SettingsDialog from "./components/SettingsDialog";
 import QrCodeDialog from "./components/QrCodeDialog";
+import ExportDialog from "./components/ExportDialog";
 import "antd/dist/reset.css";
 import { useTranslation } from "react-i18next";
 
@@ -30,6 +32,9 @@ export default function App() {
     backupOnSave: false,
     backupDir: "",
   });
+  const [exportOpen, setExportOpen] = useState(false);
+  const [exportContacts, setExportContacts] = useState([]);
+  const [checkedIds, setCheckedIds] = useState([]);
   const { i18n, t } = useTranslation();
   const {
     contacts,
@@ -64,6 +69,15 @@ export default function App() {
   const withDirtyCheck = (action) => {
     if (isDirty) setPendingAction(() => action);
     else action();
+  };
+
+  const handleExport = () => {
+    const toExport =
+      checkedIds.length > 0
+        ? contacts.filter((c) => checkedIds.includes(c.id))
+        : contacts.filter((c) => c.kind !== "group");
+    setExportContacts(toExport);
+    setExportOpen(true);
   };
 
   const handleDeleteContacts = (ids, onSuccess) => {
@@ -131,6 +145,8 @@ export default function App() {
           onSearch={setSearch}
           onSelect={(c) => withDirtyCheck(() => selectContact(c))}
           onDelete={handleDeleteContacts}
+          checkedIds={checkedIds}
+          onCheckedChange={setCheckedIds}
           error={error}
         />
       </Sider>
@@ -149,8 +165,11 @@ export default function App() {
               contact={displayedContact}
               onSave={saveContact}
               onDirtyChange={setIsDirty}
-              onDelete={(ids) =>
-                handleDeleteContacts(ids, () => setIsDirty(false))
+              onExport={handleExport}
+              exportLabel={
+                checkedIds.length > 0
+                  ? `Exporter (${checkedIds.length})`
+                  : `Exporter (${contacts.filter((c) => c.kind !== "group").length})`
               }
             />
           )
@@ -189,6 +208,11 @@ export default function App() {
         open={qrOpen}
         onClose={() => setQrOpen(false)}
         contact={displayedContact}
+      />
+      <ExportDialog
+        open={exportOpen}
+        onClose={() => setExportOpen(false)}
+        contacts={exportContacts}
       />
     </Layout>
   );

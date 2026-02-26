@@ -247,3 +247,42 @@ func (a *App) ExportContact(content string, defaultName string) error {
 	}
 	return os.WriteFile(file, []byte(content), 0644)
 }
+func (a *App) ExportToFile(content string, defaultName string, ext string) error {
+	filterName := "VCF"
+	switch ext {
+	case ".json":
+		filterName = "JSON"
+	case ".csv":
+		filterName = "CSV"
+	case ".xml":
+		filterName = "XML"
+	}
+
+	file, err := runtime.SaveFileDialog(a.ctx, runtime.SaveDialogOptions{
+		Title:           "Exporter les contacts",
+		DefaultFilename: defaultName + ext,
+		Filters: []runtime.FileFilter{
+			{DisplayName: filterName + " (*" + ext + ")", Pattern: "*" + ext},
+		},
+	})
+	if err != nil || file == "" {
+		return err
+	}
+	return os.WriteFile(file, []byte(content), 0644)
+}
+
+func (a *App) ExportToFolder(files map[string]string) error {
+	dir, err := runtime.OpenDirectoryDialog(a.ctx, runtime.OpenDialogOptions{
+		Title: "Choisir le dossier d'export",
+	})
+	if err != nil || dir == "" {
+		return err
+	}
+	for name, content := range files {
+		path := filepath.Join(dir, name)
+		if err := os.WriteFile(path, []byte(content), 0644); err != nil {
+			return err
+		}
+	}
+	return nil
+}
