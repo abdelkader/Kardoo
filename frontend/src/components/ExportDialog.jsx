@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Modal, Radio, Typography, Space, Badge } from "antd";
 import { FileOutlined, FolderOutlined } from "@ant-design/icons";
 import { generateVCard } from "../utils/vcard";
+import { useTranslation } from "react-i18next";
 import {
   toJCard,
   toXCard,
@@ -16,6 +17,7 @@ export default function ExportDialog({ open, onClose, contacts }) {
   const [format, setFormat] = useState("vcf");
   const [destination, setDestination] = useState("single");
   const [loading, setLoading] = useState(false);
+  const { t } = useTranslation();
 
   const count = contacts?.length || 0;
 
@@ -75,18 +77,12 @@ export default function ExportDialog({ open, onClose, contacts }) {
       open={open}
       onCancel={onClose}
       onOk={handleExport}
-      okText="Exporter"
-      cancelText="Annuler"
+      okText={t("export.ok")}
+      cancelText={t("export.cancel")}
       confirmLoading={loading}
       title={
         <span>
-          Exporter{" "}
-          <Badge
-            count={count}
-            style={{ backgroundColor: "#1677ff" }}
-            overflowCount={999}
-          />{" "}
-          contact{count > 1 ? "s" : ""}
+          {t(count > 1 ? "export.title_plural" : "export.title", { count })}
         </span>
       }
       width={380}
@@ -100,7 +96,7 @@ export default function ExportDialog({ open, onClose, contacts }) {
         {/* Format */}
         <div>
           <Text strong style={{ display: "block", marginBottom: 8 }}>
-            Format
+            {t("export.format")}
           </Text>
           <Radio.Group
             value={format}
@@ -110,25 +106,25 @@ export default function ExportDialog({ open, onClose, contacts }) {
               <Radio value="vcf">
                 <Text>.vcf</Text>
                 <Text type="secondary" style={{ fontSize: 11, marginLeft: 8 }}>
-                  vCard 4.0 — compatible tous appareils
+                  {t("export.vcf_desc")}
                 </Text>
               </Radio>
               <Radio value="json">
                 <Text>.json</Text>
                 <Text type="secondary" style={{ fontSize: 11, marginLeft: 8 }}>
-                  jCard (RFC 7095)
+                  {t("export.json_desc")}
                 </Text>
               </Radio>
               <Radio value="csv">
                 <Text>.csv</Text>
                 <Text type="secondary" style={{ fontSize: 11, marginLeft: 8 }}>
-                  Google Contacts format
+                  {t("export.csv_desc")}
                 </Text>
               </Radio>
               <Radio value="xml">
                 <Text>.xml</Text>
                 <Text type="secondary" style={{ fontSize: 11, marginLeft: 8 }}>
-                  xCard (RFC 6351)
+                  {t("export.xml_desc")}
                 </Text>
               </Radio>
             </Space>
@@ -138,7 +134,7 @@ export default function ExportDialog({ open, onClose, contacts }) {
         {/* Destination */}
         <div>
           <Text strong style={{ display: "block", marginBottom: 8 }}>
-            Destination
+            {t("export.destination")}
           </Text>
           <Radio.Group
             value={destination}
@@ -147,18 +143,18 @@ export default function ExportDialog({ open, onClose, contacts }) {
             <Space direction="vertical">
               <Radio value="single">
                 <FileOutlined style={{ marginRight: 6 }} />
-                <Text>Un seul fichier</Text>
+                <Text>{t("export.single_file")}</Text>
                 <Text type="secondary" style={{ fontSize: 11, marginLeft: 8 }}>
-                  tous les contacts regroupés
+                  {t("export.single_file_desc")}
                 </Text>
               </Radio>
               <Radio value="folder" disabled={format === "csv"}>
                 <FolderOutlined style={{ marginRight: 6 }} />
-                <Text>Un fichier par contact</Text>
+                <Text>{t("export.one_per_contact")}</Text>
                 <Text type="secondary" style={{ fontSize: 11, marginLeft: 8 }}>
                   {format === "csv"
-                    ? "(non disponible en CSV)"
-                    : "choisir un dossier"}
+                    ? t("export.csv_no_split")
+                    : t("export.one_per_contact_desc")}
                 </Text>
               </Radio>
             </Space>

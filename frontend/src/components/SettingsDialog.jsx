@@ -171,7 +171,7 @@ export default function SettingsDialog({ open, onClose }) {
           {t("settings.capture")}
         </Button>
         <Text type="secondary" style={{ fontSize: 11, marginLeft: 8 }}>
-          {t("settings.window_position_saved")}
+          {t("settings.capture_hint")}
         </Text>
       </Card>
       <Card
@@ -219,9 +219,7 @@ export default function SettingsDialog({ open, onClose }) {
             checked={config.backupOnSave}
             onChange={(v) => update("backupOnSave", v)}
           />
-          <Text style={{ fontSize: 12 }}>
-            {t("settings.create_backup_on_save")}
-          </Text>
+          <Text style={{ fontSize: 12 }}>{t("settings.backup_on_save")}</Text>
         </div>
         {config.backupOnSave && (
           <div>

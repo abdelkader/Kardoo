@@ -66,5 +66,22 @@
     "description": "A tool to edit (Modify, delete) VCF files.",
     "subtitle": "Manage your vCard contacts with ease.",
     "copyright": "© 2025 abdelkader · All rights reserved"
+  },
+  "export": {
+    "title": "Exporter {{count}} contact",
+    "title_plural": "Exporter {{count}} contacts",
+    "format": "Format",
+    "destination": "Destination",
+    "single_file": "Un seul fichier",
+    "single_file_desc": "tous les contacts regroupés",
+    "one_per_contact": "Un fichier par contact",
+    "one_per_contact_desc": "choisir un dossier",
+    "csv_no_split": "(non disponible en CSV)",
+    "ok": "Exporter",
+    "cancel": "Annuler",
+    "vcf_desc": "vCard 4.0 — compatible tous appareils",
+    "json_desc": "jCard (RFC 7095)",
+    "csv_desc": "Google Contacts format",
+    "xml_desc": "xCard (RFC 6351)"
   }
 }
