@@ -1,22 +1,34 @@
-import { useState } from "react";
-import { Avatar, Typography, Input, Empty } from "antd";
+import { useState, useEffect } from "react";
+import { Avatar, Typography, Input, Empty, Checkbox, Button } from "antd";
 import {
   UserOutlined,
   FolderOutlined,
   FolderOpenOutlined,
+  DeleteOutlined,
 } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import { buildTree } from "../utils/groups";
 
 const { Text } = Typography;
 
-function ContactRow({ contact, selected, onSelect, indent = false }) {
+function ContactRow({
+  contact,
+  selected,
+  onSelect,
+  checked,
+  onCheck,
+  hovered,
+  onHover,
+}) {
   const isSelected = selected?.id === contact.id;
+  const showCheckbox = hovered || checked;
+
   return (
     <div
-      onClick={() => onSelect(contact)}
+      onMouseEnter={() => onHover(contact.id)}
+      onMouseLeave={() => onHover(null)}
       style={{
-        padding: indent ? "4px 10px 4px 28px" : "4px 10px", // ← différence ici
+        padding: "4px 10px",
         cursor: "pointer",
         display: "flex",
         alignItems: "center",
@@ -25,32 +37,58 @@ function ContactRow({ contact, selected, onSelect, indent = false }) {
         borderLeft: isSelected ? "3px solid #1677ff" : "3px solid transparent",
       }}
     >
-      <Avatar
-        size={24}
-        src={contact.photo || undefined}
-        icon={!contact.photo && <UserOutlined />}
-        style={{
-          backgroundColor: contact.photo ? "transparent" : "#1677ff",
-          flexShrink: 0,
-        }}
-        onError={() => {
-          return false;
-        }}
-      />
-      <Text strong={isSelected} style={{ fontSize: 12, lineHeight: "1.2" }}>
+      {/* Zone gauche : checkbox ou avatar */}
+      {showCheckbox ? (
+        <Checkbox
+          checked={checked}
+          onChange={(e) => {
+            e.stopPropagation();
+            onCheck(contact.id, e.target.checked);
+          }}
+          onClick={(e) => e.stopPropagation()}
+          style={{ flexShrink: 0 }}
+        />
+      ) : (
+        <Avatar
+          size={24}
+          src={contact.photo || undefined}
+          icon={<UserOutlined />}
+          style={{
+            backgroundColor: contact.photo ? "transparent" : "#1677ff",
+            flexShrink: 0,
+          }}
+          onError={() => false}
+        />
+      )}
+
+      {/* Nom — clic pour sélectionner */}
+      <Text
+        strong={isSelected}
+        style={{ fontSize: 12, lineHeight: "1.2", flex: 1 }}
+        onClick={() => onSelect(contact)}
+      >
         {contact.fn}
       </Text>
     </div>
   );
 }
 
-function GroupFolder({ group, members, selected, onSelect, onSelectGroup }) {
+function GroupFolder({
+  group,
+  members,
+  selected,
+  onSelect,
+  onSelectGroup,
+  checkedIds,
+  onCheck,
+  hoveredId,
+  onHover,
+}) {
   const [open, setOpen] = useState(true);
   const isSelected = selected?.id === group.id;
 
   return (
     <div>
-      {/* En-tête du dossier */}
       <div
         style={{
           padding: "5px 10px",
@@ -82,7 +120,6 @@ function GroupFolder({ group, members, selected, onSelect, onSelectGroup }) {
         </Text>
       </div>
 
-      {/* Membres du groupe */}
       {open &&
         members.map((m, i) =>
           m.resolved ? (
@@ -92,9 +129,12 @@ function GroupFolder({ group, members, selected, onSelect, onSelectGroup }) {
               selected={selected}
               onSelect={onSelect}
               indent={true}
+              checked={checkedIds.includes(m.resolved.id)}
+              onCheck={onCheck}
+              hovered={hoveredId === m.resolved.id}
+              onHover={onHover}
             />
           ) : (
-            // Membre non résolu — affiché en grisé
             <div
               key={i}
               style={{
@@ -125,23 +165,30 @@ export default function ContactTree({
   search,
   onSearch,
   onSelect,
+  onDelete,
   error,
 }) {
   const { t } = useTranslation();
+  const [checkedIds, setCheckedIds] = useState([]);
+  const [hoveredId, setHoveredId] = useState(null);
 
-  const filtered = contacts.filter((c) =>
-    c.fn.toLowerCase().includes(search.toLowerCase()),
-  );
+  useEffect(() => {
+    setCheckedIds([]);
+  }, [contacts]);
 
-  // Si recherche active — affichage plat
-  const isSearching = search.trim().length > 0;
+  const handleCheck = (id, checked) => {
+    setCheckedIds((prev) =>
+      checked ? [...prev, id] : prev.filter((i) => i !== id),
+    );
+  };
 
   const { tree, ungrouped } = buildTree(contacts);
-  // Contacts filtrés pour la recherche
+
   const filteredFlat = contacts.filter(
     (c) =>
       c.kind !== "group" && c.fn.toLowerCase().includes(search.toLowerCase()),
   );
+  const isSearching = search.trim().length > 0;
 
   return (
     <>
@@ -153,10 +200,30 @@ export default function ContactTree({
           style={{ marginBottom: 6 }}
           size="small"
         />
-        <Text type="secondary" style={{ fontSize: 11 }}>
-          {contacts.filter((c) => c.kind !== "group").length}{" "}
-          {t("app.no_contacts")}
-        </Text>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <Text type="secondary" style={{ fontSize: 11 }}>
+            {contacts.filter((c) => c.kind !== "group").length}{" "}
+            {t("app.no_contacts")}
+          </Text>
+
+          {/* Bouton supprimer — visible si cases cochées */}
+          {checkedIds.length > 0 && (
+            <Button
+              size="small"
+              danger
+              icon={<DeleteOutlined />}
+              onClick={() => onDelete(checkedIds, () => setCheckedIds([]))}
+            >
+              {checkedIds.length}
+            </Button>
+          )}
+        </div>
       </div>
 
       {error && (
@@ -171,7 +238,6 @@ export default function ContactTree({
       {contacts.length === 0 ? (
         <Empty description={t("app.no_contacts")} style={{ marginTop: 40 }} />
       ) : isSearching ? (
-        // Mode recherche — liste plate
         <div>
           {filteredFlat.length === 0 ? (
             <Empty description="Aucun résultat" style={{ marginTop: 20 }} />
@@ -182,14 +248,16 @@ export default function ContactTree({
                 contact={c}
                 selected={selected}
                 onSelect={onSelect}
+                checked={checkedIds.includes(c.id)}
+                onCheck={handleCheck}
+                hovered={hoveredId === c.id}
+                onHover={setHoveredId}
               />
             ))
           )}
         </div>
       ) : (
-        // Mode arbre
         <div>
-          {/* Groupes */}
           {tree.map(({ group, members }) => (
             <GroupFolder
               key={group.id}
@@ -198,10 +266,13 @@ export default function ContactTree({
               selected={selected}
               onSelect={onSelect}
               onSelectGroup={onSelect}
+              checkedIds={checkedIds}
+              onCheck={handleCheck}
+              hoveredId={hoveredId}
+              onHover={setHoveredId}
             />
           ))}
 
-          {/* Séparateur si groupes + contacts sans groupe */}
           {tree.length > 0 && ungrouped.length > 0 && (
             <div
               style={{
@@ -223,13 +294,16 @@ export default function ContactTree({
             </div>
           )}
 
-          {/* Contacts sans groupe */}
           {ungrouped.map((c) => (
             <ContactRow
               key={c.id}
               contact={c}
               selected={selected}
               onSelect={onSelect}
+              checked={checkedIds.includes(c.id)}
+              onCheck={handleCheck}
+              hovered={hoveredId === c.id}
+              onHover={setHoveredId}
             />
           ))}
         </div>

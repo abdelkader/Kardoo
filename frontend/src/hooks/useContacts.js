@@ -17,6 +17,27 @@ export function useContacts(appConfig) {
   const [currentFilePath, setCurrentFilePath] = useState("");
   const [error, setError] = useState("");
 
+  const deleteContacts = async (ids) => {
+    const newContacts = contacts.filter((c) => !ids.includes(c.id));
+    setContacts(newContacts);
+
+    if (ids.includes(selected?.id)) {
+      setSelected(newContacts[0] || null);
+      setDisplayedContact(newContacts[0] || null);
+    }
+
+    try {
+      await SaveVCardFile(
+        currentFilePath,
+        generateAllVCards(newContacts),
+        appConfig.backupOnSave,
+        appConfig.backupDir,
+      );
+    } catch (e) {
+      setError("Erreur suppression : " + e.message);
+    }
+  };
+
   const openFile = async () => {
     setError("");
     try {
@@ -95,5 +116,6 @@ export function useContacts(appConfig) {
     saveContact,
     selectContact,
     newContact,
+    deleteContacts,
   };
 }

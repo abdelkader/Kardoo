@@ -142,7 +142,12 @@ function ItemList({
   );
 }
 
-export default function ContactDetail({ contact, onSave, onDirtyChange }) {
+export default function ContactDetail({
+  contact,
+  onSave,
+  onDirtyChange,
+  onDelete,
+}) {
   const [form, setForm] = useState(null);
   const [dirty, setDirty] = useState(false);
   const [adrDialogOpen, setAdrDialogOpen] = useState(false);
@@ -1131,15 +1136,17 @@ export default function ContactDetail({ contact, onSave, onDirtyChange }) {
         <Text strong style={{ fontSize: 16 }}>
           {form.fn || "Sans nom"}
         </Text>
-        <Button
-          type="primary"
-          icon={<SaveOutlined />}
-          onClick={handleSave}
-          disabled={!dirty}
-          size="small"
-        >
-          {dirty ? t("contact.save") : t("contact.saved")}
-        </Button>
+        <div style={{ display: "flex", gap: 8 }}>
+          <Button
+            type="primary"
+            icon={<SaveOutlined />}
+            onClick={handleSave}
+            disabled={!dirty}
+            size="small"
+          >
+            {dirty ? t("contact.save") : t("contact.saved")}
+          </Button>
+        </div>
       </div>
 
       <Tabs

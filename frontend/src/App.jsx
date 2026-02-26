@@ -41,6 +41,7 @@ export default function App() {
     saveContact,
     selectContact,
     newContact,
+    deleteContacts,
   } = useContacts(appConfig);
 
   useEffect(() => {
@@ -63,6 +64,27 @@ export default function App() {
   const withDirtyCheck = (action) => {
     if (isDirty) setPendingAction(() => action);
     else action();
+  };
+
+  const handleDeleteContacts = (ids, onSuccess) => {
+    Modal.confirm({
+      title:
+        ids.length === 1
+          ? "Supprimer ce contact ?"
+          : `Supprimer ${ids.length} contacts ?`,
+      content:
+        ids.length === 1
+          ? "Cette action est irréversible."
+          : `Vous allez supprimer ${ids.length} contacts. Cette action est irréversible.`,
+      okText: "Supprimer",
+      cancelText: "Annuler",
+      okButtonProps: { danger: true },
+      onOk: async () => {
+        await deleteContacts(ids);
+        onSuccess?.();
+        setIsDirty(false);
+      },
+    });
   };
 
   const handleNewContact = () =>
@@ -108,6 +130,7 @@ export default function App() {
           search={search}
           onSearch={setSearch}
           onSelect={(c) => withDirtyCheck(() => selectContact(c))}
+          onDelete={handleDeleteContacts}
           error={error}
         />
       </Sider>
@@ -126,6 +149,9 @@ export default function App() {
               contact={displayedContact}
               onSave={saveContact}
               onDirtyChange={setIsDirty}
+              onDelete={(ids) =>
+                handleDeleteContacts(ids, () => setIsDirty(false))
+              }
             />
           )
         ) : (
