@@ -19,16 +19,16 @@ function ContactRow({
   onCheck,
   hovered,
   onHover,
+  indent = false,
 }) {
   const isSelected = selected?.id === contact.id;
-  const showCheckbox = hovered || checked;
 
   return (
     <div
       onMouseEnter={() => onHover(contact.id)}
       onMouseLeave={() => onHover(null)}
       style={{
-        padding: "4px 10px",
+        padding: indent ? "4px 10px 4px 28px" : "4px 10px",
         cursor: "pointer",
         display: "flex",
         alignItems: "center",
@@ -37,31 +37,19 @@ function ContactRow({
         borderLeft: isSelected ? "3px solid #1677ff" : "3px solid transparent",
       }}
     >
-      {/* Zone gauche : checkbox ou avatar */}
-      {showCheckbox ? (
-        <Checkbox
-          checked={checked}
-          onChange={(e) => {
-            e.stopPropagation();
-            onCheck(contact.id, e.target.checked);
-          }}
-          onClick={(e) => e.stopPropagation()}
-          style={{ flexShrink: 0 }}
-        />
-      ) : (
-        <Avatar
-          size={24}
-          src={contact.photo || undefined}
-          icon={<UserOutlined />}
-          style={{
-            backgroundColor: contact.photo ? "transparent" : "#1677ff",
-            flexShrink: 0,
-          }}
-          onError={() => false}
-        />
-      )}
+      {/* Avatar — toujours visible */}
+      <Avatar
+        size={24}
+        src={contact.photo || undefined}
+        icon={<UserOutlined />}
+        style={{
+          backgroundColor: contact.photo ? "transparent" : "#1677ff",
+          flexShrink: 0,
+        }}
+        onError={() => false}
+      />
 
-      {/* Nom — clic pour sélectionner */}
+      {/* Nom */}
       <Text
         strong={isSelected}
         style={{ fontSize: 12, lineHeight: "1.2", flex: 1 }}
@@ -69,6 +57,20 @@ function ContactRow({
       >
         {contact.fn}
       </Text>
+
+      {/* Checkbox — à droite, visible au hover ou si cochée */}
+      <div style={{ width: 16, flexShrink: 0 }}>
+        {(hovered || checked) && (
+          <Checkbox
+            checked={checked}
+            onChange={(e) => {
+              e.stopPropagation();
+              onCheck(contact.id, e.target.checked);
+            }}
+            onClick={(e) => e.stopPropagation()}
+          />
+        )}
+      </div>
     </div>
   );
 }
