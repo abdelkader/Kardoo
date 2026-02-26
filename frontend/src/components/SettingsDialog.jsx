@@ -1,21 +1,11 @@
 import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
-import {
-  Modal,
-  Switch,
-  Button,
-  Input,
-  Divider,
-  Typography,
-  Card,
-  Select,
-} from "antd";
+import { Modal, Switch, Button, Input, Typography, Card, Select } from "antd";
 import { FolderOpenOutlined } from "@ant-design/icons";
 import {
   SaveConfig,
   LoadConfig,
   ChooseDirectory,
-  GetWindowPosition,
 } from "../../wailsjs/go/main/App";
 
 const { Text } = Typography;
@@ -30,12 +20,9 @@ export default function SettingsDialog({ open, onClose }) {
   const { t, i18n } = useTranslation();
 
   const [config, setConfig] = useState({
-    windowX: 0,
-    windowY: 0,
-    windowWidth: 1200,
-    windowHeight: 800,
     backupOnSave: false,
     backupDir: "",
+    language: "",
   });
   const [saved, setSaved] = useState(false);
 
@@ -50,22 +37,6 @@ export default function SettingsDialog({ open, onClose }) {
     setSaved(false);
   };
 
-  const handleSaveWindowPos = async () => {
-    try {
-      const pos = await GetWindowPosition();
-      setConfig((prev) => ({
-        ...prev,
-        windowX: pos.x,
-        windowY: pos.y,
-        windowWidth: pos.width,
-        windowHeight: pos.height,
-      }));
-      setSaved(false);
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
   const handleChooseDir = async () => {
     try {
       const dir = await ChooseDirectory();
@@ -77,11 +48,11 @@ export default function SettingsDialog({ open, onClose }) {
 
   const handleSave = async () => {
     try {
-      await SaveConfig(config); // ← plus besoin de spread language
+      await SaveConfig(config);
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
     } catch (e) {
-      console.error(e);
+      console.error("SaveConfig failed:", e);
     }
   };
 
@@ -100,80 +71,6 @@ export default function SettingsDialog({ open, onClose }) {
         </Button>,
       ]}
     >
-      {/* Fenêtre */}
-      <Card
-        size="small"
-        title={
-          <Text strong style={{ fontSize: 12 }}>
-            {t("settings.window")}
-          </Text>
-        }
-        style={cardStyle}
-        headStyle={headStyle}
-      >
-        <div
-          style={{
-            display: "flex",
-            gap: 8,
-            marginBottom: 8,
-            alignItems: "center",
-          }}
-        >
-          <Text style={{ fontSize: 12, width: 60 }}>
-            {t("settings.position_x")}
-          </Text>
-          <Input
-            size="small"
-            type="number"
-            value={config.windowX}
-            onChange={(e) => update("windowX", parseInt(e.target.value) || 0)}
-            style={{ width: 80 }}
-          />
-          <Text style={{ fontSize: 12, width: 20 }}>Y</Text>
-          <Input
-            size="small"
-            type="number"
-            value={config.windowY}
-            onChange={(e) => update("windowY", parseInt(e.target.value) || 0)}
-            style={{ width: 80 }}
-          />
-        </div>
-        <div
-          style={{
-            display: "flex",
-            gap: 8,
-            marginBottom: 10,
-            alignItems: "center",
-          }}
-        >
-          <Text style={{ fontSize: 12, width: 60 }}>{t("settings.width")}</Text>
-          <Input
-            size="small"
-            type="number"
-            value={config.windowWidth}
-            onChange={(e) =>
-              update("windowWidth", parseInt(e.target.value) || 800)
-            }
-            style={{ width: 80 }}
-          />
-          <Text style={{ fontSize: 12, width: 20 }}>H</Text>
-          <Input
-            size="small"
-            type="number"
-            value={config.windowHeight}
-            onChange={(e) =>
-              update("windowHeight", parseInt(e.target.value) || 600)
-            }
-            style={{ width: 80 }}
-          />
-        </div>
-        <Button size="small" onClick={handleSaveWindowPos}>
-          {t("settings.capture")}
-        </Button>
-        <Text type="secondary" style={{ fontSize: 11, marginLeft: 8 }}>
-          {t("settings.capture_hint")}
-        </Text>
-      </Card>
       <Card
         size="small"
         title={
@@ -189,7 +86,7 @@ export default function SettingsDialog({ open, onClose }) {
           value={i18n.language}
           onChange={(lng) => {
             i18n.changeLanguage(lng);
-            update("language", lng); // ← ajoute cette ligne
+            update("language", lng);
           }}
           options={[
             { value: "fr", label: "🇫🇷 Français" },
@@ -198,7 +95,7 @@ export default function SettingsDialog({ open, onClose }) {
           style={{ width: 160 }}
         />
       </Card>
-      {/* Backup */}
+
       <Card
         size="small"
         title={

@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -27,11 +28,12 @@ type AppConfig struct {
 }
 
 func getConfigPath() (string, error) {
-	dir, err := os.UserConfigDir()
+	exe, err := os.Executable()
 	if err != nil {
 		return "", err
 	}
-	return filepath.Join(dir, "Kardoo", "Kardoo.appconfig"), nil
+	dir := filepath.Dir(exe)
+	return filepath.Join(dir, "Kardoo.appconfig"), nil
 }
 
 func (a *App) LoadConfig() (AppConfig, error) {
@@ -71,6 +73,11 @@ func NewApp() *App {
 
 func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
+
+	cfg, err := a.LoadConfig()
+	if err == nil && cfg.WindowX > 0 && cfg.WindowY > 0 {
+		runtime.WindowSetPosition(ctx, cfg.WindowX, cfg.WindowY)
+	}
 }
 
 func (a *App) OpenVCardFile() (map[string]string, error) {
@@ -285,4 +292,18 @@ func (a *App) ExportToFolder(files map[string]string) error {
 		}
 	}
 	return nil
+}
+
+func (a *App) saveWindowState(ctx context.Context) {
+	cfg, _ := a.LoadConfig()
+	x, y := runtime.WindowGetPosition(ctx)
+	w, h := runtime.WindowGetSize(ctx)
+	fmt.Println("saveWindowState:", x, y, w, h)
+	if w > 100 && h > 100 {
+		cfg.WindowX = x
+		cfg.WindowY = y
+		cfg.WindowWidth = w
+		cfg.WindowHeight = h
+		a.SaveConfig(cfg)
+	}
 }
