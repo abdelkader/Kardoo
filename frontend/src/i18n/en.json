@@ -85,5 +85,35 @@
     "xml_desc": "xCard (RFC 6351)",
     "export_selected": "Export ({{count}})",
     "export_all": "Export ({{count}})"
-  }
+  },
+  "import": {
+  "title": "Import Contacts",
+  "choose_files": "Choose Files",
+  "confirm": "Import ({{count}})",
+  "cancel": "Cancel",
+  "hint": "Click OK to choose one or more files",
+  "formats": "Supported formats: .vcf, .json (jCard), .xml (xCard), .csv",
+  "preview": "{{count}} contact(s) found — confirm import?"
+},
+"tools": {
+  "title": "Tools",
+  "import": "Import",
+  "export": "Export",
+  "media": "Media"
+},
+"media": {
+  "title": "Media Manager",
+  "photos": "Photos",
+  "logos": "Logos",
+  "sounds": "Audio",
+  "preview": "Preview",
+  "contact": "Contact",
+  "size": "Size",
+  "type": "Format",
+  "none": "No media found",
+  "confirm_delete": "Delete this media?",
+  "delete": "Delete",
+  "cancel": "Cancel",
+  "close": "Close"
+}
 }

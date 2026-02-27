@@ -106,6 +106,47 @@ export function useContacts(appConfig) {
     }
   };
 
+  const importContacts = async (newContacts) => {
+    // Réassigner les IDs pour éviter les conflits
+    const maxId = contacts.reduce((max, c) => Math.max(max, c.id), 0);
+    const reindexed = newContacts.map((c, i) => ({ ...c, id: maxId + i + 1 }));
+
+    let updatedContacts;
+    let filePath = currentFilePath;
+
+    if (filePath) {
+      // Fichier déjà ouvert — on fusionne
+      updatedContacts = [...contacts, ...reindexed];
+      setContacts(updatedContacts);
+    } else {
+      // Pas de fichier ouvert — on demande où sauvegarder
+      try {
+        const result = await NewVCardFile();
+        if (!result?.path) return;
+        filePath = result.path;
+        setCurrentFilePath(filePath);
+        updatedContacts = reindexed;
+        setContacts(updatedContacts);
+        setSelected(reindexed[0] || null);
+        setDisplayedContact(reindexed[0] || null);
+      } catch (e) {
+        setError("Erreur : " + e.message);
+        return;
+      }
+    }
+
+    try {
+      await SaveVCardFile(
+        filePath,
+        generateAllVCards(updatedContacts),
+        appConfig.backupOnSave,
+        appConfig.backupDir,
+      );
+    } catch (e) {
+      setError("Erreur import : " + e.message);
+    }
+  };
+
   return {
     contacts,
     selected,
@@ -117,5 +158,6 @@ export function useContacts(appConfig) {
     selectContact,
     newContact,
     deleteContacts,
+    importContacts,
   };
 }

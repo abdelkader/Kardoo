@@ -34,6 +34,10 @@ export function OpenImageFile() {
   return window['go']['main']['App']['OpenImageFile']();
 }
 
+export function OpenImportFiles() {
+  return window['go']['main']['App']['OpenImportFiles']();
+}
+
 export function OpenSoundFile() {
   return window['go']['main']['App']['OpenSoundFile']();
 }

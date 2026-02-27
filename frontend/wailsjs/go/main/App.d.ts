@@ -18,6 +18,8 @@ export function NewVCardFile():Promise<Record<string, string>>;
 
 export function OpenImageFile():Promise<string>;
 
+export function OpenImportFiles():Promise<Array<Record<string, string>>>;
+
 export function OpenSoundFile():Promise<string>;
 
 export function OpenVCardFile():Promise<Record<string, string>>;

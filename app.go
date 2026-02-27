@@ -317,3 +317,28 @@ func (a *App) WindowToggleMaximise() {
 func (a *App) WindowClose() {
 	runtime.Quit(a.ctx)
 }
+
+func (a *App) OpenImportFiles() ([]map[string]string, error) {
+	files, err := runtime.OpenMultipleFilesDialog(a.ctx, runtime.OpenDialogOptions{
+		Title: "Importer des contacts",
+		Filters: []runtime.FileFilter{
+			{DisplayName: "Contacts (*.vcf, *.json, *.xml, *.csv)", Pattern: "*.vcf;*.json;*.xml;*.csv"},
+		},
+	})
+	if err != nil || len(files) == 0 {
+		return nil, err
+	}
+	result := []map[string]string{}
+	for _, file := range files {
+		content, err := os.ReadFile(file)
+		if err != nil {
+			continue
+		}
+		result = append(result, map[string]string{
+			"path":    file,
+			"content": string(content),
+			"ext":     strings.ToLower(filepath.Ext(file)),
+		})
+	}
+	return result, nil
+}

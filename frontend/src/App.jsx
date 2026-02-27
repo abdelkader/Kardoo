@@ -12,6 +12,8 @@ import SettingsDialog from "./components/SettingsDialog";
 import QrCodeDialog from "./components/QrCodeDialog";
 import ExportDialog from "./components/ExportDialog";
 import TitleBar from "./components/TitleBar";
+import ImportDialog from "./components/ImportDialog";
+import MediaDialog from "./components/MediaDialog";
 import "antd/dist/reset.css";
 import { useTranslation } from "react-i18next";
 
@@ -31,6 +33,8 @@ export default function App() {
   const [exportOpen, setExportOpen] = useState(false);
   const [exportContacts, setExportContacts] = useState([]);
   const [checkedIds, setCheckedIds] = useState([]);
+  const [importOpen, setImportOpen] = useState(false);
+  const [mediaOpen, setMediaOpen] = useState(false);
   const { i18n, t } = useTranslation();
   const {
     contacts,
@@ -43,6 +47,7 @@ export default function App() {
     selectContact,
     newContact,
     deleteContacts,
+    importContacts,
   } = useContacts(appConfig);
 
   useEffect(() => {
@@ -57,6 +62,11 @@ export default function App() {
   const withDirtyCheck = (action) => {
     if (isDirty) setPendingAction(() => action);
     else action();
+  };
+
+  const handleImport = (newContacts) => {
+    // Fusionner avec les contacts existants
+    // Il faut exposer une fonction dans useContacts
   };
 
   const handleExport = () => {
@@ -121,6 +131,9 @@ export default function App() {
           onAbout={() => setAboutOpen(true)}
           onNewContact={handleNewContact}
           onQrCode={() => setQrOpen(true)}
+          onImport={() => setImportOpen(true)}
+          onExport={handleExport}
+          onMedia={() => setMediaOpen(true)}
         />
         <div
           style={{
@@ -210,6 +223,17 @@ export default function App() {
         open={exportOpen}
         onClose={() => setExportOpen(false)}
         contacts={exportContacts}
+      />
+      <ImportDialog
+        open={importOpen}
+        onClose={() => setImportOpen(false)}
+        onImport={importContacts}
+      />
+      <MediaDialog
+        open={mediaOpen}
+        onClose={() => setMediaOpen(false)}
+        contacts={contacts}
+        onSave={saveContact}
       />
     </div>
   );

@@ -1,12 +1,16 @@
 import { t } from "i18next";
 import IconBarBtn from "./IconBarBtn";
-
+import { Dropdown } from "antd";
 import {
   FolderOpenOutlined,
   SettingOutlined,
   InfoCircleOutlined,
   UserAddOutlined,
   QrcodeOutlined,
+  ToolOutlined,
+  ImportOutlined,
+  ExportOutlined,
+  PictureOutlined,
 } from "@ant-design/icons";
 
 export default function IconBar({
@@ -15,7 +19,34 @@ export default function IconBar({
   onAbout,
   onNewContact,
   onQrCode,
+  onImport,
+  onExport,
+  onMedia,
 }) {
+  const toolsMenu = {
+    items: [
+      {
+        key: "import",
+        icon: <ImportOutlined />,
+        label: t("tools.import"),
+        onClick: onImport,
+      },
+      {
+        key: "export",
+        icon: <ExportOutlined />,
+        label: t("tools.export"),
+        onClick: onExport,
+      },
+      { type: "divider" },
+      {
+        key: "media",
+        icon: <PictureOutlined />,
+        label: t("tools.media"),
+        onClick: onMedia,
+      },
+    ],
+  };
+
   return (
     <div
       style={{
@@ -31,30 +62,36 @@ export default function IconBar({
     >
       <IconBarBtn
         icon={<UserAddOutlined />}
-        tooltip="Nouveau contact"
+        tooltip={t("app.new_contact")}
         onClick={onNewContact}
       />
       <IconBarBtn
         icon={<FolderOpenOutlined />}
-        tooltip="Ouvrir un fichier .vcf"
+        tooltip={t("app.open_file")}
         onClick={onOpen}
       />
       <IconBarBtn
         icon={<QrcodeOutlined />}
-        tooltip="Exporter en QR Code"
+        tooltip={t("app.qrcode")}
         onClick={onQrCode}
       />
 
-      <div style={{ flex: 1 }} />
+      {/* Tools dropdown — placement à droite de l'IconBar */}
+      <Dropdown menu={toolsMenu} trigger={["click"]} placement="rightTop">
+        <span>
+          <IconBarBtn icon={<ToolOutlined />} tooltip={t("tools.title")} />
+        </span>
+      </Dropdown>
 
+      <div style={{ flex: 1 }} />
       <IconBarBtn
         icon={<SettingOutlined />}
-        tooltip="Paramètres"
+        tooltip={t("settings.title")}
         onClick={onSettings}
       />
       <IconBarBtn
         icon={<InfoCircleOutlined />}
-        tooltip="À propos"
+        tooltip={t("about.title")}
         onClick={onAbout}
       />
     </div>
