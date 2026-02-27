@@ -232,7 +232,7 @@ export default function MediaDialog({ open, onClose, contacts, onSave }) {
             key: "photo",
             label: (
               <span>
-                <PictureOutlined /> {t("media.photos")}
+                🖼️ {t("media.photos")}
                 {photoCount > 0 && (
                   <Text
                     type="secondary"
@@ -255,7 +255,7 @@ export default function MediaDialog({ open, onClose, contacts, onSave }) {
             key: "logo",
             label: (
               <span>
-                <TrademarkOutlined /> {t("media.logos")}
+                ® {t("media.logos")}
                 {logoCount > 0 && (
                   <Text
                     type="secondary"
@@ -278,7 +278,7 @@ export default function MediaDialog({ open, onClose, contacts, onSave }) {
             key: "sound",
             label: (
               <span>
-                <SoundOutlined /> {t("media.sounds")}
+                🔊{t("media.sounds")}
                 {soundCount > 0 && (
                   <Text
                     type="secondary"

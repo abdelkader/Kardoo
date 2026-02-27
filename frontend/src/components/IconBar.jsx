@@ -8,9 +8,6 @@ import {
   UserAddOutlined,
   QrcodeOutlined,
   ToolOutlined,
-  ImportOutlined,
-  ExportOutlined,
-  PictureOutlined,
 } from "@ant-design/icons";
 
 export default function IconBar({
@@ -27,20 +24,17 @@ export default function IconBar({
     items: [
       {
         key: "import",
-        icon: <ImportOutlined />,
         label: t("tools.import"),
         onClick: onImport,
       },
       {
         key: "export",
-        icon: <ExportOutlined />,
         label: t("tools.export"),
         onClick: onExport,
       },
       { type: "divider" },
       {
         key: "media",
-        icon: <PictureOutlined />,
         label: t("tools.media"),
         onClick: onMedia,
       },
@@ -79,7 +73,11 @@ export default function IconBar({
       {/* Tools dropdown — placement à droite de l'IconBar */}
       <Dropdown menu={toolsMenu} trigger={["click"]} placement="rightTop">
         <span>
-          <IconBarBtn icon={<ToolOutlined />} tooltip={t("tools.title")} />
+          <IconBarBtn
+            icon={<ToolOutlined />}
+            tooltip={t("tools.title")}
+            disableTooltip
+          />
         </span>
       </Dropdown>
 

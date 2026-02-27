@@ -74,9 +74,9 @@
     "title_plural": "Export {{count}} contacts",
     "format": "Format",
     "destination": "Destination",
-    "single_file": "Single file",
+    "single_file": "📄 Single file",
     "single_file_desc": "all contacts grouped together",
-    "one_per_contact": "One file per contact",
+    "one_per_contact": "📁 One file per contact",
     "one_per_contact_desc": "choose a folder",
     "csv_no_split": "(not available in CSV)",
     "ok": "Export",
@@ -89,20 +89,20 @@
     "export_all": "Export ({{count}})"
   },
   "import": {
-  "title": "Import Contacts",
-  "choose_files": "Choose Files",
-  "confirm": "Import ({{count}})",
-  "cancel": "Cancel",
-  "hint": "Click OK to choose one or more files",
-  "formats": "Supported formats: .vcf, .json (jCard), .xml (xCard), .csv",
-  "preview": "{{count}} contact(s) found — confirm import?"
-},
-"tools": {
-  "title": "Tools",
-  "import": "Import",
-  "export": "Export",
-  "media": "Media"
-},
+    "title": "Import Contacts",
+    "choose_files": "Choose Files",
+    "confirm": "Import ({{count}})",
+    "cancel": "Cancel",
+    "hint": "Click OK to choose one or more files",
+    "formats": "Supported formats: .vcf, .json (jCard), .xml (xCard), .csv",
+    "preview": "{{count}} contact(s) found — confirm import?"
+  },
+  "tools": {
+    "title": "🛠️ Tools",
+    "import": "📥 Import",
+    "export": "📤 Export",
+    "media": "🎨 Media"
+  },
 "media": {
   "title": "Media Manager",
   "photos": "Photos",

@@ -142,14 +142,12 @@ export default function ExportDialog({ open, onClose, contacts }) {
           >
             <Space direction="vertical">
               <Radio value="single">
-                <FileOutlined style={{ marginRight: 6 }} />
                 <Text>{t("export.single_file")}</Text>
                 <Text type="secondary" style={{ fontSize: 11, marginLeft: 8 }}>
                   {t("export.single_file_desc")}
                 </Text>
               </Radio>
               <Radio value="folder" disabled={format === "csv"}>
-                <FolderOutlined style={{ marginRight: 6 }} />
                 <Text>{t("export.one_per_contact")}</Text>
                 <Text type="secondary" style={{ fontSize: 11, marginLeft: 8 }}>
                   {format === "csv"

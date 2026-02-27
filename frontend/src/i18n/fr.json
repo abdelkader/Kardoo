@@ -99,8 +99,8 @@
   },
   "tools": {
     "title": "Outils",
-    "import": "Importer",
-    "export": "Exporter",
+    "import": "📥 Importer",
+    "export": "📤 Exporter",
     "media": "Media"
   },
   "media": {

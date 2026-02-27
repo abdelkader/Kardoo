@@ -1,8 +1,14 @@
 import { Tooltip } from "antd";
 
-export default function IconBarBtn({ icon, tooltip, onClick, active }) {
+export default function IconBarBtn({
+  icon,
+  tooltip,
+  onClick,
+  active,
+  disableTooltip,
+}) {
   return (
-    <Tooltip title={tooltip} placement="right">
+    <Tooltip title={disableTooltip ? null : tooltip} placement="right">
       <button
         onClick={onClick}
         style={{
