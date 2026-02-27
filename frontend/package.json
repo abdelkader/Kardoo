@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@ant-design/icons": "^6.1.0",
+    "@fontsource/inter": "^5.2.8",
     "antd": "^6.3.0",
     "i18next": "^25.8.13",
     "qrcode": "^1.5.4",

@@ -7,7 +7,8 @@
     "contacts": "contact",
     "contacts_plural": "contacts",
     "no_contacts": "Open a .vcf file",
-    "no_contact_selected": "Open a .vcf file and select a contact"
+    "no_contact_selected": "Open a .vcf file and select a contact",
+    "qrcode": "QR Code"
   },
   "contact": {
     "new_contact": "New contact",
@@ -17,6 +18,7 @@
     "name": "Name",
     "address": "Address",
     "phones": "Phones",
+    "emails": "Emails",
     "web": "Web",
     "identity": "Identity",
     "dates": "Dates",

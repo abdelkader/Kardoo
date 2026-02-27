@@ -62,12 +62,12 @@ export default function IconBar({
     >
       <IconBarBtn
         icon={<UserAddOutlined />}
-        tooltip={t("app.new_contact")}
+        tooltip={t("contact.new_contact")}
         onClick={onNewContact}
       />
       <IconBarBtn
         icon={<FolderOpenOutlined />}
-        tooltip={t("app.open_file")}
+        tooltip={t("app.open")}
         onClick={onOpen}
       />
       <IconBarBtn

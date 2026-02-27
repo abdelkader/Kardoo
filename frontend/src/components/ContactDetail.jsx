@@ -490,16 +490,40 @@ export default function ContactDetail({ contact, onSave, onDirtyChange }) {
         )}
       </Card>
 
-      {/* Phones & Web */}
+      {/* Phones & Email & Web */}
       <div style={{ display: "flex", gap: 10 }}>
         <div style={{ flex: 1 }}>
           <ItemList
-            title="Phones"
+            title={t("contact.phones")}
             items={form.tel}
             typeOptions={TEL_TYPES}
             onAdd={addTel}
             onRemove={removeTel}
             onChange={updateTel}
+          />
+        </div>
+        <div style={{ flex: 1 }}>
+          <ItemList
+            title={t("contact.emails")}
+            items={form.email}
+            typeOptions={["Home", "Work", "Internet", "Pref"]}
+            onAdd={() =>
+              update("email", [...form.email, { type: "internet", value: "" }])
+            }
+            onRemove={(i) =>
+              update(
+                "email",
+                form.email.filter((_, idx) => idx !== i),
+              )
+            }
+            onChange={(i, field, value) =>
+              update(
+                "email",
+                form.email.map((e, idx) =>
+                  idx === i ? { ...e, [field]: value } : e,
+                ),
+              )
+            }
           />
         </div>
         <div style={{ flex: 1 }}>
