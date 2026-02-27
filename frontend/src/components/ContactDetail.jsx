@@ -151,6 +151,14 @@ export default function ContactDetail({ contact, onSave, onDirtyChange }) {
 
   const { t } = useTranslation();
   useEffect(() => {
+    const handleSaveShortcut = () => {
+      if (dirty) handleSave();
+    };
+    window.addEventListener("kardoo:save", handleSaveShortcut);
+    return () => window.removeEventListener("kardoo:save", handleSaveShortcut);
+  }, [dirty, form]);
+
+  useEffect(() => {
     if (!contact) return;
     setForm({
       fn: contact.fn || "",

@@ -67,6 +67,27 @@ export default function App() {
     }, false);
   }, []);
 
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.ctrlKey && e.key === "s") {
+        e.preventDefault();
+        // Sauvegarder — on émet un événement custom que ContactDetail écoutera
+        window.dispatchEvent(new CustomEvent("kardoo:save"));
+      }
+      if (e.ctrlKey && e.key === "o") {
+        e.preventDefault();
+        withDirtyCheck(openFile);
+      }
+      if (e.ctrlKey && e.key === "n") {
+        e.preventDefault();
+        handleNewContact();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isDirty, displayedContact]);
+
   const withDirtyCheck = (action) => {
     if (isDirty) setPendingAction(() => action);
     else action();
