@@ -24,6 +24,8 @@ export function OpenSoundFile():Promise<string>;
 
 export function OpenVCardFile():Promise<Record<string, string>>;
 
+export function ReadFileContent(arg1:string):Promise<string>;
+
 export function SaveConfig(arg1:main.AppConfig):Promise<void>;
 
 export function SaveContactPhoto(arg1:string,arg2:string):Promise<void>;

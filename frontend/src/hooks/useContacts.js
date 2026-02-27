@@ -8,6 +8,7 @@ import {
   OpenVCardFile,
   SaveVCardFile,
   NewVCardFile,
+  ReadFileContent,
 } from "../../wailsjs/go/main/App";
 
 export function useContacts(appConfig) {
@@ -16,6 +17,20 @@ export function useContacts(appConfig) {
   const [displayedContact, setDisplayedContact] = useState(null);
   const [currentFilePath, setCurrentFilePath] = useState("");
   const [error, setError] = useState("");
+
+  const openFileFromPath = async (path) => {
+    setError("");
+    try {
+      const content = await ReadFileContent(path);
+      setCurrentFilePath(path);
+      const parsed = splitAndParse(content);
+      setContacts(parsed);
+      setSelected(parsed[0] || null);
+      setDisplayedContact(parsed[0] || null);
+    } catch (e) {
+      setError("Erreur : " + e.message);
+    }
+  };
 
   const deleteContacts = async (ids) => {
     const newContacts = contacts.filter((c) => !ids.includes(c.id));
@@ -154,6 +169,7 @@ export function useContacts(appConfig) {
     currentFilePath,
     error,
     openFile,
+    openFileFromPath,
     saveContact,
     selectContact,
     newContact,

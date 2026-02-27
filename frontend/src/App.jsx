@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { Layout, Modal, Empty } from "antd";
+import { Modal, Empty } from "antd";
 import { generateAllVCards } from "./utils/vcard";
 import { LoadConfig, SaveVCardFile } from "../wailsjs/go/main/App";
+import { OnFileDrop } from "../wailsjs/runtime/runtime";
 import { useContacts } from "./hooks/useContacts";
 import IconBar from "./components/IconBar";
 import ContactTree from "./components/ContactTree";
@@ -16,8 +17,6 @@ import ImportDialog from "./components/ImportDialog";
 import MediaDialog from "./components/MediaDialog";
 import "antd/dist/reset.css";
 import { useTranslation } from "react-i18next";
-
-const { Sider, Content } = Layout;
 
 export default function App() {
   const [search, setSearch] = useState("");
@@ -48,6 +47,7 @@ export default function App() {
     newContact,
     deleteContacts,
     importContacts,
+    openFileFromPath,
   } = useContacts(appConfig);
 
   useEffect(() => {
@@ -59,14 +59,17 @@ export default function App() {
       .catch(console.error);
   }, []);
 
+  useEffect(() => {
+    OnFileDrop((x, y, paths) => {
+      const vcfFiles = paths.filter((f) => f.toLowerCase().endsWith(".vcf"));
+      if (vcfFiles.length === 0) return;
+      withDirtyCheck(() => openFileFromPath(vcfFiles[0]));
+    }, false);
+  }, []);
+
   const withDirtyCheck = (action) => {
     if (isDirty) setPendingAction(() => action);
     else action();
-  };
-
-  const handleImport = (newContacts) => {
-    // Fusionner avec les contacts existants
-    // Il faut exposer une fonction dans useContacts
   };
 
   const handleExport = () => {

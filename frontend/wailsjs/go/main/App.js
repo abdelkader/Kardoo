@@ -46,6 +46,10 @@ export function OpenVCardFile() {
   return window['go']['main']['App']['OpenVCardFile']();
 }
 
+export function ReadFileContent(arg1) {
+  return window['go']['main']['App']['ReadFileContent'](arg1);
+}
+
 export function SaveConfig(arg1) {
   return window['go']['main']['App']['SaveConfig'](arg1);
 }
