@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   WindowMinimise,
   WindowToggleMaximise,
@@ -6,17 +6,18 @@ import {
 } from "../../wailsjs/go/main/App";
 import logo from "../assets/logo.png";
 
-export default function TitleBar() {
+export default function TitleBar({ currentFilePath, isDirty }) {
   const [isMaximized, setIsMaximized] = useState(false);
-
   const handleMinimize = () => WindowMinimise();
-
   const handleMaximize = () => {
     WindowToggleMaximise();
     setIsMaximized(!isMaximized);
   };
-
   const handleClose = () => WindowClose();
+
+  const fileName = currentFilePath
+    ? currentFilePath.split(/[\\/]/).pop()
+    : null;
 
   return (
     <div
@@ -31,7 +32,7 @@ export default function TitleBar() {
         "--wails-draggable": "drag",
       }}
     >
-      {/* Logo + Titre */}
+      {/* Logo + Titre + Fichier */}
       <div
         style={{
           display: "flex",
@@ -44,6 +45,24 @@ export default function TitleBar() {
         <span style={{ fontSize: 13, fontWeight: 700, color: "#333" }}>
           Kardoo
         </span>
+        {fileName && (
+          <>
+            <span style={{ color: "#bbb", fontSize: 13 }}>—</span>
+            <span style={{ fontSize: 12, color: "#666" }}>{fileName}</span>
+            {isDirty && (
+              <span
+                style={{
+                  width: 7,
+                  height: 7,
+                  borderRadius: "50%",
+                  background: "#fa8c16",
+                  display: "inline-block",
+                  marginLeft: 2,
+                }}
+              />
+            )}
+          </>
+        )}
       </div>
 
       {/* Boutons */}
@@ -86,7 +105,6 @@ export default function TitleBar() {
 
 function TitleBarButton({ onClick, children, title, isClose }) {
   const [hover, setHover] = useState(false);
-
   return (
     <button
       title={title}

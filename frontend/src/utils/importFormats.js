@@ -6,23 +6,39 @@ function jCardPropToField(props) {
   const getAll = (name) => props.filter((p) => p[0] === name);
 
   const n = get("n")?.[3] || [];
-  const tels = getAll("tel").map((p) => ({
-    type: p[1]?.type?.[0] || "voice",
-    value: (p[3] || "").replace("tel:", ""),
-  }));
-  const emails = getAll("email").map((p) => ({
-    type: p[1]?.type?.[0] || "internet",
-    value: p[3] || "",
-  }));
-  const adrs = getAll("adr").map((p) => ({
-    type: p[1]?.type?.[0] || "home",
-    raw: Array.isArray(p[3]) ? p[3] : ["", "", "", "", "", "", ""],
-    value: Array.isArray(p[3]) ? p[3].filter(Boolean).join(", ") : "",
-  }));
-  const urls = getAll("url").map((p) => ({
-    type: p[1]?.type?.[0] || "home",
-    value: p[3] || "",
-  }));
+  const tels = getAll("tel").map((p) => {
+    const typeRaw = p[1]?.type;
+    const type = Array.isArray(typeRaw) ? typeRaw[0] : typeRaw || "voice";
+    return {
+      type,
+      value: (p[3] || "").replace("tel:", ""),
+    };
+  });
+  const emails = getAll("email").map((p) => {
+    const typeRaw = p[1]?.type;
+    const type = Array.isArray(typeRaw) ? typeRaw[0] : typeRaw || "internet";
+    return {
+      type,
+      value: p[3] || "",
+    };
+  });
+  const adrs = getAll("adr").map((p) => {
+    const typeRaw = p[1]?.type;
+    const type = Array.isArray(typeRaw) ? typeRaw[0] : typeRaw || "home";
+    return {
+      type,
+      raw: Array.isArray(p[3]) ? p[3] : ["", "", "", "", "", "", ""],
+      value: Array.isArray(p[3]) ? p[3].filter(Boolean).join(", ") : "",
+    };
+  });
+  const urls = getAll("url").map((p) => {
+    const typeRaw = p[1]?.type;
+    const type = Array.isArray(typeRaw) ? typeRaw[0] : typeRaw || "home";
+    return {
+      type,
+      value: p[3] || "",
+    };
+  });
   const langs = getAll("lang").map((p) => ({
     pref: p[1]?.pref || "",
     value: p[3] || "",
@@ -81,12 +97,18 @@ function jCardPropToField(props) {
 
 export function fromJCard(jsonStr) {
   const data = JSON.parse(jsonStr);
-  // Peut être un seul vcard ou un tableau
-  const cards = Array.isArray(data[0]) ? [data] : data;
-  return cards.map((card, i) => ({
-    id: i,
-    ...jCardPropToField(card[1]),
-  }));
+
+  // Cas 1: un seul jCard ["vcard", [...]]
+  if (data[0] === "vcard") {
+    return [{ id: 0, ...jCardPropToField(data[1]) }];
+  }
+
+  // Cas 2: tableau de jCards [["vcard", [...]], ["vcard", [...]]]
+  if (Array.isArray(data) && data[0]?.[0] === "vcard") {
+    return data.map((card, i) => ({ id: i, ...jCardPropToField(card[1]) }));
+  }
+
+  return [];
 }
 
 // ─── xCard ───────────────────────────────────────────────────────────────────

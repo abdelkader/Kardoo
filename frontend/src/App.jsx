@@ -147,7 +147,7 @@ export default function App() {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
-      <TitleBar />
+      <TitleBar currentFilePath={currentFilePath} isDirty={isDirty} />
       <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
         <IconBar
           onOpen={() => withDirtyCheck(openFile)}

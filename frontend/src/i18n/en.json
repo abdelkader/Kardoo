@@ -101,10 +101,10 @@
     "title": "🛠️ Tools",
     "import": "📥 Import",
     "export": "📤 Export",
-    "media": "🎨 Media"
+    "media": "🎨 Media Manager"
   },
 "media": {
-  "title": "Media Manager",
+  "title": "🎨 Media Manager",
   "photos": "Photos",
   "logos": "Logos",
   "sounds": "Audio",
