@@ -8,6 +8,7 @@ export namespace main {
 	    backupOnSave: boolean;
 	    backupDir: string;
 	    language: string;
+	    exportFields: string[];
 	
 	    static createFrom(source: any = {}) {
 	        return new AppConfig(source);
@@ -22,6 +23,7 @@ export namespace main {
 	        this.backupOnSave = source["backupOnSave"];
 	        this.backupDir = source["backupDir"];
 	        this.language = source["language"];
+	        this.exportFields = source["exportFields"];
 	    }
 	}
 

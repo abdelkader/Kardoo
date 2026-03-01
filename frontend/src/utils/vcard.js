@@ -331,83 +331,98 @@ export function splitAndParse(raw) {
   });
 }
 
-export function generateVCard(contact) {
+export function generateVCard(contact, exportFields = []) {
+  const all = exportFields.length === 0; // [] = tous les champs
+  const has = (field) => all || exportFields.includes(field);
+
   const lines = [];
   lines.push("BEGIN:VCARD");
   lines.push("VERSION:3.0");
 
-  const n = [
-    contact.lastName || "",
-    contact.firstName || "",
-    contact.middleName || "",
-    contact.prefix || "",
-    contact.suffix || "",
-  ].join(";");
-  lines.push(`N:${n}`);
-  lines.push(`FN:${contact.fn || ""}`);
+  if (has("n")) {
+    const n = [
+      contact.lastName || "",
+      contact.firstName || "",
+      contact.middleName || "",
+      contact.prefix || "",
+      contact.suffix || "",
+    ].join(";");
+    lines.push(`N:${n}`);
+  }
+  if (has("fn")) lines.push(`FN:${contact.fn || ""}`);
+  if (has("nickname") && contact.nickname)
+    lines.push(`NICKNAME:${contact.nickname}`);
+  if (has("org") && contact.org) lines.push(`ORG:${contact.org}`);
+  if (has("title") && contact.title) lines.push(`TITLE:${contact.title}`);
+  if (has("role") && contact.role) lines.push(`ROLE:${contact.role}`);
+  if (has("bday") && contact.bday) lines.push(`BDAY:${contact.bday}`);
+  if (has("anniversary") && contact.anniversary)
+    lines.push(`ANNIVERSARY:${contact.anniversary}`);
+  if (has("gender") && contact.gender) lines.push(`GENDER:${contact.gender}`);
+  if (has("tz") && contact.tz) lines.push(`TZ:${contact.tz}`);
+  if (has("geo") && contact.geo) lines.push(`GEO:${contact.geo}`);
+  if (has("categories") && contact.categories)
+    lines.push(`CATEGORIES:${contact.categories}`);
+  if (has("uid") && contact.uid) lines.push(`UID:${contact.uid}`);
+  if (has("note") && contact.note) lines.push(`NOTE:${contact.note}`);
+  if (has("rev") && contact.rev) lines.push(`REV:${contact.rev}`);
 
-  if (contact.nickname) lines.push(`NICKNAME:${contact.nickname}`);
-  if (contact.org) lines.push(`ORG:${contact.org}`);
-  if (contact.title) lines.push(`TITLE:${contact.title}`);
-  if (contact.role) lines.push(`ROLE:${contact.role}`);
-  if (contact.kind) lines.push(`KIND:${contact.kind}`);
-  if (contact.bday) lines.push(`BDAY:${contact.bday}`);
-  if (contact.anniversary) lines.push(`ANNIVERSARY:${contact.anniversary}`);
-  if (contact.gender) lines.push(`GENDER:${contact.gender}`);
-  if (contact.tz) lines.push(`TZ:${contact.tz}`);
-  if (contact.geo) lines.push(`GEO:${contact.geo}`);
-  if (contact.categories) lines.push(`CATEGORIES:${contact.categories}`);
-  if (contact.uid) lines.push(`UID:${contact.uid}`);
-  if (contact.note) lines.push(`NOTE:${contact.note}`);
-
-  contact.tel?.forEach((t) => {
-    if (t.value)
-      lines.push(`TEL;TYPE=${t.type?.toUpperCase() || "VOICE"}:${t.value}`);
-  });
-
-  contact.email?.forEach((e) => {
-    if (e.value)
+  if (has("tel")) {
+    contact.tel?.forEach((t) => {
+      if (t.value)
+        lines.push(`TEL;TYPE=${t.type?.toUpperCase() || "VOICE"}:${t.value}`);
+    });
+  }
+  if (has("email")) {
+    contact.email?.forEach((e) => {
+      if (e.value)
+        lines.push(
+          `EMAIL;TYPE=${e.type?.toUpperCase() || "INTERNET"}:${e.value}`,
+        );
+    });
+  }
+  if (has("adr")) {
+    contact.adr?.forEach((a) => {
+      const raw = a.raw || ["", "", "", "", "", "", ""];
       lines.push(
-        `EMAIL;TYPE=${e.type?.toUpperCase() || "INTERNET"}:${e.value}`,
+        `ADR;TYPE=${a.type?.toUpperCase() || "HOME"}:${raw.join(";")}`,
       );
-  });
-
-  contact.adr?.forEach((a) => {
-    const raw = a.raw || ["", "", "", "", "", "", ""];
-    lines.push(`ADR;TYPE=${a.type?.toUpperCase() || "HOME"}:${raw.join(";")}`);
-  });
-
-  contact.url?.forEach((u) => {
-    if (u.value)
-      lines.push(`URL;TYPE=${u.type?.toUpperCase() || "HOME"}:${u.value}`);
-  });
-
-  contact.lang?.forEach((l) => {
-    if (l.value) lines.push(`LANG;PREF=${l.pref || "1"}:${l.value}`);
-  });
-
-  contact.impp?.forEach((im) => {
-    if (im.value)
-      lines.push(
-        `IMPP${im.type ? `;TYPE=${im.type.toUpperCase()}` : ""}:${im.value}`,
-      );
-  });
-
-  contact.related?.forEach((r) => {
-    if (r.value)
-      lines.push(
-        `RELATED${r.type ? `;TYPE=${r.type.toUpperCase()}` : ""}:${r.value}`,
-      );
-  });
-
-  if (contact.photo?.startsWith("data:")) {
+    });
+  }
+  if (has("url")) {
+    contact.url?.forEach((u) => {
+      if (u.value)
+        lines.push(`URL;TYPE=${u.type?.toUpperCase() || "HOME"}:${u.value}`);
+    });
+  }
+  if (has("lang")) {
+    contact.lang?.forEach((l) => {
+      if (l.value) lines.push(`LANG;PREF=${l.pref || "1"}:${l.value}`);
+    });
+  }
+  if (has("impp")) {
+    contact.impp?.forEach((im) => {
+      if (im.value)
+        lines.push(
+          `IMPP${im.type ? `;TYPE=${im.type.toUpperCase()}` : ""}:${im.value}`,
+        );
+    });
+  }
+  if (has("related")) {
+    contact.related?.forEach((r) => {
+      if (r.value)
+        lines.push(
+          `RELATED${r.type ? `;TYPE=${r.type.toUpperCase()}` : ""}:${r.value}`,
+        );
+    });
+  }
+  if (has("photo") && contact.photo?.startsWith("data:")) {
     const [header, data] = contact.photo.split(",");
     const mime = header.match(/data:(image\/\w+)/)?.[1] || "image/jpeg";
     const type = mime.split("/")[1].toUpperCase();
     lines.push(`PHOTO;ENCODING=b;TYPE=${type}:${data}`);
   }
-
-  if (contact.logo) {
+  if (has("logo") && contact.logo) {
     if (contact.logo.startsWith("data:")) {
       const [header, data] = contact.logo.split(",");
       const mime = header.match(/data:(image\/\w+)/)?.[1] || "image/png";
@@ -417,22 +432,23 @@ export function generateVCard(contact) {
       lines.push(`LOGO:${contact.logo}`);
     }
   }
-
-  if (contact.sound?.url?.startsWith("data:")) {
-    const [header, data] = contact.sound.url.split(",");
-    const mime = header.match(/data:(audio\/\w+)/)?.[1] || "audio/ogg";
-    const type = mime.split("/")[1].toUpperCase();
-    lines.push(`SOUND;ENCODING=b;TYPE=${type}:${data}`);
-  } else if (contact.sound?.url?.startsWith("http")) {
-    lines.push(`SOUND:${contact.sound.url}`);
+  if (has("sound")) {
+    if (contact.sound?.url?.startsWith("data:")) {
+      const [header, data] = contact.sound.url.split(",");
+      const mime = header.match(/data:(audio\/\w+)/)?.[1] || "audio/ogg";
+      const type = mime.split("/")[1].toUpperCase();
+      lines.push(`SOUND;ENCODING=b;TYPE=${type}:${data}`);
+    } else if (contact.sound?.url?.startsWith("http")) {
+      lines.push(`SOUND:${contact.sound.url}`);
+    }
   }
 
   lines.push("END:VCARD");
   return lines.join("\r\n");
 }
 
-export function generateAllVCards(contacts) {
-  return contacts.map(generateVCard).join("\r\n");
+export function generateAllVCards(contacts, exportFields = []) {
+  return contacts.map((c) => generateVCard(c, exportFields)).join("\r\n");
 }
 
 export function createEmptyContact(id) {

@@ -44,7 +44,7 @@ export function useContacts(appConfig) {
     try {
       await SaveVCardFile(
         currentFilePath,
-        generateAllVCards(newContacts),
+        generateAllVCards(newContacts, appConfig.exportFields || []),
         appConfig.backupOnSave,
         appConfig.backupDir,
       );
@@ -78,7 +78,7 @@ export function useContacts(appConfig) {
     try {
       await SaveVCardFile(
         currentFilePath,
-        generateAllVCards(newContacts),
+        generateAllVCards(newContacts, appConfig.exportFields || []),
         appConfig.backupOnSave,
         appConfig.backupDir,
       );
@@ -153,7 +153,7 @@ export function useContacts(appConfig) {
     try {
       await SaveVCardFile(
         filePath,
-        generateAllVCards(updatedContacts),
+        generateAllVCards(updatedContacts, appConfig.exportFields || []),
         appConfig.backupOnSave,
         appConfig.backupDir,
       );

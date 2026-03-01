@@ -13,7 +13,12 @@ import { ExportToFile, ExportToFolder } from "../../wailsjs/go/main/App";
 
 const { Text } = Typography;
 
-export default function ExportDialog({ open, onClose, contacts }) {
+export default function ExportDialog({
+  open,
+  onClose,
+  contacts,
+  exportFields = [],
+}) {
   const [format, setFormat] = useState("vcf");
   const [destination, setDestination] = useState("single");
   const [loading, setLoading] = useState(false);
@@ -43,7 +48,9 @@ export default function ExportDialog({ open, onClose, contacts }) {
       case "xml":
         return toXCard(contactList);
       default:
-        return contactList.map((c) => generateVCard(c)).join("\n");
+        return contactList
+          .map((c) => generateVCard(c, exportFields))
+          .join("\n");
     }
   };
 

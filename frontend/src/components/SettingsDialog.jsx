@@ -1,6 +1,15 @@
 import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
-import { Modal, Switch, Button, Input, Typography, Card, Select } from "antd";
+import {
+  Modal,
+  Switch,
+  Button,
+  Input,
+  Typography,
+  Card,
+  Select,
+  Checkbox,
+} from "antd";
 import { FolderOpenOutlined } from "@ant-design/icons";
 import {
   SaveConfig,
@@ -16,6 +25,34 @@ const headStyle = {
   borderBottom: "1px solid #bbb",
 };
 
+const ALL_FIELDS = [
+  { value: "fn", label: "Full Name" },
+  { value: "n", label: "Name (first, last...)" },
+  { value: "photo", label: "Photo" },
+  { value: "logo", label: "Logo" },
+  { value: "org", label: "Organization" },
+  { value: "title", label: "Title" },
+  { value: "role", label: "Role" },
+  { value: "nickname", label: "Nickname" },
+  { value: "tel", label: "Phone" },
+  { value: "email", label: "Email" },
+  { value: "adr", label: "Address" },
+  { value: "url", label: "Website" },
+  { value: "bday", label: "Birthday" },
+  { value: "anniversary", label: "Anniversary" },
+  { value: "gender", label: "Gender" },
+  { value: "note", label: "Note" },
+  { value: "categories", label: "Categories" },
+  { value: "geo", label: "Geo" },
+  { value: "tz", label: "Timezone" },
+  { value: "lang", label: "Languages" },
+  { value: "impp", label: "Messaging" },
+  { value: "related", label: "Related" },
+  { value: "sound", label: "Sound" },
+  { value: "uid", label: "UID" },
+  { value: "rev", label: "Revision" },
+];
+
 export default function SettingsDialog({ open, onClose }) {
   const { t, i18n } = useTranslation();
 
@@ -25,7 +62,8 @@ export default function SettingsDialog({ open, onClose }) {
     language: "",
   });
   const [saved, setSaved] = useState(false);
-
+  const isAllSelected =
+    !config.exportFields || config.exportFields.length === 0;
   useEffect(() => {
     if (open) {
       LoadConfig().then(setConfig).catch(console.error);
@@ -71,6 +109,49 @@ export default function SettingsDialog({ open, onClose }) {
         </Button>,
       ]}
     >
+      <Card
+        size="small"
+        title={
+          <Text strong style={{ fontSize: 12 }}>
+            {t("settings.export_fields")}
+          </Text>
+        }
+        style={cardStyle}
+        headStyle={headStyle}
+      >
+        <div style={{ marginBottom: 8 }}>
+          <Checkbox
+            checked={isAllSelected}
+            onChange={(e) =>
+              update(
+                "exportFields",
+                e.target.checked ? [] : ALL_FIELDS.map((f) => f.value),
+              )
+            }
+          >
+            <Text style={{ fontSize: 12 }}>
+              {t("settings.export_all_fields")}
+            </Text>
+          </Checkbox>
+        </div>
+        {!isAllSelected && (
+          <Checkbox.Group
+            value={config.exportFields}
+            onChange={(values) => update("exportFields", values)}
+            style={{ display: "flex", flexWrap: "wrap", gap: "4px 16px" }}
+          >
+            {ALL_FIELDS.map((f) => (
+              <Checkbox
+                key={f.value}
+                value={f.value}
+                style={{ fontSize: 12, marginLeft: 0 }}
+              >
+                {f.label}
+              </Checkbox>
+            ))}
+          </Checkbox.Group>
+        )}
+      </Card>
       <Card
         size="small"
         title={

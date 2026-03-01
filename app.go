@@ -17,13 +17,14 @@ type App struct {
 }
 
 type AppConfig struct {
-	WindowX      int    `json:"windowX"`
-	WindowY      int    `json:"windowY"`
-	WindowWidth  int    `json:"windowWidth"`
-	WindowHeight int    `json:"windowHeight"`
-	BackupOnSave bool   `json:"backupOnSave"`
-	BackupDir    string `json:"backupDir"`
-	Language     string `json:"language"`
+	WindowX      int      `json:"windowX"`
+	WindowY      int      `json:"windowY"`
+	WindowWidth  int      `json:"windowWidth"`
+	WindowHeight int      `json:"windowHeight"`
+	BackupOnSave bool     `json:"backupOnSave"`
+	BackupDir    string   `json:"backupDir"`
+	Language     string   `json:"language"`
+	ExportFields []string `json:"exportFields"`
 }
 
 func getConfigPath() (string, error) {

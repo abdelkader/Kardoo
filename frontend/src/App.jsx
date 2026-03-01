@@ -131,7 +131,7 @@ export default function App() {
         try {
           await SaveVCardFile(
             result.path,
-            generateAllVCards(result.contacts),
+            generateAllVCards(result.contacts, appConfig.exportFields || []),
             appConfig.backupOnSave,
             appConfig.backupDir,
           );
@@ -247,6 +247,7 @@ export default function App() {
         open={exportOpen}
         onClose={() => setExportOpen(false)}
         contacts={exportContacts}
+        exportFields={appConfig.exportFields || []}
       />
       <ImportDialog
         open={importOpen}
