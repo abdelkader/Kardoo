@@ -15,6 +15,7 @@ import ExportDialog from "./components/ExportDialog";
 import TitleBar from "./components/TitleBar";
 import ImportDialog from "./components/ImportDialog";
 import MediaDialog from "./components/MediaDialog";
+import DuplicatesDialog from "./components/DuplicatesDialog";
 import "antd/dist/reset.css";
 import { useTranslation } from "react-i18next";
 import { App as AntApp } from "antd";
@@ -35,6 +36,7 @@ export default function App() {
   const [checkedIds, setCheckedIds] = useState([]);
   const [importOpen, setImportOpen] = useState(false);
   const [mediaOpen, setMediaOpen] = useState(false);
+  const [duplicatesOpen, setDuplicatesOpen] = useState(false);
   const { i18n, t } = useTranslation();
   const {
     contacts,
@@ -164,6 +166,7 @@ export default function App() {
           onImport={() => setImportOpen(true)}
           onExport={handleExport}
           onMedia={() => setMediaOpen(true)}
+          onDuplicates={() => setDuplicatesOpen(true)}
         />
         <div
           style={{
@@ -265,6 +268,13 @@ export default function App() {
         onClose={() => setMediaOpen(false)}
         contacts={contacts}
         onSave={saveContact}
+      />
+      <DuplicatesDialog
+        open={duplicatesOpen}
+        onClose={() => setDuplicatesOpen(false)}
+        contacts={contacts}
+        onSave={saveContact}
+        onDeleteContacts={(ids) => deleteContacts(ids)}
       />
     </div>
   );

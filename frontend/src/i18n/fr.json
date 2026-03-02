@@ -120,5 +120,21 @@
     "delete": "Supprimer",
     "cancel": "Annuler",
     "close": "Fermer"
-  }
+  },
+  "duplicates": {
+  "title": "Doublons",
+  "found": "{{count}} groupe(s) de doublons trouvé(s)",
+  "none_found": "Aucun doublon détecté",
+  "reason_both": "Nom + Téléphone",
+  "reason_name": "Nom identique",
+  "reason_phone": "Téléphone identique",
+  "confidence_certain": "Certain",
+  "confidence_probable": "Probable",
+  "contacts": "contacts",
+  "merge": "Fusionner",
+  "merge_all": "Tout fusionner ({{count}})",
+  "delete_duplicates": "Supprimer les doublons",
+  "ignore": "Ignorer",
+  "close": "Fermer"
+}
 }

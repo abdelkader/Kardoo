@@ -8,6 +8,7 @@ import {
   UserAddOutlined,
   QrcodeOutlined,
   ToolOutlined,
+  SisternodeOutlined,
 } from "@ant-design/icons";
 
 export default function IconBar({
@@ -19,6 +20,7 @@ export default function IconBar({
   onImport,
   onExport,
   onMedia,
+  onDuplicates,
 }) {
   const toolsMenu = {
     items: [
@@ -37,6 +39,12 @@ export default function IconBar({
         key: "media",
         label: t("tools.media"),
         onClick: onMedia,
+      },
+      {
+        key: "duplicates",
+        icon: <SisternodeOutlined />,
+        label: t("duplicates.title"),
+        onClick: onDuplicates,
       },
     ],
   };

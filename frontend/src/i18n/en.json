@@ -120,5 +120,21 @@
   "delete": "Delete",
   "cancel": "Cancel",
   "close": "Close"
-}
+  },
+  "duplicates": {
+    "title": "Duplicates",
+    "found": "{{count}} duplicate group(s) found",
+    "none_found": "No duplicates detected",
+    "reason_both": "Name + Phone",
+    "reason_name": "Same name",
+    "reason_phone": "Same phone",
+    "confidence_certain": "Certain",
+    "confidence_probable": "Probable",
+    "contacts": "contacts",
+    "merge": "Merge",
+    "merge_all": "Merge all ({{count}})",
+    "delete_duplicates": "Delete duplicates",
+    "ignore": "Ignore",
+    "close": "Close"
+  }
 }
