@@ -135,6 +135,13 @@
   "merge_all": "Tout fusionner ({{count}})",
   "delete_duplicates": "Supprimer les doublons",
   "ignore": "Ignorer",
-  "close": "Fermer"
+  "close": "Fermer",
+  "check_name": "Nom",
+  "check_phone": "Téléphone",
+  "check_email": "Email",
+  "search": "Rechercher",
+  "reason_name_email": "Nom + Email",
+  "reason_phone_email": "Téléphone + Email",
+  "reason_all": "Nom + Téléphone + Email"
 }
 }

@@ -8,7 +8,7 @@ import {
   Empty,
   Spin,
   Space,
-  Collapse,
+  Checkbox,
 } from "antd";
 import {
   UserOutlined,
@@ -77,11 +77,15 @@ function ContactCard({ contact }) {
 function DuplicateGroup({ group, onMerge, onIgnore, onDeleteDuplicates }) {
   const { t } = useTranslation();
 
-  const reasonLabel = {
+  const reasonLabels = {
     both: t("duplicates.reason_both"),
     name: t("duplicates.reason_name"),
     phone: t("duplicates.reason_phone"),
-  }[group.reason];
+    email: t("duplicates.reason_email"),
+    name_email: t("duplicates.reason_name_email"),
+    phone_email: t("duplicates.reason_phone_email"),
+    all: t("duplicates.reason_all"),
+  };
 
   const confidenceColor = group.confidence === "certain" ? "red" : "orange";
 
@@ -95,7 +99,6 @@ function DuplicateGroup({ group, onMerge, onIgnore, onDeleteDuplicates }) {
         background: "#fff",
       }}
     >
-      {/* Header */}
       <div
         style={{
           display: "flex",
@@ -109,14 +112,13 @@ function DuplicateGroup({ group, onMerge, onIgnore, onDeleteDuplicates }) {
           {t(`duplicates.confidence_${group.confidence}`)}
         </Tag>
         <Tag color="blue" style={{ fontSize: 11 }}>
-          {reasonLabel}
+          {reasonLabels[group.reason] || group.reason}
         </Tag>
         <Text type="secondary" style={{ fontSize: 11 }}>
           {group.contacts.length} {t("duplicates.contacts")}
         </Text>
       </div>
 
-      {/* Contacts côte à côte */}
       <div
         style={{ display: "flex", gap: 8, marginBottom: 10, flexWrap: "wrap" }}
       >
@@ -125,7 +127,6 @@ function DuplicateGroup({ group, onMerge, onIgnore, onDeleteDuplicates }) {
         ))}
       </div>
 
-      {/* Actions */}
       <Space>
         <Button
           size="small"
@@ -165,36 +166,36 @@ export default function DuplicatesDialog({
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [groups, setGroups] = useState([]);
-  const [done, setDone] = useState(false);
+  const [options, setOptions] = useState({
+    checkName: true,
+    checkPhone: true,
+    checkEmail: false,
+  });
+
+  const runSearch = () => {
+    setLoading(true);
+    setTimeout(() => {
+      const found = findDuplicates(contacts, options);
+      setGroups(found);
+      setLoading(false);
+    }, 100);
+  };
 
   useEffect(() => {
     if (!open) return;
-    setDone(false);
-    setLoading(true);
-    // setTimeout pour laisser le temps au modal de s'afficher
-    setTimeout(() => {
-      const found = findDuplicates(contacts);
-      setGroups(found);
-      setLoading(false);
-      if (found.length === 0) setDone(true);
-    }, 100);
-  }, [open, contacts]);
+    runSearch();
+  }, [open]);
 
   const handleMerge = (group) => {
     const merged = mergeContacts(group.contacts);
-    // Garder l'ID du premier contact
     merged.id = group.contacts[0].id;
-    // Sauvegarder le contact fusionné
     onSave(merged);
-    // Supprimer les doublons
     const idsToDelete = group.contacts.slice(1).map((c) => c.id);
     onDeleteContacts(idsToDelete);
-    // Retirer le groupe de la liste
     setGroups((prev) => prev.filter((g) => g !== group));
   };
 
   const handleDeleteDuplicates = (group) => {
-    // Garder le premier (le plus complet), supprimer les autres
     const idsToDelete = group.contacts.slice(1).map((c) => c.id);
     onDeleteContacts(idsToDelete);
     setGroups((prev) => prev.filter((g) => g !== group));
@@ -205,7 +206,7 @@ export default function DuplicatesDialog({
   };
 
   const handleMergeAll = () => {
-    groups.forEach((group) => handleMerge(group));
+    [...groups].forEach((group) => handleMerge(group));
   };
 
   return (
@@ -231,6 +232,51 @@ export default function DuplicatesDialog({
         </Button>,
       ].filter(Boolean)}
     >
+      {/* Options de recherche */}
+      <div
+        style={{
+          display: "flex",
+          gap: 16,
+          alignItems: "center",
+          marginBottom: 16,
+          padding: "8px 12px",
+          background: "#f9f9f9",
+          borderRadius: 6,
+          border: "1px solid #f0f0f0",
+        }}
+      >
+        <Text style={{ fontSize: 12, flexShrink: 0 }}>
+          {t("duplicates.compare_by")}
+        </Text>
+        <Checkbox
+          checked={options.checkName}
+          onChange={(e) =>
+            setOptions((p) => ({ ...p, checkName: e.target.checked }))
+          }
+        >
+          <Text style={{ fontSize: 12 }}>{t("duplicates.check_name")}</Text>
+        </Checkbox>
+        <Checkbox
+          checked={options.checkPhone}
+          onChange={(e) =>
+            setOptions((p) => ({ ...p, checkPhone: e.target.checked }))
+          }
+        >
+          <Text style={{ fontSize: 12 }}>{t("duplicates.check_phone")}</Text>
+        </Checkbox>
+        <Checkbox
+          checked={options.checkEmail}
+          onChange={(e) =>
+            setOptions((p) => ({ ...p, checkEmail: e.target.checked }))
+          }
+        >
+          <Text style={{ fontSize: 12 }}>{t("duplicates.check_email")}</Text>
+        </Checkbox>
+        <Button size="small" type="primary" onClick={runSearch}>
+          {t("duplicates.search")}
+        </Button>
+      </div>
+
       {loading && <Spin style={{ display: "block", margin: "40px auto" }} />}
 
       {!loading && groups.length === 0 && (
@@ -248,7 +294,7 @@ export default function DuplicatesDialog({
           >
             {t("duplicates.found", { count: groups.length })}
           </Text>
-          <div style={{ maxHeight: 480, overflow: "auto" }}>
+          <div style={{ maxHeight: 440, overflow: "auto" }}>
             {groups.map((group, i) => (
               <DuplicateGroup
                 key={i}

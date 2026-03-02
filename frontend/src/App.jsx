@@ -166,7 +166,13 @@ export default function App() {
           onImport={() => setImportOpen(true)}
           onExport={handleExport}
           onMedia={() => setMediaOpen(true)}
-          onDuplicates={() => setDuplicatesOpen(true)}
+          onDuplicates={() => {
+            if (contacts.length === 0) {
+              message.warning(t("export.no_contacts"));
+              return;
+            }
+            setDuplicatesOpen(true);
+          }}
         />
         <div
           style={{

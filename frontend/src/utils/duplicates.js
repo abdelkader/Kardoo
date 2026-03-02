@@ -17,6 +17,17 @@ function areNamesSimilar(a, b) {
   return na === nb;
 }
 
+function shareEmail(a, b) {
+  const emailsA = a.email?.filter((e) => e.value) || [];
+  const emailsB = b.email?.filter((e) => e.value) || [];
+
+  if (emailsA.length === 0 || emailsB.length === 0) return false;
+
+  return emailsA.some((ea) =>
+    emailsB.some((eb) => ea.value.toLowerCase() === eb.value.toLowerCase()),
+  );
+}
+
 /**
  * Vérifie si deux contacts partagent au moins un numéro de téléphone
  * Retourne { match: bool, confidence: "certain" | "probable" }
@@ -46,12 +57,10 @@ function sharePhone(a, b) {
   return { match: false, confidence: null };
 }
 
-/**
- * Trouve tous les groupes de doublons dans une liste de contacts.
- * Retourne un tableau de groupes :
- * [{ contacts: [...], reason: "name"|"phone"|"both", confidence: "certain"|"probable" }]
- */
-export function findDuplicates(contacts) {
+export function findDuplicates(
+  contacts,
+  options = { checkName: true, checkPhone: true, checkEmail: false },
+) {
   const nonGroups = contacts.filter((c) => c.kind !== "group");
   const visited = new Set();
   const groups = [];
@@ -69,14 +78,28 @@ export function findDuplicates(contacts) {
       const a = nonGroups[i];
       const b = nonGroups[j];
 
-      const sameName = areNamesSimilar(a, b);
-      const phoneResult = sharePhone(a, b);
+      const sameName = options.checkName && areNamesSimilar(a, b);
+      const phoneResult = options.checkPhone
+        ? sharePhone(a, b)
+        : { match: false };
+      const sameEmail = options.checkEmail && shareEmail(a, b);
 
       let reason = null;
       let confidence = null;
 
-      if (sameName && phoneResult.match) {
+      if (sameName && phoneResult.match && sameEmail) {
+        reason = "all";
+        confidence =
+          phoneResult.confidence === "certain" ? "certain" : "probable";
+      } else if (sameName && phoneResult.match) {
         reason = "both";
+        confidence =
+          phoneResult.confidence === "certain" ? "certain" : "probable";
+      } else if (sameName && sameEmail) {
+        reason = "name_email";
+        confidence = "probable";
+      } else if (phoneResult.match && sameEmail) {
+        reason = "phone_email";
         confidence =
           phoneResult.confidence === "certain" ? "certain" : "probable";
       } else if (sameName) {
@@ -85,20 +108,19 @@ export function findDuplicates(contacts) {
       } else if (phoneResult.match) {
         reason = "phone";
         confidence = phoneResult.confidence;
+      } else if (sameEmail) {
+        reason = "email";
+        confidence = "probable";
       }
 
       if (reason) {
         group.push(b);
         visited.add(b.id);
-
-        // Élever la confiance du groupe si on trouve "certain"
         if (confidence === "certain") groupConfidence = "certain";
         else if (!groupConfidence) groupConfidence = "probable";
-
-        // Reason priority: both > phone > name
-        if (reason === "both") groupReason = "both";
-        else if (reason === "phone" && groupReason !== "both")
-          groupReason = "phone";
+        if (reason === "all") groupReason = "all";
+        else if (reason === "both" && groupReason !== "all")
+          groupReason = "both";
         else if (!groupReason) groupReason = reason;
       }
     }

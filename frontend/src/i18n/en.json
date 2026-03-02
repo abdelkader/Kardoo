@@ -135,6 +135,15 @@
     "merge_all": "Merge all ({{count}})",
     "delete_duplicates": "Delete duplicates",
     "ignore": "Ignore",
-    "close": "Close"
+    "close": "Close",
+     "compare_by": "Compare by:",
+  "check_name": "Name",
+  "check_phone": "Phone",
+  "check_email": "Email",
+  "search": "Search",
+  "reason_email": "Same email",
+  "reason_name_email": "Name + Email",
+  "reason_phone_email": "Phone + Email",
+  "reason_all": "Name + Phone + Email"
   }
 }
