@@ -17,6 +17,7 @@ import ImportDialog from "./components/ImportDialog";
 import MediaDialog from "./components/MediaDialog";
 import "antd/dist/reset.css";
 import { useTranslation } from "react-i18next";
+import { App as AntApp } from "antd";
 
 export default function App() {
   const [search, setSearch] = useState("");
@@ -49,6 +50,7 @@ export default function App() {
     importContacts,
     openFileFromPath,
   } = useContacts(appConfig);
+  const { message } = AntApp.useApp();
 
   useEffect(() => {
     LoadConfig()
@@ -94,6 +96,10 @@ export default function App() {
   };
 
   const handleExport = () => {
+    if (contacts.length === 0) {
+      message.warning(t("export.no_contacts"));
+      return;
+    }
     const toExport =
       checkedIds.length > 0
         ? contacts.filter((c) => checkedIds.includes(c.id))

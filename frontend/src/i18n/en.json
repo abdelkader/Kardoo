@@ -88,7 +88,8 @@
     "csv_desc": "Google Contacts format",
     "xml_desc": "xCard (RFC 6351)",
     "export_selected": "Export ({{count}})",
-    "export_all": "Export ({{count}})"
+    "export_all": "Export ({{count}})",
+    "no_contacts": "Aucun contact à exporter"
   },
   "import": {
     "title": "Import Contacts",
