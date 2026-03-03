@@ -3,10 +3,12 @@ import { Modal, Button, Switch, Typography, Alert } from "antd";
 import { DownloadOutlined } from "@ant-design/icons";
 import QRCode from "qrcode";
 import { generateVCard } from "../utils/vcard";
+import { useTranslation } from "react-i18next";
 
 const { Text } = Typography;
 
 export default function QrCodeDialog({ open, onClose, contact }) {
+  const { t } = useTranslation();
   const canvasRef = useRef(null);
   const [withPhoto, setWithPhoto] = useState(false);
   const [dataSize, setDataSize] = useState(0);
@@ -39,13 +41,13 @@ export default function QrCodeDialog({ open, onClose, contact }) {
           });
         } catch (e) {
           setError(
-            "Données trop volumineuses pour un QR code. Désactivez la photo.",
+            t("qrcode.too_large_data"),
           );
         }
       }, 50);
     } catch (e) {
       setError(
-        "Données trop volumineuses pour un QR code. Désactivez la photo.",
+        t("qrcode.too_large_data"),
       );
     }
   };
@@ -70,7 +72,7 @@ export default function QrCodeDialog({ open, onClose, contact }) {
       centered
       footer={[
         <Button key="close" onClick={onClose}>
-          Fermer
+          {t("qrcode.close")}
         </Button>,
         <Button
           key="dl"
@@ -78,7 +80,7 @@ export default function QrCodeDialog({ open, onClose, contact }) {
           icon={<DownloadOutlined />}
           onClick={handleDownload}
         >
-          Télécharger PNG
+          {t("qrcode.download_png")}
         </Button>,
       ]}
     >
@@ -100,10 +102,10 @@ export default function QrCodeDialog({ open, onClose, contact }) {
           }}
         >
           <Switch size="small" checked={withPhoto} onChange={setWithPhoto} />
-          <Text style={{ fontSize: 12 }}>Inclure la photo</Text>
+          <Text style={{ fontSize: 12 }}>{t("qrcode.photo")}</Text>
           {withPhoto && (
             <Text type="warning" style={{ fontSize: 11 }}>
-              ⚠️ Risque de dépasser la limite
+              {t("qrcode.limit_warning")}
             </Text>
           )}
         </div>
@@ -111,12 +113,13 @@ export default function QrCodeDialog({ open, onClose, contact }) {
         {/* Taille des données */}
         <div style={{ alignSelf: "stretch" }}>
           <Text type={sizeColor} style={{ fontSize: 11 }}>
-            Taille : {dataSize} caractères
+            {t("qrcode.char_count", { count: dataSize })}
+            {" — "}
             {dataSize > 2500
-              ? " — trop volumineux !"
+              ? t("qrcode.too_bulky")
               : dataSize > 1500
-                ? " — limite approchée"
-                : " — OK"}
+                ? t("qrcode.approx_limit")
+                : "OK"}
           </Text>
         </div>
 
@@ -134,7 +137,7 @@ export default function QrCodeDialog({ open, onClose, contact }) {
         />
 
         <Text type="secondary" style={{ fontSize: 11, textAlign: "center" }}>
-          Scannez avec l'app Contacts de votre téléphone
+          {t("qrcode.scan_qr")}
         </Text>
       </div>
     </Modal>
