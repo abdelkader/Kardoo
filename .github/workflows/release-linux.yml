@@ -1,0 +1,190 @@
+name: Release Kardoo Linux
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Version tag'
+        required: true
+        default: '1.0.0'
+
+jobs:
+  prepare:
+    name: Prepare version tag
+    runs-on: ubuntu-22.04
+    outputs:
+      version: ${{ steps.normalise_version.outputs.version }}
+    steps:
+      - name: Normalise version tag
+        id: normalise_version
+        shell: bash
+        run: |
+          if [ "${{ github.event.release.tag_name }}" == "" ]; then
+            version=$(echo ${{ github.event.inputs.tag }} | sed -e 's/v//g')
+          else
+            version=$(echo ${{ github.event.release.tag_name }} | sed -e 's/v//g')
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+  release-linux:
+    name: Release Linux (${{ matrix.webkit_name }})
+    needs: prepare
+    runs-on: ${{ matrix.runner }}
+
+    strategy:
+      matrix:
+        include:
+          - runner: ubuntu-22.04
+            webkit_dev: libwebkit2gtk-4.0-dev
+            webkit_runtime: libwebkit2gtk-4.0-37
+            webkit_tags: ""
+            webkit_name: webkit2gtk-4.0
+            deb_name: kardoo_${{ needs.prepare.outputs.version }}_linux_amd64
+
+          - runner: ubuntu-24.04
+            webkit_dev: libwebkit2gtk-4.1-dev
+            webkit_runtime: libwebkit2gtk-4.1-0
+            webkit_tags: "-tags webkit2_41"
+            webkit_name: webkit2gtk-4.1
+            deb_name: kardoo_${{ needs.prepare.outputs.version }}_webkit2_41
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: stable
+          cache: true
+
+      - name: Install Wails
+        run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
+
+      - name: Install Linux dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-3-dev ${{ matrix.webkit_dev }} jq
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Build frontend assets
+        run: |
+          npm install -g npm@latest
+          cd frontend
+          npm install
+
+      - name: Build Wails app for Linux
+        run: |
+          CGO_ENABLED=1 wails build -clean -platform linux/amd64 \
+          -ldflags "-X main.version=v${{ needs.prepare.outputs.version }}" \
+          ${{ matrix.webkit_tags }} \
+          -o kardoo
+
+      - name: Verify build output
+        run: |
+          echo "=== Bin directory contents ==="
+          ls -la build/bin/
+          echo "=== Looking for icon ==="
+          find build/ -name "*.png" -o -name "appicon*"
+
+      - name: Create DEB package structure
+        run: |
+          PKG=${{ matrix.deb_name }}
+          mkdir -p build/linux/$PKG/DEBIAN
+          mkdir -p build/linux/$PKG/usr/local/bin
+          mkdir -p build/linux/$PKG/usr/share/applications
+          mkdir -p build/linux/$PKG/usr/share/icons/hicolor/512x512/apps
+          echo "PKG=$PKG" >> $GITHUB_ENV
+
+      - name: Create DEBIAN control file
+        run: |
+          cat > build/linux/$PKG/DEBIAN/control << EOF
+          Package: kardoo
+          Version: ${{ needs.prepare.outputs.version }}
+          Section: utils
+          Priority: optional
+          Architecture: amd64
+          Depends: libgtk-3-0, ${{ matrix.webkit_runtime }}
+          Maintainer: abdelkader
+          Homepage: https://github.com/abdelkader/kardoo
+          Description: Kardoo
+           A simple and clean desktop tool to view, edit and manage your VCF (vCard) contact files.
+          EOF
+
+      - name: Create copyright file
+        run: |
+          mkdir -p build/linux/$PKG/usr/share/doc/kardoo
+          cat > build/linux/$PKG/usr/share/doc/kardoo/copyright << 'EOF'
+          Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+          Upstream-Name: kardoo
+          Upstream-Contact: abdelkader
+          Source: https://github.com/abdelkader/kardoo
+
+          Files: *
+          Copyright: 2025 abdelkader
+          License: MIT
+
+          License: MIT
+           Permission is hereby granted, free of charge, to any person obtaining a
+           copy of this software and associated documentation files (the "Software"),
+           to deal in the Software without restriction, including without limitation
+           the rights to use, copy, modify, merge, publish, distribute, sublicense,
+           and/or sell copies of the Software, and to permit persons to whom the
+           Software is furnished to do so, subject to the following conditions:
+           .
+           The above copyright notice and this permission notice shall be included
+           in all copies or substantial portions of the Software.
+           .
+           THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+           OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+           FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+          EOF
+
+      - name: Create desktop file
+        run: |
+          cat > build/linux/$PKG/usr/share/applications/kardoo.desktop << 'EOF'
+          [Desktop Entry]
+          Name=Kardoo
+          Comment=Kardoo
+          Exec=kardoo
+          Icon=kardoo
+          Terminal=false
+          Type=Application
+          Categories=Development;
+          EOF
+
+      - name: Copy binary to DEB structure
+        run: |
+          cp build/bin/kardoo build/linux/$PKG/usr/local/bin/
+          chmod +x build/linux/$PKG/usr/local/bin/kardoo
+
+      - name: Copy icon
+        run: |
+          ICON_DEST=build/linux/$PKG/usr/share/icons/hicolor/512x512/apps/kardoo.png
+          if [ -f "frontend/dist/logo.png" ]; then
+            cp frontend/dist/logo.png $ICON_DEST
+          elif [ -f "build/appicon.png" ]; then
+            cp build/appicon.png $ICON_DEST
+          elif [ -f "appicon.png" ]; then
+            cp appicon.png $ICON_DEST
+          else
+            echo "Warning: Icon not found, skipping"
+          fi
+
+      - name: Build DEB package
+        run: |
+          cd build/linux
+          dpkg-deb --build -Zxz $PKG
+
+      - name: Upload release assets
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ needs.prepare.outputs.version }}
+          files: ./build/linux/${{ env.PKG }}.deb
+          token: ${{ secrets.GITHUB_TOKEN }}
