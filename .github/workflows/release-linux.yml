@@ -113,7 +113,7 @@ jobs:
           Depends: libgtk-3-0, ${{ matrix.webkit_runtime }}
           Maintainer: abdelkader
           Description: Kardoo
-           A lightweight and modern app built with Wails.
+           A simple and clean desktop tool to view, edit and manage your VCF (vCard) contact files.
           EOF
 
       - name: Create desktop file
@@ -137,12 +137,12 @@ jobs:
       - name: Copy icon
         run: |
           ICON_DEST=build/linux/$PKG/usr/share/icons/hicolor/512x512/apps/kardoo.png
-          if [ -f "build/appicon.png" ]; then
+          if [ -f "frontend/dist/logo.png" ]; then
+            cp frontend/dist/logo.png $ICON_DEST
+          elif [ -f "build/appicon.png" ]; then
             cp build/appicon.png $ICON_DEST
           elif [ -f "appicon.png" ]; then
             cp appicon.png $ICON_DEST
-          elif [ -f "build/bin/appicon.png" ]; then
-            cp build/bin/appicon.png $ICON_DEST
           else
             echo "Warning: Icon not found, skipping"
           fi
