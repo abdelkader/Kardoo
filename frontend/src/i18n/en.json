@@ -107,20 +107,20 @@
     "export": "📤 Export",
     "media": "🎨 Media Manager"
   },
-"media": {
-  "title": "🎨 Media Manager",
-  "photos": "Photos",
-  "logos": "Logos",
-  "sounds": "Audio",
-  "preview": "Preview",
-  "contact": "Contact",
-  "size": "Size",
-  "type": "Format",
-  "none": "No media found",
-  "confirm_delete": "Delete this media?",
-  "delete": "Delete",
-  "cancel": "Cancel",
-  "close": "Close"
+  "media": {
+    "title": "🎨 Media Manager",
+    "photos": "Photos",
+    "logos": "Logos",
+    "sounds": "Audio",
+    "preview": "Preview",
+    "contact": "Contact",
+    "size": "Size",
+    "type": "Format",
+    "none": "No media found",
+    "confirm_delete": "Delete this media?",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "close": "Close"
   },
   "duplicates": {
     "title": "Duplicates",
@@ -137,14 +137,25 @@
     "delete_duplicates": "Delete duplicates",
     "ignore": "Ignore",
     "close": "Close",
-     "compare_by": "Compare by:",
-  "check_name": "Name",
-  "check_phone": "Phone",
-  "check_email": "Email",
-  "search": "Search",
-  "reason_email": "Same email",
-  "reason_name_email": "Name + Email",
-  "reason_phone_email": "Phone + Email",
-  "reason_all": "Name + Phone + Email"
+    "compare_by": "Compare by:",
+    "check_name": "Name",
+    "check_phone": "Phone",
+    "check_email": "Email",
+    "search": "Search",
+    "reason_email": "Same email",
+    "reason_name_email": "Name + Email",
+    "reason_phone_email": "Phone + Email",
+    "reason_all": "Name + Phone + Email"
+  },
+  "qrcode": {
+    "too_large_data": "Data too large for a QR code. Disable the photo.",
+    "photo": "Include photo",
+    "limit_warning": "⚠️ Risk of exceeding the limit",
+    "char_count": "Size: {{count}} characters",
+    "approx_limit": "approximate limit",
+    "too_bulky": "too bulky!",
+    "scan_qr": "Scan with your phone's Contacts app",
+    "download_png": "Download PNG",
+    "close": "Close"
   }
 }
