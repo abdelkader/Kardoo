@@ -29,38 +29,31 @@ jobs:
           echo "version=$version" >> "$GITHUB_OUTPUT"
 
   release-windows:
-    name: Release Windows (${{ matrix.platform }})
+    name: Release Windows (${{ matrix.arch }})
     needs: prepare
     runs-on: windows-latest
 
     strategy:
       matrix:
-        platform:
-          - windows/amd64
-          - windows/arm64
+        include:
+          - arch: amd64
+            platform: windows/amd64
+            suffix: x64
+            installer_name: amd64
+          - arch: arm64
+            platform: windows/arm64
+            suffix: arm64
+            installer_name: arm64
 
     steps:
       - name: Checkout source code
         uses: actions/checkout@v4
 
-      - name: Normalise platform tag
-        id: normalise_platform
-        shell: bash
-        run: |
-          tag=$(echo ${{ matrix.platform }} | sed -e 's/\//_/g' -e 's/amd64/x64/g')
-          echo "tag=$tag" >> "$GITHUB_OUTPUT"
-
-      - name: Normalise platform name
-        id: normalise_platform_name
-        shell: bash
-        run: |
-          pname=$(echo "${{ matrix.platform }}" | sed 's/windows\///g')
-          echo "pname=$pname" >> "$GITHUB_OUTPUT"
-
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
           go-version: stable
+          cache: true
 
       - name: Install Chocolatey packages
         uses: crazy-max/ghaction-chocolatey@v2
@@ -81,25 +74,32 @@ jobs:
         run: |
           npm install -g npm@latest
           cd frontend
+          jq '.version = "${{ needs.prepare.outputs.version }}"' package.json > tmp.json
+          mv tmp.json package.json
           npm install
+
+      - name: Update Wails version
+        shell: bash
+        run: |
+          jq '.info.productVersion = "${{ needs.prepare.outputs.version }}"' wails.json > tmp.json
+          mv tmp.json wails.json
 
       - name: Build Windows portable app
         shell: bash
         run: |
           CGO_ENABLED=1 wails build -clean -platform ${{ matrix.platform }} \
           -webview2 embed \
-          -ldflags "-X main.version=v${{ needs.prepare.outputs.version }}" \
-          -o kardoo
+          -ldflags "-X main.version=v${{ needs.prepare.outputs.version }}"
 
       - name: Compress portable binary
         working-directory: ./build/bin
-        run: Compress-Archive "kardoo.exe" "kardoo_${{ needs.prepare.outputs.version }}_${{ steps.normalise_platform.outputs.tag }}_portable.zip"
+        run: Compress-Archive "Kardoo.exe" "Kardoo_Portable_${{ needs.prepare.outputs.version }}_windows_${{ matrix.suffix }}.zip"
 
       - name: Upload portable
         uses: softprops/action-gh-release@v1
         with:
           tag_name: v${{ needs.prepare.outputs.version }}
-          files: ./build/bin/kardoo_${{ needs.prepare.outputs.version }}_${{ steps.normalise_platform.outputs.tag }}_portable.zip
+          files: ./build/bin/Kardoo_Portable_${{ needs.prepare.outputs.version }}_windows_${{ matrix.suffix }}.zip
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build Windows NSIS installer
@@ -108,16 +108,15 @@ jobs:
           export PATH="/c/Program Files (x86)/NSIS:$PATH"
           CGO_ENABLED=1 wails build -clean -platform ${{ matrix.platform }} \
           -nsis -webview2 embed \
-          -ldflags "-X main.version=v${{ needs.prepare.outputs.version }}" \
-          -o kardoo
+          -ldflags "-X main.version=v${{ needs.prepare.outputs.version }}"
 
       - name: Rename installer
         working-directory: ./build/bin
-        run: Rename-Item -Path "kardoo-${{ steps.normalise_platform_name.outputs.pname }}-installer.exe" -NewName "kardoo_${{ needs.prepare.outputs.version }}_${{ steps.normalise_platform.outputs.tag }}_setup.exe"
+        run: Rename-Item -Path "kardoo-${{ matrix.installer_name }}-installer.exe" -NewName "Kardoo_Setup_${{ needs.prepare.outputs.version }}_windows_${{ matrix.suffix }}.exe"
 
       - name: Upload installer
         uses: softprops/action-gh-release@v1
         with:
           tag_name: v${{ needs.prepare.outputs.version }}
-          files: ./build/bin/kardoo_${{ needs.prepare.outputs.version }}_${{ steps.normalise_platform.outputs.tag }}_setup.exe
+          files: ./build/bin/Kardoo_Setup_${{ needs.prepare.outputs.version }}_windows_${{ matrix.suffix }}.exe
           token: ${{ secrets.GITHUB_TOKEN }}
