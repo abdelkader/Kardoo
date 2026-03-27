@@ -138,14 +138,14 @@ export default function App() {
     Modal.confirm({
       title:
         ids.length === 1
-          ? "Supprimer ce contact ?"
-          : `Supprimer ${ids.length} contacts ?`,
+          ? t("delete_contact.title")
+          : t("delete_contact.title_plural", { count: ids.length }),
       content:
         ids.length === 1
-          ? "Cette action est irréversible."
-          : `Vous allez supprimer ${ids.length} contacts. Cette action est irréversible.`,
-      okText: "Supprimer",
-      cancelText: "Annuler",
+          ? t("delete_contact.content")
+          : t("delete_contact.content_plural", { count: ids.length }),
+      okText: t("delete_contact.ok"),
+      cancelText: t("delete_contact.cancel"),
       okButtonProps: { danger: true },
       onOk: async () => {
         await deleteContacts(ids);
