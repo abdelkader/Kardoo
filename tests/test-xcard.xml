@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vcards xmlns="urn:ietf:params:xml:ns:vcard-4.0">
+  <vcard>
+    <version><text>4.0</text></version>
+    <fn><text>Diana Prince</text></fn>
+    <n>
+      <surname>Prince</surname>
+      <given>Diana</given>
+      <additional></additional>
+      <prefix>Dr.</prefix>
+      <suffix></suffix>
+    </n>
+    <org><text>Justice League</text></org>
+    <title><text>Wonder Woman</text></title>
+    <tel>
+      <parameters>
+        <type><text>work</text></type>
+      </parameters>
+      <uri>tel:+1-202-555-0100</uri>
+    </tel>
+    <tel>
+      <parameters>
+        <type><text>cell</text></type>
+      </parameters>
+      <uri>tel:+1-202-555-0101</uri>
+    </tel>
+    <email>
+      <parameters>
+        <type><text>work</text></type>
+      </parameters>
+      <text>diana@justiceleague.com</text>
+    </email>
+    <adr>
+      <parameters>
+        <type><text>work</text></type>
+      </parameters>
+      <pobox></pobox>
+      <ext></ext>
+      <street>1 Justice League HQ</street>
+      <locality>Metropolis</locality>
+      <region>NY</region>
+      <code>10001</code>
+      <country>United States</country>
+    </adr>
+    <bday><date>1985-03-22</date></bday>
+    <gender><sex>F</sex></gender>
+    <note><text>Amazonian princess and superhero</text></note>
+    <url>
+      <parameters>
+        <type><text>home</text></type>
+      </parameters>
+      <uri>https://wonderwoman.example.com</uri>
+    </url>
+  </vcard>
+  <vcard>
+    <version><text>4.0</text></version>
+    <fn><text>Clark Kent</text></fn>
+    <n>
+      <surname>Kent</surname>
+      <given>Clark</given>
+      <additional>Joseph</additional>
+      <prefix></prefix>
+      <suffix></suffix>
+    </n>
+    <org><text>Daily Planet</text></org>
+    <title><text>Reporter</text></title>
+    <tel>
+      <parameters>
+        <type><text>work</text></type>
+      </parameters>
+      <uri>tel:+1-212-555-0200</uri>
+    </tel>
+    <email>
+      <text>clark.kent@dailyplanet.com</text>
+    </email>
+    <note><text>Also known as Superman</text></note>
+  </vcard>
+</vcards>

@@ -1,0 +1,57 @@
+BEGIN:VCARD
+VERSION:3.0
+FN:John Smith
+N:Smith;John;;;
+TEL;TYPE=CELL:+1-555-123-4567
+EMAIL:john.smith@example.com
+ORG:Acme Corp
+NOTE:Original contact
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+FN:John Smith
+N:Smith;John;;;
+TEL;TYPE=CELL:+15551234567
+EMAIL:john.smith@example.com
+NOTE:Duplicate - same name and phone (no country code format)
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+FN:Sarah Connor
+N:Connor;Sarah;;;
+TEL;TYPE=CELL:+1-800-555-9999
+EMAIL:sarah@skynet.com
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+FN:Sarah Connor
+N:Connor;Sarah;;;
+TEL;TYPE=WORK:+1-800-555-8888
+EMAIL:sarah@skynet.com
+NOTE:Duplicate - same name and email
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+FN:Peter Parker
+N:Parker;Peter;;;
+TEL;TYPE=CELL:555-867-5309
+EMAIL:peter@dailybugle.com
+ORG:Daily Bugle
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+FN:Peter Parker
+N:Parker;Peter;;;
+TEL;TYPE=CELL:555-867-5309
+EMAIL:spiderman@marvel.com
+ORG:Avengers
+NOTE:Duplicate - same name and phone (no country code)
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+FN:Unique Person
+N:Person;Unique;;;
+TEL;TYPE=CELL:+1-999-888-7777
+EMAIL:unique@example.com
+NOTE:No duplicate for this one
+END:VCARD

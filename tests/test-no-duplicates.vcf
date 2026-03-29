@@ -1,0 +1,21 @@
+BEGIN:VCARD
+VERSION:3.0
+FN:Alpha One
+N:One;Alpha;;;
+TEL;TYPE=CELL:+1-555-111-0001
+EMAIL:alpha@example.com
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+FN:Beta Two
+N:Two;Beta;;;
+TEL;TYPE=CELL:+1-555-222-0002
+EMAIL:beta@example.com
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+FN:Gamma Three
+N:Three;Gamma;;;
+TEL;TYPE=CELL:+1-555-333-0003
+EMAIL:gamma@example.com
+END:VCARD

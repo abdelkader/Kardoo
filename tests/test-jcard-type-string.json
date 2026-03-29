@@ -1,0 +1,24 @@
+["vcard",
+  [
+    ["version", {}, "text", "4.0"],
+    ["fn", {}, "text", "Type Test Contact"],
+    ["n", {}, "text", ["Contact", "Type", "Test", "", ""]],
+    ["tel", {"type": "work"}, "uri", "tel:+1-555-200-0001"],
+    ["tel", {"type": "home"}, "uri", "tel:+1-555-200-0002"],
+    ["tel", {"type": "cell"}, "uri", "tel:+1-555-200-0003"],
+    ["email", {"type": "work"}, "text", "work@typetest.com"],
+    ["email", {"type": "home"}, "text", "home@typetest.com"],
+    ["adr",
+      {"type": "work", "pref": "1"},
+      "text",
+      ["", "", "1 Work Street", "Worktown", "WT", "10001", "USA"]
+    ],
+    ["adr",
+      {"type": "home"},
+      "text",
+      ["", "", "2 Home Ave", "Hometown", "HT", "20002", "USA"]
+    ],
+    ["url", {"type": "work"}, "uri", "https://work.typetest.com"],
+    ["url", {"type": "home"}, "uri", "https://home.typetest.com"]
+  ]
+]

@@ -1,0 +1,37 @@
+[
+  ["vcard",
+    [
+      ["version", {}, "text", "4.0"],
+      ["fn", {}, "text", "Alice Wonderland"],
+      ["n", {}, "text", ["Wonderland", "Alice", "", "", ""]],
+      ["tel", {"type": ["cell"]}, "uri", "tel:+1-555-100-0001"],
+      ["email", {}, "text", "alice@wonderland.com"],
+      ["org", {}, "text", "Wonderland Inc."]
+    ]
+  ],
+  ["vcard",
+    [
+      ["version", {}, "text", "4.0"],
+      ["fn", {}, "text", "Bob Builder"],
+      ["n", {}, "text", ["Builder", "Bob", "", "", ""]],
+      ["tel", {"type": ["work"]}, "uri", "tel:+44-20-7946-1234"],
+      ["tel", {"type": ["cell"]}, "uri", "tel:+44-7700-900456"],
+      ["email", {"type": ["work"]}, "text", "bob@buildit.co.uk"],
+      ["adr",
+        {"type": ["work"]},
+        "text",
+        ["", "", "10 Builder Street", "London", "England", "EC1A 1BB", "United Kingdom"]
+      ]
+    ]
+  ],
+  ["vcard",
+    [
+      ["version", {}, "text", "4.0"],
+      ["fn", {}, "text", "Charlie Chaplin"],
+      ["n", {}, "text", ["Chaplin", "Charlie", "Spencer", "Sir", ""]],
+      ["bday", {}, "date", "1889-04-16"],
+      ["gender", {}, "sex", "M"],
+      ["note", {}, "text", "The Tramp"]
+    ]
+  ]
+]

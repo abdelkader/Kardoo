@@ -1,0 +1,24 @@
+["vcard",
+  [
+    ["version", {}, "text", "4.0"],
+    ["n", {}, "text", ["Gump", "Forrest", "", "Mr.", ""]],
+    ["fn", {}, "text", "Forrest Gump"],
+    ["org", {}, "text", "Bubba Gump Shrimp Co."],
+    ["title", {}, "text", "Shrimp Man"],
+    ["tel", {"type": ["work", "voice"]}, "uri", "tel:+1-111-555-1212"],
+    ["tel", {"type": ["home", "voice"]}, "uri", "tel:+1-404-555-1212"],
+    ["adr",
+      {"type": "work"},
+      "text",
+      ["", "", "100 Waters Edge", "Baytown", "LA", "30314", "United States"]
+    ],
+    ["adr",
+      {"type": "home"},
+      "text",
+      ["", "", "42 Plantation St.", "Baytown", "LA", "30314", "United States"]
+    ],
+    ["email", {}, "text", "forrestgump@example.com"],
+    ["bday", {}, "date", "1956-06-06"],
+    ["rev", {}, "timestamp", "2024-01-15T10:30:00Z"]
+  ]
+]

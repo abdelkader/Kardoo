@@ -1,0 +1,24 @@
+BEGIN:VCARD
+VERSION:3.0
+FN:Élodie Ñoño
+N:Ñoño;Élodie;;;
+TEL;TYPE=CELL:+33-6-98-76-54-32
+EMAIL:elodie@example.fr
+NOTE:Accents: é è ê ë à â ù û ü ï î ô œ æ ç ñ
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+FN:Ångström Müller
+N:Müller;Ångström;;;
+TEL;TYPE=CELL:+49-151-23456789
+EMAIL:angstrom@example.de
+ORG:Müller GmbH & Co. KG
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+FN:O'Brien, Patrick
+N:O'Brien;Patrick;;;
+TEL;TYPE=CELL:+353-87-123-4567
+EMAIL:patrick@example.ie
+NOTE:Name with apostrophe and comma
+END:VCARD

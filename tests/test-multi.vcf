@@ -1,0 +1,41 @@
+BEGIN:VCARD
+VERSION:3.0
+FN:Alice Martin
+N:Martin;Alice;;;
+TEL;TYPE=CELL:+33-6-12-34-56-78
+EMAIL:alice.martin@example.fr
+ADR;TYPE=HOME:;;12 Rue de la Paix;Paris;;75001;France
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+FN:Bob Smith
+N:Smith;Bob;;;
+TEL;TYPE=CELL:+44-7700-900123
+TEL;TYPE=WORK:+44-20-7946-0958
+EMAIL:bob.smith@example.co.uk
+ORG:Smith & Co
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+FN:Carlos García
+N:García;Carlos;;;
+TEL;TYPE=CELL:+34-612-345-678
+EMAIL:carlos@example.es
+ADR;TYPE=HOME:;;Calle Mayor 5;Madrid;;28001;Spain
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+FN:田中 太郎
+N:田中;太郎;;;
+TEL;TYPE=CELL:+81-90-1234-5678
+EMAIL:tanaka@example.jp
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+FN:Marie Dubois
+N:Dubois;Marie;;;
+TEL;TYPE=HOME:+33-1-23-45-67-89
+EMAIL:marie.dubois@example.fr
+BDAY:1990-07-22
+NOTE:Collègue de travail
+END:VCARD

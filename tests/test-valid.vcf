@@ -1,0 +1,51 @@
+BEGIN:VCARD
+VERSION:3.0
+N:Gump;Forrest;;Mr.;
+FN:Forrest Gump
+ORG:Bubba Gump Shrimp Co.
+TITLE:Shrimp Man
+TEL;TYPE=WORK,VOICE:+1-111-555-1212
+TEL;TYPE=HOME,VOICE:+1-404-555-1212
+TEL;TYPE=CELL:+1-404-555-3434
+EMAIL;TYPE=INTERNET:forrestgump@example.com
+EMAIL;TYPE=WORK:forrest.work@bubbagump.com
+ADR;TYPE=WORK:;;100 Waters Edge;Baytown;LA;30314;United States
+ADR;TYPE=HOME:;;42 Plantation St.;Baytown;LA;30314;United States
+URL;TYPE=HOME:https://forrestgump.example.com
+NOTE:Best shrimp in the world
+BDAY:1956-06-06
+GENDER:M
+NICKNAME:Forrest
+CATEGORIES:Friend,Business
+REV:2024-01-15T10:30:00Z
+UID:550e8400-e29b-41d4-a716-446655440000
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+N:Wayne;Bruce;;;
+FN:Bruce Wayne
+ORG:Wayne Enterprises
+TITLE:CEO
+TEL;TYPE=WORK:+1-212-555-9999
+TEL;TYPE=CELL:+1-212-555-0001
+EMAIL;TYPE=WORK:bruce@wayneenterprises.com
+ADR;TYPE=WORK:;;1 Wayne Tower;Gotham;NY;10001;United States
+URL;TYPE=WORK:https://wayneenterprises.com
+NOTE:Also known as Batman
+GENDER:M
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+N:Doe;Jane;;Dr.;PhD
+FN:Dr. Jane Doe
+ORG:MIT
+TITLE:Professor
+TEL;TYPE=WORK:+1-617-555-2222
+EMAIL;TYPE=INTERNET:jane.doe@mit.edu
+ADR;TYPE=WORK:;;77 Mass Ave;Cambridge;MA;02139;United States
+BDAY:1980-03-15
+GENDER:F
+LANG:en
+LANG:fr
+END:VCARD
+END:VCARD
