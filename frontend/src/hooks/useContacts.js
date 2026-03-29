@@ -162,6 +162,23 @@ export function useContacts(appConfig) {
     }
   };
 
+  const addContact = async (newC) => {
+    const updated = [...contacts, newC];
+    setContacts(updated);
+    setSelected(newC);
+    setDisplayedContact(newC);
+    try {
+      await SaveVCardFile(
+        currentFilePath,
+        generateAllVCards(updated, appConfig.exportFields || []),
+        appConfig.backupOnSave,
+        appConfig.backupDir,
+      );
+    } catch (e) {
+      setError("Erreur : " + e.message);
+    }
+  };
+
   return {
     contacts,
     selected,
@@ -175,5 +192,6 @@ export function useContacts(appConfig) {
     newContact,
     deleteContacts,
     importContacts,
+    addContact,
   };
 }

@@ -144,5 +144,11 @@
   "reason_name_email": "Nom + Email",
   "reason_phone_email": "Téléphone + Email",
   "reason_all": "Nom + Téléphone + Email"
-}
+  },
+  "contact_menu": {
+  "select": "Sélectionner",
+  "duplicate": "Dupliquer",
+  "export": "Exporter",
+  "delete": "Supprimer"
+  }
 }

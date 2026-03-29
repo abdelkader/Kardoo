@@ -56,6 +56,7 @@ export default function App() {
     deleteContacts,
     importContacts,
     openFileFromPath,
+    addContact,
   } = useContacts(appConfig);
   const { message } = AntApp.useApp();
 
@@ -132,6 +133,17 @@ export default function App() {
         : contacts.filter((c) => c.kind !== "group");
     setExportContacts(toExport);
     setExportOpen(true);
+  };
+
+  const handleDuplicateContact = (contact) => {
+    const duplicated = {
+      ...contact,
+      id: Date.now(),
+      fn: contact.fn + " (copy)",
+      uid: "",
+      rev: "",
+    };
+    addContact(duplicated);
   };
 
   const handleDeleteContacts = (ids, onSuccess) => {
@@ -216,6 +228,11 @@ export default function App() {
             checkedIds={checkedIds}
             onCheckedChange={setCheckedIds}
             error={error}
+            onDuplicate={handleDuplicateContact}
+            onExport={(contact) => {
+              setExportContacts([contact]);
+              setExportOpen(true);
+            }}
           />
         </div>
         <div

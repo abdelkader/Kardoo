@@ -1,10 +1,21 @@
 import { useState, useEffect } from "react";
-import { Avatar, Typography, Input, Empty, Checkbox, Button } from "antd";
+import {
+  Avatar,
+  Typography,
+  Input,
+  Empty,
+  Checkbox,
+  Button,
+  Dropdown,
+} from "antd";
 import {
   UserOutlined,
   FolderOutlined,
   FolderOpenOutlined,
   DeleteOutlined,
+  CopyOutlined,
+  ExportOutlined,
+  CheckSquareOutlined,
 } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import { buildTree } from "../utils/groups";
@@ -20,58 +31,93 @@ function ContactRow({
   hovered,
   onHover,
   indent = false,
+  onDelete,
+  onDuplicate,
+  onExport,
 }) {
+  const { t } = useTranslation();
   const isSelected = selected?.id === contact.id;
 
+  const contextMenu = {
+    items: [
+      {
+        key: "select",
+        icon: <CheckSquareOutlined />,
+        label: t("contact_menu.select"),
+        onClick: () => onCheck(contact.id, !checked),
+      },
+      { type: "divider" },
+      {
+        key: "duplicate",
+        icon: <CopyOutlined />,
+        label: t("contact_menu.duplicate"),
+        onClick: () => onDuplicate(contact),
+      },
+      {
+        key: "export",
+        icon: <ExportOutlined />,
+        label: t("contact_menu.export"),
+        onClick: () => onExport(contact),
+      },
+      { type: "divider" },
+      {
+        key: "delete",
+        icon: <DeleteOutlined />,
+        label: t("contact_menu.delete"),
+        danger: true,
+        onClick: () => onDelete([contact.id]),
+      },
+    ],
+  };
+
   return (
-    <div
-      onMouseEnter={() => onHover(contact.id)}
-      onMouseLeave={() => onHover(null)}
-      style={{
-        padding: indent ? "4px 10px 4px 28px" : "4px 10px",
-        cursor: "pointer",
-        display: "flex",
-        alignItems: "center",
-        gap: 8,
-        background: isSelected ? "#e6f4ff" : "transparent",
-        borderLeft: isSelected ? "3px solid #1677ff" : "3px solid transparent",
-      }}
-    >
-      {/* Avatar — toujours visible */}
-      <Avatar
-        size={24}
-        src={contact.photo || undefined}
-        icon={<UserOutlined />}
+    <Dropdown menu={contextMenu} trigger={["contextMenu"]}>
+      <div
+        onMouseEnter={() => onHover(contact.id)}
+        onMouseLeave={() => onHover(null)}
         style={{
-          backgroundColor: contact.photo ? "transparent" : "#1677ff",
-          flexShrink: 0,
+          padding: indent ? "4px 10px 4px 28px" : "4px 10px",
+          cursor: "pointer",
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+          background: isSelected ? "#e6f4ff" : "transparent",
+          borderLeft: isSelected
+            ? "3px solid #1677ff"
+            : "3px solid transparent",
         }}
-        onError={() => false}
-      />
-
-      {/* Nom */}
-      <Text
-        strong={isSelected}
-        style={{ fontSize: 12, lineHeight: "1.2", flex: 1 }}
-        onClick={() => onSelect(contact)}
       >
-        {contact.fn}
-      </Text>
-
-      {/* Checkbox — à droite, visible au hover ou si cochée */}
-      <div style={{ width: 16, flexShrink: 0 }}>
-        {(hovered || checked) && (
-          <Checkbox
-            checked={checked}
-            onChange={(e) => {
-              e.stopPropagation();
-              onCheck(contact.id, e.target.checked);
-            }}
-            onClick={(e) => e.stopPropagation()}
-          />
-        )}
+        <Avatar
+          size={24}
+          src={contact.photo || undefined}
+          icon={<UserOutlined />}
+          style={{
+            backgroundColor: contact.photo ? "transparent" : "#1677ff",
+            flexShrink: 0,
+          }}
+          onError={() => false}
+        />
+        <Text
+          strong={isSelected}
+          style={{ fontSize: 12, lineHeight: "1.2", flex: 1 }}
+          onClick={() => onSelect(contact)}
+        >
+          {contact.fn}
+        </Text>
+        <div style={{ width: 16, flexShrink: 0 }}>
+          {(hovered || checked) && (
+            <Checkbox
+              checked={checked}
+              onChange={(e) => {
+                e.stopPropagation();
+                onCheck(contact.id, e.target.checked);
+              }}
+              onClick={(e) => e.stopPropagation()}
+            />
+          )}
+        </div>
       </div>
-    </div>
+    </Dropdown>
   );
 }
 
@@ -168,6 +214,8 @@ export default function ContactTree({
   onSearch,
   onSelect,
   onDelete,
+  onDuplicate,
+  onExport,
   checkedIds,
   onCheckedChange,
   error,
@@ -256,6 +304,9 @@ export default function ContactTree({
                 onCheck={handleCheck}
                 hovered={hoveredId === c.id}
                 onHover={setHoveredId}
+                onDelete={onDelete}
+                onDuplicate={onDuplicate}
+                onExport={onExport}
               />
             ))
           )}
@@ -308,6 +359,9 @@ export default function ContactTree({
               onCheck={handleCheck}
               hovered={hoveredId === c.id}
               onHover={setHoveredId}
+              onDelete={onDelete}
+              onDuplicate={onDuplicate}
+              onExport={onExport}
             />
           ))}
         </div>
