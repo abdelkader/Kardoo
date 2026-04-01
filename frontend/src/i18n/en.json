@@ -63,13 +63,14 @@
     "close": "Close",
     "language": "Language",
     "export_fields": "Fields to export",
-  "export_all_fields": "All fields (default)"    
+    "export_all_fields": "All fields (default)"    
   },
   "about": {
+    "title": "About",
     "close": "Close",
     "description": "A tool to edit (Modify, delete) VCF files.",
     "subtitle": "Manage your vCard contacts with ease.",
-    "copyright": "© 2025 abdelkader · All rights reserved",
+    "copyright": "© 2026 abdelkader · All rights reserved",
     "support": "Support"
   },
   "export": {
