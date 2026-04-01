@@ -38,6 +38,14 @@
     "change_photo": "Changer",
     "download_photo": "Télécharger"
   },
+  "delete_contact": {
+    "title": "Supprimer ce contact?",
+    "title_plural": "Supprimer {{count}} contacts?",
+    "content": "Cette action est irréversible.",
+    "content_plural": "Vous allez supprimer {{count}} contacts. Cette action est irréversible.",
+    "ok": "Supprimer",
+    "cancel": "Annuler"
+  },
   "dirty": {
     "title": "Modifications non sauvegardées",
     "content": "Voulez-vous abandonner les modifications en cours ?",

@@ -38,6 +38,14 @@
     "change_photo": "Change",
     "download_photo": "Download"
   },
+  "delete_contact": {
+    "title": "Delete this contact?",
+    "title_plural": "Delete {{count}} contacts?",
+    "content": "This action is irreversible.",
+    "content_plural": "You are about to delete {{count}} contacts. This action cannot be undone.",
+    "ok": "Delete",
+    "cancel": "Cancel"
+  },
   "dirty": {
     "title": "Unsaved changes",
     "content": "Do you want to discard the current changes?",
