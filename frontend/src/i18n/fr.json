@@ -6,10 +6,11 @@
     "settings": "Paramètres",
     "about": "À propos",
     "search": "Rechercher...",
-    "contacts": "contact",
-    "contacts_plural": "contacts",
-    "no_contacts": "Ouvre un fichier .vcf",
-    "no_contact_selected": "Ouvre un fichier .vcf et sélectionne un contact",
+    "contacts": "{{count}} contact",
+    "contacts_plural": "{{count}} contacts",
+    "no_contacts": "Aucun contact chargé",
+    "no_contact_selected": "Aucun contact sélectionné",
+    "no_contact_result": "Aucun contact trouvé",
     "qrcode": "Code QR"
   },
   "contact": {

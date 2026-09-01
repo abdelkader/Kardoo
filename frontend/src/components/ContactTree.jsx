@@ -260,8 +260,7 @@ export default function ContactTree({
           }}
         >
           <Text type="secondary" style={{ fontSize: 11 }}>
-            {contacts.filter((c) => c.kind !== "group").length}{" "}
-            {t("app.no_contacts")}
+            {contacts.length === 0 ? t("app.no_contacts") : (contacts.length === 1 ? t("app.contacts", { count: contacts.filter((c) => c.kind !== "group").length }) : t("app.contacts_plural", { count: contacts.filter((c) => c.kind !== "group").length }))}
           </Text>
 
           {/* Bouton supprimer — visible si cases cochées */}
@@ -292,7 +291,7 @@ export default function ContactTree({
       ) : isSearching ? (
         <div>
           {filteredFlat.length === 0 ? (
-            <Empty description="Aucun résultat" style={{ marginTop: 20 }} />
+            <Empty description={t("app.no_contact_result")} style={{ marginTop: 20 }} />
           ) : (
             filteredFlat.map((c) => (
               <ContactRow
