@@ -1,6 +1,8 @@
 {
   "app": {
     "open": "Ouvrir un fichier .vcf",
+    "save": "Enregistrer le fichier de contacts",
+    "create": "Enregistrer le nouveau fichier de contacts",
     "settings": "Paramètres",
     "about": "À propos",
     "search": "Rechercher...",
@@ -36,7 +38,10 @@
     "no_element": "Aucun élément",
     "no_language": "Aucune langue",
     "change_photo": "Changer",
-    "download_photo": "Télécharger"
+    "download_photo": "Télécharger",
+    "choose_photo": "Sélectionner la photo du contact",
+    "save_photo": "Enregistrer la photo du contact",
+    "choose_sound": "Sélectionner le son de contact"
   },
   "delete_contact": {
     "title": "Supprimer ce contact?",
@@ -66,6 +71,7 @@
     "backup_dir": "Dossier de backup :",
     "backup_placeholder": "Même dossier que le fichier .vcf",
     "backup_hint": "Les backups sont nommés : contacts_backup_20250223_143022.vcf",
+    "backup_select_folder": "Sélectionnez le dossier de sauvegarde",
     "save": "Sauvegarder",
     "saved": "✓ Sauvegardé",
     "close": "Fermer",
@@ -99,7 +105,7 @@
     "xml_desc": "xCard (RFC 6351)",
     "export_selected": "Export ({{count}})",
     "export_all": "Export ({{count}})",
-     "no_contacts": "No contacts loaded"
+    "no_contacts": "Aucun contact chargé"
   },
   "import": {
     "title": "Importer des contacts",
@@ -132,33 +138,33 @@
     "close": "Fermer"
   },
   "duplicates": {
-  "title": "Doublons",
-  "found": "{{count}} groupe(s) de doublons trouvé(s)",
-  "none_found": "Aucun doublon détecté",
-  "reason_both": "Nom + Téléphone",
-  "reason_name": "Nom identique",
-  "reason_phone": "Téléphone identique",
-  "confidence_certain": "Certain",
-  "confidence_probable": "Probable",
-  "contacts": "contacts",
-  "merge": "Fusionner",
-  "merge_all": "Tout fusionner ({{count}})",
-  "delete_duplicates": "Supprimer les doublons",
-  "ignore": "Ignorer",
-  "close": "Fermer",
-  "check_name": "Nom",
-  "check_phone": "Téléphone",
-  "check_email": "Email",
-  "search": "Rechercher",
-  "reason_name_email": "Nom + Email",
-  "reason_phone_email": "Téléphone + Email",
-  "reason_all": "Nom + Téléphone + Email"
+    "title": "Doublons",
+    "found": "{{count}} groupe(s) de doublons trouvé(s)",
+    "none_found": "Aucun doublon détecté",
+    "reason_both": "Nom + Téléphone",
+    "reason_name": "Nom identique",
+    "reason_phone": "Téléphone identique",
+    "confidence_certain": "Certain",
+    "confidence_probable": "Probable",
+    "contacts": "contacts",
+    "merge": "Fusionner",
+    "merge_all": "Tout fusionner ({{count}})",
+    "delete_duplicates": "Supprimer les doublons",
+    "ignore": "Ignorer",
+    "close": "Fermer",
+    "check_name": "Nom",
+    "check_phone": "Téléphone",
+    "check_email": "Email",
+    "search": "Rechercher",
+    "reason_name_email": "Nom + Email",
+    "reason_phone_email": "Téléphone + Email",
+    "reason_all": "Nom + Téléphone + Email"
   },
   "contact_menu": {
-  "select": "Sélectionner",
-  "duplicate": "Dupliquer",
-  "export": "Exporter",
-  "delete": "Supprimer"
+    "select": "Sélectionner",
+    "duplicate": "Dupliquer",
+    "export": "Exporter",
+    "delete": "Supprimer"
   },
   "qrcode": {
     "too_large_data": "Données trop volumineuses pour un QR code. Désactivez la photo.",

@@ -17,7 +17,7 @@ export default function ImportDialog({ open, onClose, onImport }) {
     setLoading(true);
     setError(null);
     try {
-      const files = await OpenImportFiles();
+      const files = await OpenImportFiles(t("import.title"));
       if (!files || files.length === 0) {
         setLoading(false);
         return;

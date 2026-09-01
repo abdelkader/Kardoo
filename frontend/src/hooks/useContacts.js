@@ -10,6 +10,7 @@ import {
   NewVCardFile,
   ReadFileContent,
 } from "../../wailsjs/go/main/App";
+import { useTranslation } from "react-i18next";
 
 export function useContacts(appConfig) {
   const [contacts, setContacts] = useState([]);
@@ -17,6 +18,7 @@ export function useContacts(appConfig) {
   const [displayedContact, setDisplayedContact] = useState(null);
   const [currentFilePath, setCurrentFilePath] = useState("");
   const [error, setError] = useState("");
+  const { t } = useTranslation();
 
   const openFileFromPath = async (path) => {
     setError("");
@@ -43,6 +45,7 @@ export function useContacts(appConfig) {
 
     try {
       await SaveVCardFile(
+        "",
         currentFilePath,
         generateAllVCards(newContacts, appConfig.exportFields || []),
         appConfig.backupOnSave,
@@ -56,7 +59,7 @@ export function useContacts(appConfig) {
   const openFile = async () => {
     setError("");
     try {
-      const result = await OpenVCardFile();
+      const result = await OpenVCardFile(t("app.open"));
       if (!result) return;
       setCurrentFilePath(result.path);
       const parsed = splitAndParse(result.content);
@@ -77,6 +80,7 @@ export function useContacts(appConfig) {
     setDisplayedContact(updated);
     try {
       await SaveVCardFile(
+        t("app.save"),
         currentFilePath,
         generateAllVCards(newContacts, appConfig.exportFields || []),
         appConfig.backupOnSave,
@@ -106,7 +110,7 @@ export function useContacts(appConfig) {
 
     // Sinon — on crée un nouveau fichier
     try {
-      const result = await NewVCardFile();
+      const result = await NewVCardFile(t("app.create"));
       if (!result?.path) return null;
 
       const updated = [newC];
@@ -136,7 +140,7 @@ export function useContacts(appConfig) {
     } else {
       // Pas de fichier ouvert — on demande où sauvegarder
       try {
-        const result = await NewVCardFile();
+        const result = await NewVCardFile(t("app.create"));
         if (!result?.path) return;
         filePath = result.path;
         setCurrentFilePath(filePath);
@@ -152,6 +156,7 @@ export function useContacts(appConfig) {
 
     try {
       await SaveVCardFile(
+        t("app.save"),
         filePath,
         generateAllVCards(updatedContacts, appConfig.exportFields || []),
         appConfig.backupOnSave,
@@ -169,6 +174,7 @@ export function useContacts(appConfig) {
     setDisplayedContact(newC);
     try {
       await SaveVCardFile(
+        t("app.save"),
         currentFilePath,
         generateAllVCards(updated, appConfig.exportFields || []),
         appConfig.backupOnSave,

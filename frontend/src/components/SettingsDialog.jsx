@@ -77,7 +77,7 @@ export default function SettingsDialog({ open, onClose }) {
 
   const handleChooseDir = async () => {
     try {
-      const dir = await ChooseDirectory();
+      const dir = await ChooseDirectory(t("settings.backup_select_folder"));
       if (dir) update("backupDir", dir);
     } catch (e) {
       console.error(e);

@@ -80,9 +80,9 @@ func (a *App) startup(ctx context.Context) {
 	}
 }
 
-func (a *App) OpenVCardFile() (map[string]string, error) {
+func (a *App) OpenVCardFile(title string) (map[string]string, error) {
 	file, err := runtime.OpenFileDialog(a.ctx, runtime.OpenDialogOptions{
-		Title:   "Ouvrir un fichier vCard",
+		Title: title,
 		Filters: []runtime.FileFilter{{DisplayName: "vCard (*.vcf)", Pattern: "*.vcf"}},
 	})
 	if err != nil || file == "" {
@@ -95,9 +95,9 @@ func (a *App) OpenVCardFile() (map[string]string, error) {
 	return map[string]string{"path": file, "content": string(content)}, nil
 }
 
-func (a *App) OpenImageFile() (string, error) {
+func (a *App) OpenImageFile(title string) (string, error) {
 	file, err := runtime.OpenFileDialog(a.ctx, runtime.OpenDialogOptions{
-		Title:   "Choisir une photo",
+		Title: title,
 		Filters: []runtime.FileFilter{{DisplayName: "Images (*.jpg, *.jpeg, *.png)", Pattern: "*.jpg;*.jpeg;*.png"}},
 	})
 	if err != nil || file == "" {
@@ -115,7 +115,7 @@ func (a *App) OpenImageFile() (string, error) {
 	return "data:" + mimeType + ";base64," + base64.StdEncoding.EncodeToString(content), nil
 }
 
-func (a *App) SaveVCardFile(path string, content string, backup bool, backupDir string) error {
+func (a *App) SaveVCardFile(title string, path string, content string, backup bool, backupDir string) error {
 	// Backup avant sauvegarde
 	if backup && path != "" {
 		dir := backupDir
@@ -137,9 +137,9 @@ func (a *App) SaveVCardFile(path string, content string, backup bool, backupDir 
 	if path == "" {
 		var err error
 		path, err = runtime.SaveFileDialog(a.ctx, runtime.SaveDialogOptions{
-			Title:           "Sauvegarder le fichier vCard",
+			Title: title,
 			DefaultFilename: "contacts.vcf",
-			Filters:         []runtime.FileFilter{{DisplayName: "vCard (*.vcf)", Pattern: "*.vcf"}},
+			Filters: []runtime.FileFilter{{DisplayName: "vCard (*.vcf)", Pattern: "*.vcf"}},
 		})
 		if err != nil || path == "" {
 			return err
@@ -148,9 +148,9 @@ func (a *App) SaveVCardFile(path string, content string, backup bool, backupDir 
 	return os.WriteFile(path, []byte(content), 0644)
 }
 
-func (a *App) ChooseDirectory() (string, error) {
+func (a *App) ChooseDirectory(title string) (string, error) {
 	return runtime.OpenDirectoryDialog(a.ctx, runtime.OpenDialogOptions{
-		Title: "Choisir le dossier de backup",
+		Title: title,
 	})
 }
 
@@ -165,9 +165,9 @@ func (a *App) SetWindowPosition(x, y, w, h int) {
 	runtime.WindowSetSize(a.ctx, w, h)
 }
 
-func (a *App) OpenSoundFile() (string, error) {
+func (a *App) OpenSoundFile(title string) (string, error) {
 	file, err := runtime.OpenFileDialog(a.ctx, runtime.OpenDialogOptions{
-		Title: "Choisir un fichier audio",
+		Title: title,
 		Filters: []runtime.FileFilter{
 			{DisplayName: "Audio (*.ogg, *.mp3, *.wav)", Pattern: "*.ogg;*.mp3;*.wav"},
 		},
@@ -192,7 +192,7 @@ func (a *App) OpenSoundFile() (string, error) {
 	return "data:" + mimeType + ";base64," + base64.StdEncoding.EncodeToString(content), nil
 }
 
-func (a *App) SaveContactPhoto(base64Data string, defaultName string) error {
+func (a *App) SaveContactPhoto(title string, base64Data string, defaultName string) error {
 	// Détecter le type d'image
 	mimeType := "image/jpeg"
 	ext := ".jpg"
@@ -214,7 +214,7 @@ func (a *App) SaveContactPhoto(base64Data string, defaultName string) error {
 	}
 
 	file, err := runtime.SaveFileDialog(a.ctx, runtime.SaveDialogOptions{
-		Title:           "Sauvegarder la photo",
+		Title: title,
 		DefaultFilename: defaultName + ext,
 		Filters: []runtime.FileFilter{
 			{DisplayName: "Images", Pattern: "*" + ext},
@@ -227,9 +227,9 @@ func (a *App) SaveContactPhoto(base64Data string, defaultName string) error {
 	return os.WriteFile(file, decoded, 0644)
 }
 
-func (a *App) NewVCardFile() (map[string]string, error) {
+func (a *App) NewVCardFile(title string) (map[string]string, error) {
 	file, err := runtime.SaveFileDialog(a.ctx, runtime.SaveDialogOptions{
-		Title:           "Créer un nouveau fichier vCard",
+		Title: title,
 		DefaultFilename: "contacts.vcf",
 		Filters: []runtime.FileFilter{
 			{DisplayName: "vCard (*.vcf)", Pattern: "*.vcf"},
@@ -241,9 +241,9 @@ func (a *App) NewVCardFile() (map[string]string, error) {
 	return map[string]string{"path": file}, nil
 }
 
-func (a *App) ExportContact(content string, defaultName string) error {
+func (a *App) ExportContact(title string, content string, defaultName string) error {
 	file, err := runtime.SaveFileDialog(a.ctx, runtime.SaveDialogOptions{
-		Title:           "Exporter le contact",
+		Title: "Exporter le contact",
 		DefaultFilename: defaultName + ".vcf",
 		Filters: []runtime.FileFilter{
 			{DisplayName: "vCard (*.vcf)", Pattern: "*.vcf"},
@@ -254,19 +254,19 @@ func (a *App) ExportContact(content string, defaultName string) error {
 	}
 	return os.WriteFile(file, []byte(content), 0644)
 }
-func (a *App) ExportToFile(content string, defaultName string, ext string) error {
+func (a *App) ExportToFile(title string, content string, defaultName string, ext string) error {
 	filterName := "VCF"
 	switch ext {
-	case ".json":
-		filterName = "JSON"
-	case ".csv":
-		filterName = "CSV"
-	case ".xml":
-		filterName = "XML"
+    case ".json":
+      filterName = "JSON"
+    case ".csv":
+      filterName = "CSV"
+    case ".xml":
+      filterName = "XML"
 	}
 
 	file, err := runtime.SaveFileDialog(a.ctx, runtime.SaveDialogOptions{
-		Title:           "Exporter les contacts",
+		Title: title,
 		DefaultFilename: defaultName + ext,
 		Filters: []runtime.FileFilter{
 			{DisplayName: filterName + " (*" + ext + ")", Pattern: "*" + ext},
@@ -278,9 +278,9 @@ func (a *App) ExportToFile(content string, defaultName string, ext string) error
 	return os.WriteFile(file, []byte(content), 0644)
 }
 
-func (a *App) ExportToFolder(files map[string]string) error {
+func (a *App) ExportToFolder(title string, files map[string]string) error {
 	dir, err := runtime.OpenDirectoryDialog(a.ctx, runtime.OpenDialogOptions{
-		Title: "Choisir le dossier d'export",
+		Title: title,
 	})
 	if err != nil || dir == "" {
 		return err
@@ -319,9 +319,9 @@ func (a *App) WindowClose() {
 	runtime.Quit(a.ctx)
 }
 
-func (a *App) OpenImportFiles() ([]map[string]string, error) {
+func (a *App) OpenImportFiles(title string) ([]map[string]string, error) {
 	files, err := runtime.OpenMultipleFilesDialog(a.ctx, runtime.OpenDialogOptions{
-		Title: "Importer des contacts",
+		Title: title,
 		Filters: []runtime.FileFilter{
 			{DisplayName: "Contacts (*.vcf, *.json, *.xml, *.csv)", Pattern: "*.vcf;*.json;*.xml;*.csv"},
 		},

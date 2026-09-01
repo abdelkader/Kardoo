@@ -368,7 +368,7 @@ export default function ContactDetail({ contact, onSave, onDirtyChange }) {
                 type="text"
                 onClick={async () => {
                   try {
-                    const dataUrl = await OpenImageFile();
+                    const dataUrl = await OpenImageFile(t("contact.choose_photo"));
                     if (dataUrl) update("photo", dataUrl);
                   } catch (e) {
                     console.error("Erreur photo:", e);
@@ -382,7 +382,7 @@ export default function ContactDetail({ contact, onSave, onDirtyChange }) {
                   type="text"
                   onClick={async () => {
                     try {
-                      await SaveContactPhoto(form.photo, form.fn || "contact");
+                      await SaveContactPhoto(t("contact.save_photo"), form.photo, form.fn || "contact");
                     } catch (e) {
                       console.error("Erreur photo:", e);
                     }
@@ -656,7 +656,7 @@ export default function ContactDetail({ contact, onSave, onDirtyChange }) {
                 type="text"
                 onClick={async () => {
                   try {
-                    const dataUrl = await OpenImageFile();
+                    const dataUrl = await OpenImageFile(t("contact.choose_photo"));
                     if (dataUrl) update("logo", dataUrl);
                   } catch (e) {
                     console.error(e);
@@ -672,6 +672,7 @@ export default function ContactDetail({ contact, onSave, onDirtyChange }) {
                     onClick={async () => {
                       try {
                         await SaveContactPhoto(
+                          t("contact.save_photo"), 
                           form.logo,
                           (form.org || "logo") + "_logo",
                         );
@@ -924,7 +925,7 @@ export default function ContactDetail({ contact, onSave, onDirtyChange }) {
             type="text"
             onClick={async () => {
               try {
-                const dataUrl = await OpenSoundFile();
+                const dataUrl = await OpenSoundFile(t("contact.choose_sound"));
                 if (dataUrl) update("sound", dataUrl);
               } catch (e) {
                 console.error("Erreur son:", e);

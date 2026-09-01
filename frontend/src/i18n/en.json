@@ -1,6 +1,8 @@
 {
   "app": {
     "open": "Open .vcf file",
+    "save": "Save contacts file",
+    "create": "Save new contacts file",
     "settings": "Settings",
     "about": "About",
     "search": "Search...",
@@ -36,7 +38,10 @@
     "no_element": "No element",
     "no_language": "No language",
     "change_photo": "Change",
-    "download_photo": "Download"
+    "download_photo": "Download",
+    "choose_photo": "Select contact photo",
+    "save_photo": "Save contact photo",
+    "choose_sound": "Select contact sound"
   },
   "delete_contact": {
     "title": "Delete this contact?",
@@ -66,6 +71,7 @@
     "backup_dir": "Backup folder:",
     "backup_placeholder": "Same folder as the .vcf file",
     "backup_hint": "Backups are named: contacts_backup_20250223_143022.vcf",
+    "backup_select_folder": "Select backup folder",
     "save": "Save",
     "saved": "✓ Saved",
     "close": "Close",
@@ -99,10 +105,10 @@
     "xml_desc": "xCard (RFC 6351)",
     "export_selected": "Export ({{count}})",
     "export_all": "Export ({{count}})",
-    "no_contacts": "Aucun contact chargé"
+    "no_contacts": "No contacts loaded"
   },
   "import": {
-    "title": "Import Contacts",
+    "title": "Import contacts",
     "choose_files": "Choose Files",
     "confirm": "Import ({{count}})",
     "cancel": "Cancel",
@@ -155,8 +161,8 @@
     "reason_name_email": "Name + Email",
     "reason_phone_email": "Phone + Email",
     "reason_all": "Name + Phone + Email"
-    },
-    "contact_menu": {
+  },
+  "contact_menu": {
     "select": "Select",
     "duplicate": "Duplicate",
     "export": "Export",
