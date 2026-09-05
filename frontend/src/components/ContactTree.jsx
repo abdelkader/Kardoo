@@ -242,6 +242,16 @@ export default function ContactTree({
   );
   const isSearching = search.trim().length > 0;
 
+  const contactsWithoutGroup = contacts.filter((c) => c.kind !== "group").length;
+  let displayContactNumber;
+  if (contacts.length === 0) {
+    displayContactNumber = t("app.no_contacts");
+  } else if (contacts.length === 1) {
+    displayContactNumber = t("app.contacts", { count: contactsWithoutGroup });
+  } else {
+    displayContactNumber = t("app.contacts_plural", { count: contactsWithoutGroup });
+  }
+
   return (
     <>
       <div style={{ padding: "10px 10px 6px" }}>
@@ -260,7 +270,7 @@ export default function ContactTree({
           }}
         >
           <Text type="secondary" style={{ fontSize: 11 }}>
-            {contacts.length === 0 ? t("app.no_contacts") : (contacts.length === 1 ? t("app.contacts", { count: contacts.filter((c) => c.kind !== "group").length }) : t("app.contacts_plural", { count: contacts.filter((c) => c.kind !== "group").length }))}
+            {displayContactNumber}
           </Text>
 
           {/* Bouton supprimer — visible si cases cochées */}
