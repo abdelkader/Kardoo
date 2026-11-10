@@ -270,7 +270,7 @@ export default function ContactTree({
               size="small"
               danger
               icon={<DeleteOutlined />}
-              onClick={() => onDelete(checkedIds, () => setCheckedIds([]))}
+              onClick={() => onDelete(checkedIds)}
             >
               {checkedIds.length}
             </Button>
