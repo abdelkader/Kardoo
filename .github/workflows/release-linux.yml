@@ -212,7 +212,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev flatpak flatpak-builder
+          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev flatpak flatpak-builder imagemagick
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -235,12 +235,13 @@ jobs:
         run: |
           cp build/bin/kardoo $FLATPAK_DIR/kardoo
           if [ -f "frontend/dist/logo.png" ]; then
-            cp frontend/dist/logo.png $FLATPAK_DIR/icon.png
+            SRC=frontend/dist/logo.png
           elif [ -f "build/appicon.png" ]; then
-            cp build/appicon.png $FLATPAK_DIR/icon.png
+            SRC=build/appicon.png
           else
             echo "Icon not found" && exit 1
           fi
+          convert "$SRC" -resize 512x512 -background none -gravity center -extent 512x512 $FLATPAK_DIR/icon.png
 
       - name: Install Flatpak runtime
         run: |
