@@ -242,6 +242,16 @@ export default function ContactTree({
   );
   const isSearching = search.trim().length > 0;
 
+  const contactsWithoutGroup = contacts.filter((c) => c.kind !== "group").length;
+  let displayContactNumber;
+  if (contacts.length === 0) {
+    displayContactNumber = t("app.no_contacts");
+  } else if (contacts.length === 1) {
+    displayContactNumber = t("app.contacts", { count: contactsWithoutGroup });
+  } else {
+    displayContactNumber = t("app.contacts_plural", { count: contactsWithoutGroup });
+  }
+
   return (
     <>
       <div style={{ padding: "10px 10px 6px" }}>
@@ -260,8 +270,7 @@ export default function ContactTree({
           }}
         >
           <Text type="secondary" style={{ fontSize: 11 }}>
-            {contacts.filter((c) => c.kind !== "group").length}{" "}
-            {t("app.no_contacts")}
+            {displayContactNumber}
           </Text>
 
           {/* Bouton supprimer — visible si cases cochées */}
@@ -292,7 +301,7 @@ export default function ContactTree({
       ) : isSearching ? (
         <div>
           {filteredFlat.length === 0 ? (
-            <Empty description="Aucun résultat" style={{ marginTop: 20 }} />
+            <Empty description={t("app.no_contact_result")} style={{ marginTop: 20 }} />
           ) : (
             filteredFlat.map((c) => (
               <ContactRow

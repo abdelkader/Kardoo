@@ -61,7 +61,7 @@ export default function ExportDialog({
         const content = generateContent(contacts);
         const defaultName =
           count === 1 ? sanitizeFilename(contacts[0].fn) : `contacts_${count}`;
-        await ExportToFile(content, defaultName, getExtension());
+        await ExportToFile(t("export.title"), content, defaultName, getExtension());
       } else {
         // Un fichier par contact
         const files = {};
@@ -69,7 +69,7 @@ export default function ExportDialog({
           const name = sanitizeFilename(c.fn) + getExtension();
           files[name] = generateContent([c]);
         });
-        await ExportToFolder(files);
+        await ExportToFolder(t("export.title_plural", { count }), files);
       }
       onClose();
     } catch (e) {

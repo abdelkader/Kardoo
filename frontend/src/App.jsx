@@ -174,6 +174,7 @@ export default function App() {
         // Sauvegarde immédiate du fichier avec le nouveau contact vide
         try {
           await SaveVCardFile(
+            t("app.create"),
             result.path,
             generateAllVCards(result.contacts, appConfig.exportFields || []),
             appConfig.backupOnSave,

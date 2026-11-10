@@ -78,7 +78,7 @@ function PhotoTab({ contacts, mediaField, onDelete }) {
                 size="small"
                 icon={<DownloadOutlined />}
                 onClick={() =>
-                  SaveContactPhoto(row.src, row.contact.fn + "_" + mediaField)
+                  SaveContactPhoto(t("contact.save_photo"), row.src, row.contact.fn + "_" + mediaField)
                 }
               />
               <Popconfirm

@@ -1,6 +1,7 @@
 import quotedPrintable from "quoted-printable";
 import utf8 from "utf8";
 import vCard from "vcard-parser";
+import i18n from "../i18n";
 
 export function decodeQP(value, meta) {
   try {
@@ -454,7 +455,7 @@ export function generateAllVCards(contacts, exportFields = []) {
 export function createEmptyContact(id) {
   return {
     id,
-    fn: "Nouveau contact",
+    fn: i18n.t("contact.new_contact"),
     firstName: "",
     lastName: "",
     middleName: "",
