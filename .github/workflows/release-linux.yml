@@ -187,4 +187,6 @@ jobs:
         with:
           tag_name: v${{ needs.prepare.outputs.version }}
           files: ./build/linux/${{ env.PKG }}.deb
+    
+    release-flatpak:
           token: ${{ secrets.GITHUB_TOKEN }}
