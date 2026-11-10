@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Kardoo
+Comment=View, edit and manage your VCF contact files
+Exec=kardoo
+Icon=io.github.abdelkader.Kardoo
+Terminal=false
+Type=Application
+Categories=Utility;
