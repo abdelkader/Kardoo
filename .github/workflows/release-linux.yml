@@ -71,11 +71,10 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
       - name: Build frontend assets
         run: |
-          npm install -g npm@latest
           cd frontend
           npm install
 
@@ -218,11 +217,10 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
       - name: Build frontend assets
         run: |
-          npm install -g npm@latest
           cd frontend
           npm install
 
