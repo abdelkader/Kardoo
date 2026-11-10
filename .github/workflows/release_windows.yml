@@ -67,12 +67,11 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
       - name: Build frontend assets
         shell: bash
         run: |
-          npm install -g npm@latest
           cd frontend
           jq '.version = "${{ needs.prepare.outputs.version }}"' package.json > tmp.json
           mv tmp.json package.json
