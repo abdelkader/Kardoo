@@ -187,6 +187,78 @@ jobs:
         with:
           tag_name: v${{ needs.prepare.outputs.version }}
           files: ./build/linux/${{ env.PKG }}.deb
-    
-    release-flatpak:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  release-flatpak:
+    name: Release Flatpak
+    needs: prepare
+    runs-on: ubuntu-24.04
+    env:
+      APP_ID: io.github.abdelkader.Kardoo
+      FLATPAK_DIR: packaging/flatpak
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: stable
+          cache: true
+
+      - name: Install Wails
+        run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev flatpak flatpak-builder
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Build frontend assets
+        run: |
+          npm install -g npm@latest
+          cd frontend
+          npm install
+
+      - name: Build Wails app
+        run: |
+          CGO_ENABLED=1 wails build -clean -platform linux/amd64 \
+          -ldflags "-X main.version=v${{ needs.prepare.outputs.version }}" \
+          -tags webkit2_41 \
+          -o kardoo
+
+      - name: Stage Flatpak sources
+        run: |
+          cp build/bin/kardoo $FLATPAK_DIR/kardoo
+          if [ -f "frontend/dist/logo.png" ]; then
+            cp frontend/dist/logo.png $FLATPAK_DIR/icon.png
+          elif [ -f "build/appicon.png" ]; then
+            cp build/appicon.png $FLATPAK_DIR/icon.png
+          else
+            echo "Icon not found" && exit 1
+          fi
+
+      - name: Install Flatpak runtime
+        run: |
+          flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+          flatpak install --user -y flathub org.gnome.Platform//47 org.gnome.Sdk//47
+
+      - name: Build Flatpak bundle
+        run: |
+          flatpak-builder --user --force-clean --repo=flatpak-repo flatpak-build \
+            $FLATPAK_DIR/$APP_ID.yml
+          flatpak build-bundle flatpak-repo \
+            kardoo_${{ needs.prepare.outputs.version }}_amd64.flatpak $APP_ID
+
+      - name: Upload release assets
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ needs.prepare.outputs.version }}
+          files: kardoo_${{ needs.prepare.outputs.version }}_amd64.flatpak
           token: ${{ secrets.GITHUB_TOKEN }}
